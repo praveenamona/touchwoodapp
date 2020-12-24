@@ -3,6 +3,7 @@ import 'package:touchwoodapp/screens/Customer.dart' as dashboard;
 import 'package:touchwoodapp/screens/relative.dart' as relative;
 import 'package:touchwoodapp/Widgets/custom_expansion_tile.dart' as custom;
 import 'package:touchwoodapp/Widgets/sidebar.dart' as sidebar;
+import 'package:touchwoodapp/screens/AddYarn.dart' as Yarn;
 
 void main() {
   runApp(MyApp());
@@ -120,7 +121,7 @@ class CustomDrawer extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => relative.Example()));
+                                builder: (context) => Yarn.HomePage("10", 1)));
                       },
                       leading: Image.asset(
                         'images/group.png',
