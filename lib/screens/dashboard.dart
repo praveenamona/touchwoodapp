@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:touchwoodapp/models/Master.dart';
 import 'package:touchwoodapp/models/customer.dart';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
@@ -68,7 +69,7 @@ TextStyle textStyle = new TextStyle(color: Colors.black);
 GlobalKey<AutoCompleteTextFieldState<customer.Customer>> custKey =
     new GlobalKey();
 AutoCompleteTextField<customer.Customer> textField;
-List<type.Customer> typedetails = <type.Customer>[];
+List<Master> typedetails = <Master>[];
 List<String> typedata = [];
 final _custNameController = TextEditingController();
 final _custIdController = TextEditingController();
@@ -198,9 +199,11 @@ class HomePageState extends State<HomePage> {
 
                                                     typeid = typedetails
                                                         .where((element) =>
-                                                            element.ptyname ==
+                                                            element
+                                                                .columnname ==
                                                             val)
-                                                        .map((e) => e.partyid)
+                                                        .map((e) =>
+                                                            e.columnMasterid)
                                                         .first
                                                         .toString();
                                                   });
@@ -691,7 +694,7 @@ class HomePageState extends State<HomePage> {
 
   List<customer.Customer> data = new List<customer.Customer>();
 
-  Future<List<type.Customer>> getGroupMaster(String filter) async {
+  Future<List<Master>> getGroupMaster(String filter) async {
     setState(() {
       typedetails = [];
       typedata = [];
@@ -714,19 +717,19 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         typedetails = typedetails
-            .where((element) => element.ptyname
+            .where((element) => element.columnname
                 .toLowerCase()
                 .toString()
                 .contains(filter.toLowerCase().toString()))
             .toList();
 
-      typedata = typedetails.map((e) => e.ptyname).toList();
+      typedata = typedetails.map((e) => e.columnname).toList();
       if (typeid == '' || typeid == null || typeid == '0')
         selectedcustomer = typedata.first;
 
       typeid = typeid = typedetails
-          .where((element) => element.ptyname == selectedcustomer)
-          .map((e) => e.partyid)
+          .where((element) => element.columnname == selectedcustomer)
+          .map((e) => e.columnMasterid)
           .first
           .toString();
     });

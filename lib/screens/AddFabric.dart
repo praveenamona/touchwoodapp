@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:touchwoodapp/models/Yarn.dart';
+import 'package:touchwoodapp/models/Fabric.dart';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
 import 'dart:convert';
@@ -38,9 +38,9 @@ void main() => runApp(new MaterialApp(
       ),
     ));
 PageController controller = PageController();
-List<Yarn> _reportItems = <Yarn>[];
+List<Fabric> _reportItems = <Fabric>[];
 Paging _pagingdetails = new Paging();
-List<Yarn> data = <Yarn>[];
+List<Fabric> data = <Fabric>[];
 TextEditingController _GotoTextController;
 
 List<Paging> paging = new List<Paging>();
@@ -55,34 +55,33 @@ int pageno;
 FocusNode idFocusNode;
 String searchtext;
 
-String selectedyarntype;
-String selectedyarncolor;
-String selectedyarnmill;
-String selectedyarncount;
+String selectedfabriccolor;
+String selecteddia;
+String selectedfabric;
 
 String custselectedtype;
 int custpageno;
-String yarncountid;
-String yarnmillid;
-String yarncolorid;
-String typeid;
+String fabricid;
+String diaiid;
+String fabriccolorid;
+
 GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<customer.Customer>>();
 String _id = "";
 TextStyle textStyle = new TextStyle(color: Colors.black);
 GlobalKey<AutoCompleteTextFieldState<customer.Customer>> custKey =
     new GlobalKey();
 AutoCompleteTextField<customer.Customer> textField;
-List<Master.Master> typedetails = <Master.Master>[];
-List<Master.Master> yarncountdetails = <Master.Master>[];
-List<Master.Master> yarnmilldetails = <Master.Master>[];
-List<Master.Master> yarncolordetails = <Master.Master>[];
+
+List<Master.Master> fabricdetails = <Master.Master>[];
+List<Master.Master> diadetails = <Master.Master>[];
+List<Master.Master> fabriccolordetails = <Master.Master>[];
 List<String> typedata = [];
-List<String> yarnmilldata = [];
-List<String> yarncolordata = [];
-List<String> yarncountsdata = [];
-final _yarnkgsController = TextEditingController();
+List<String> fabricdiaid = [];
+List<String> fabriccolordata = [];
+List<String> fabricdata = [];
+final _fabricgsmController = TextEditingController();
 ProgressDialog pr;
-FocusNode custidFocusNode;
+FocusNode GsmFocusNode;
 double maxwidth;
 double maxheight;
 
@@ -112,7 +111,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add Yarn',
+              'Add Fabric',
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -153,14 +152,14 @@ class HomePageState extends State<HomePage> {
                                             MainAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            "Enter Yarn Details",
+                                            "Enter Fabric Details",
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           SizedBox(
                                             height: 10,
                                           ),
-                                          if (yarncountsdata != null &&
-                                              yarncountsdata.isNotEmpty)
+                                          if (fabricdata != null &&
+                                              fabricdata.isNotEmpty)
                                             Container(
                                               constraints: BoxConstraints(
                                                 minWidth: 200,
@@ -175,7 +174,7 @@ class HomePageState extends State<HomePage> {
                                                 validator: (v) => v == null
                                                     ? "required field"
                                                     : null,
-                                                hint: "Select a Count",
+                                                hint: "Select a Fabric",
                                                 mode: Mode.MENU,
                                                 enabled: (_id != null &&
                                                         _id != '' &&
@@ -184,14 +183,14 @@ class HomePageState extends State<HomePage> {
                                                     : true,
                                                 showSelectedItem: true,
                                                 showSearchBox: true,
-                                                items: yarncountsdata,
-                                                label: "Count *",
+                                                items: fabricdata,
+                                                label: "Fabric *",
                                                 showClearButton: false,
                                                 onChanged: (val) {
                                                   setState(() {
-                                                    selectedyarncount = val;
+                                                    selectedfabric = val;
 
-                                                    yarncountid = yarncountdetails
+                                                    fabricid = fabricdetails
                                                         .where((element) =>
                                                             element
                                                                 .columnname ==
@@ -204,11 +203,11 @@ class HomePageState extends State<HomePage> {
                                                 },
                                                 popupItemDisabled: (String s) =>
                                                     s.startsWith('I'),
-                                                selectedItem: selectedyarncount,
+                                                selectedItem: selectedfabric,
                                               ),
                                             ),
-                                          if (typedata != null &&
-                                              typedata.isNotEmpty)
+                                          if (fabricdiaid != null &&
+                                              fabricdiaid.isNotEmpty)
                                             Container(
                                               constraints: BoxConstraints(
                                                 minWidth: 200,
@@ -223,7 +222,7 @@ class HomePageState extends State<HomePage> {
                                                 validator: (v) => v == null
                                                     ? "required field"
                                                     : null,
-                                                hint: "Select a Type",
+                                                hint: "Select a Dia",
                                                 mode: Mode.MENU,
                                                 enabled: (_id != null &&
                                                         _id != '' &&
@@ -232,14 +231,14 @@ class HomePageState extends State<HomePage> {
                                                     : true,
                                                 showSelectedItem: true,
                                                 showSearchBox: true,
-                                                items: typedata,
-                                                label: "Type *",
+                                                items: fabricdiaid,
+                                                label: "Dia *",
                                                 showClearButton: false,
                                                 onChanged: (val) {
                                                   setState(() {
-                                                    selectedyarntype = val;
+                                                    selecteddia = val;
 
-                                                    typeid = typedetails
+                                                    diaiid = diadetails
                                                         .where((element) =>
                                                             element
                                                                 .columnname ==
@@ -252,11 +251,11 @@ class HomePageState extends State<HomePage> {
                                                 },
                                                 popupItemDisabled: (String s) =>
                                                     s.startsWith('I'),
-                                                selectedItem: selectedyarntype,
+                                                selectedItem: selecteddia,
                                               ),
                                             ),
-                                          if (yarnmilldata != null &&
-                                              yarnmilldata.isNotEmpty)
+                                          if (fabriccolordata != null &&
+                                              fabriccolordata.isNotEmpty)
                                             Container(
                                               constraints: BoxConstraints(
                                                 minWidth: 200,
@@ -271,7 +270,7 @@ class HomePageState extends State<HomePage> {
                                                 validator: (v) => v == null
                                                     ? "required field"
                                                     : null,
-                                                hint: "Select a YarnMill",
+                                                hint: "Select a FabricColor",
                                                 mode: Mode.MENU,
                                                 enabled: (_id != null &&
                                                         _id != '' &&
@@ -280,75 +279,29 @@ class HomePageState extends State<HomePage> {
                                                     : true,
                                                 showSelectedItem: true,
                                                 showSearchBox: true,
-                                                items: yarnmilldata,
-                                                label: "YarnMill *",
+                                                items: fabriccolordata,
+                                                label: "Fabric Color *",
                                                 showClearButton: false,
                                                 onChanged: (val) {
                                                   setState(() {
-                                                    selectedyarnmill = val;
+                                                    selectedfabriccolor = val;
 
-                                                    yarnmillid = yarnmilldetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
+                                                    fabriccolorid =
+                                                        fabriccolordetails
+                                                            .where((element) =>
+                                                                element
+                                                                    .columnname ==
+                                                                val)
+                                                            .map((e) => e
+                                                                .columnMasterid)
+                                                            .first
+                                                            .toString();
                                                   });
                                                 },
                                                 popupItemDisabled: (String s) =>
                                                     s.startsWith('I'),
-                                                selectedItem: selectedyarnmill,
-                                              ),
-                                            ),
-                                          if (yarncolordata != null &&
-                                              yarncolordata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a YarnColor",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: yarncolordata,
-                                                label: "Yarn Color *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedyarncolor = val;
-
-                                                    yarncolorid = yarncolordetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedyarncolor,
+                                                selectedItem:
+                                                    selectedfabriccolor,
                                               ),
                                             ),
                                           Container(
@@ -367,13 +320,13 @@ class HomePageState extends State<HomePage> {
                                                   ),
                                                   border: InputBorder.none,
                                                   //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                  labelText: "Kgs/Box",
+                                                  labelText: "Gsm",
                                                   labelStyle: TextStyle(
                                                       fontSize: 20.0)),
                                               keyboardType: TextInputType.text,
                                               style: textStyle,
-                                              controller: _yarnkgsController,
-                                              focusNode: custidFocusNode,
+                                              controller: _fabricgsmController,
+                                              focusNode: GsmFocusNode,
 
                                               readOnly: enable,
                                               //enableInteractiveSelection: enable,
@@ -449,7 +402,7 @@ class HomePageState extends State<HomePage> {
   }
 
   void saveItems() async {
-    String custGstin = _yarnkgsController.text;
+    String custGstin = _fabricgsmController.text;
     if (_id != '') {
       //   pr.show();
 
@@ -465,7 +418,7 @@ class HomePageState extends State<HomePage> {
             'custGstin',
             'custemail',
             "",
-            selectedyarntype,
+            "selectedfabrictype",
             typeid);
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
@@ -530,16 +483,16 @@ class HomePageState extends State<HomePage> {
   }
 
   void clearData(context) {
-    _yarnkgsController.text = '0';
+    _fabricgsmController.text = '0';
     _id = '0';
   }
 
-  List<Yarn> data = new List<Yarn>();
+  List<Fabric> data = new List<Fabric>();
 
-  Future<List<Master.Master>> getGroupMaster(String filter) async {
+  Future<List<Master.Master>> getfabricmaster(String filter) async {
     setState(() {
-      typedetails = [];
-      typedata = [];
+      fabricdetails = [];
+      fabricdata = [];
       //  getitems = [];
     });
 
@@ -553,24 +506,26 @@ class HomePageState extends State<HomePage> {
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
     setState(() {
-      typedetails = parsed
+      fabricdetails = parsed
           .map<Master.Master>((json) => Master.Master.fromJSON(json))
           .toList();
 
       if (filter != "")
-        typedetails = typedetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
+        fabricdetails = fabricdetails
+            .where((element) =>
+                element.columnname
+                    .toLowerCase()
+                    .toString()
+                    .contains(filter.toLowerCase().toString()) &&
+                element.tablename == 'fabric')
             .toList();
 
-      typedata = typedetails.map((e) => e.columnname).toList();
-      if (typeid == '' || typeid == null || typeid == '0')
-        selectedyarntype = typedata.first;
+      fabricdata = fabricdetails.map((e) => e.columnname).toList();
+      if (fabricid == '' || fabricid == null || fabricid == '0')
+        selectedfabric = fabricdata.first;
 
-      typeid = typeid = typedetails
-          .where((element) => element.columnname == selectedyarntype)
+      fabricid = fabricdetails
+          .where((element) => element.columnname == selectedfabric)
           .map((e) => e.columnMasterid)
           .first
           .toString();
@@ -579,10 +534,10 @@ class HomePageState extends State<HomePage> {
     return typedetails;
   }
 
-  Future<List<Master.Master>> getyarncountmaster(String filter) async {
+  Future<List<Master.Master>> getdiadetails(String filter) async {
     setState(() {
-      yarncountdetails = [];
-      yarncountsdata = [];
+      diadetails = [];
+      fabricdiaid = [];
       //  getitems = [];
     });
 
@@ -596,38 +551,38 @@ class HomePageState extends State<HomePage> {
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
     setState(() {
-      yarncountdetails = parsed
+      diadetails = parsed
           .map<Master.Master>((json) => Master.Master.fromJSON(json))
           .toList();
 
       if (filter != "")
-        yarncountdetails = yarncountdetails
+        diadetails = diadetails
             .where((element) =>
                 element.columnname
                     .toLowerCase()
                     .toString()
                     .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'yarn count')
+                element.tablename == 'fabric mill')
             .toList();
 
-      yarncountsdata = yarncountdetails.map((e) => e.columnname).toList();
-      if (yarncountid == '' || yarncountid == null || yarncountid == '0')
-        selectedyarncount = yarncountsdata.first;
+      fabricdiaid = diadetails.map((e) => e.columnname).toList();
+      if (diaiid == '' || diaiid == null || diaiid == '0')
+        selecteddia = fabricdiaid.first;
 
-      yarncountid = yarncountdetails
-          .where((element) => element.columnname == selectedyarncount)
+      diaiid = diadetails
+          .where((element) => element.columnname == selecteddia)
           .map((e) => e.columnMasterid)
           .first
           .toString();
     });
 
-    return typedetails;
+    return diadetails;
   }
 
-  Future<List<Master.Master>> getyarnmillmaster(String filter) async {
+  Future<List<Master.Master>> getfabriccolormaster(String filter) async {
     setState(() {
-      yarnmilldetails = [];
-      yarnmilldata = [];
+      fabriccolordetails = [];
+      fabriccolordata = [];
       //  getitems = [];
     });
 
@@ -641,77 +596,32 @@ class HomePageState extends State<HomePage> {
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
     setState(() {
-      yarnmilldetails = parsed
+      fabriccolordetails = parsed
           .map<Master.Master>((json) => Master.Master.fromJSON(json))
           .toList();
 
       if (filter != "")
-        yarnmilldetails = yarnmilldetails
+        fabriccolordetails = fabriccolordetails
             .where((element) =>
                 element.columnname
                     .toLowerCase()
                     .toString()
                     .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'yarn mill')
+                element.tablename == 'fabric color')
             .toList();
 
-      yarnmilldata = yarnmilldetails.map((e) => e.columnname).toList();
-      if (yarnmillid == '' || yarnmillid == null || yarnmillid == '0')
-        selectedyarnmill = yarnmilldata.first;
+      fabriccolordata = fabriccolordetails.map((e) => e.columnname).toList();
+      if (fabriccolorid == '' || fabriccolorid == null || fabriccolorid == '0')
+        selectedfabriccolor = fabriccolordata.first;
 
-      yarnmillid = yarnmilldetails
-          .where((element) => element.columnname == selectedyarnmill)
+      fabriccolorid = fabriccolordetails
+          .where((element) => element.columnname == selectedfabriccolor)
           .map((e) => e.columnMasterid)
           .first
           .toString();
     });
 
-    return yarnmilldetails;
-  }
-
-  Future<List<Master.Master>> getyarncolormaster(String filter) async {
-    setState(() {
-      yarncolordetails = [];
-      yarncolordata = [];
-      //  getitems = [];
-    });
-
-    final String customerurl =
-        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      yarncolordetails = parsed
-          .map<Master.Master>((json) => Master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        yarncolordetails = yarncolordetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'yarn color')
-            .toList();
-
-      yarncolordata = yarncolordetails.map((e) => e.columnname).toList();
-      if (yarncolorid == '' || yarncolorid == null || yarncolorid == '0')
-        selectedyarncolor = yarncolordata.first;
-
-      yarncolorid = yarncolordetails
-          .where((element) => element.columnname == selectedyarncolor)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return yarncolordetails;
+    return fabriccolordetails;
   }
 
   Future<customer.Customer> getAddCustomerJson() async {
@@ -735,22 +645,24 @@ class HomePageState extends State<HomePage> {
 
     var response = await http.get(Uri.encodeFull(customerurl),
         headers: {"Accept": "application/json"});
-    List<Yarn> _yarndetails = new List<Yarn>();
+    List<Fabric> _fabricdetails = new List<Fabric>();
 
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    _yarndetails = parsed.map<Yarn>((json) => Yarn.fromJSON(json)).toList();
-    data = _yarndetails;
+    _fabricdetails =
+        parsed.map<Fabric>((json) => Fabric.fromJSON(json)).toList();
+    data = _fabricdetails;
     if (_id != "" && _id != "" && _id != null)
-      _yarndetails
-          .where((element) => element.yarnmasterid == _id)
+      _fabricdetails
+          .where((element) => element.fabricmasterid == _id)
           .forEach((element) => setState(() {
-                typeid = element.yarntypeid;
-                selectedyarntype = element.yarntype;
-                _yarnkgsController.text = element.kgsperbox.toString();
-                yarncountid = element.yarncountid;
-                yarnmillid = element.yarnmillid;
-                yarncolorid = element.yarncolorid;
+                selecteddia = element.dia;
+                selectedfabric = element.fabricname;
+                selectedfabriccolor = element.fabriccolor;
+                _fabricgsmController.text = element.gsm.toString();
+                fabricid = element.fabricmasterid;
+                diaiid = element.diaid;
+                fabriccolorid = element.fabcolorid;
               }));
   }
 
@@ -763,9 +675,11 @@ class HomePageState extends State<HomePage> {
     //getPagingDetails();
     searchtext = '';
     getCustomerJson();
-    custidFocusNode = FocusNode();
+    GsmFocusNode = FocusNode();
     //_custIdController.text = '0';
-    getGroupMaster('');
+    getfabricmaster("");
+    getdiadetails("");
+    getfabriccolormaster("");
     setState(() {
       getAddCustomerJson();
       // if ((_id != "") && (_id != null) && (_id != "0"))
@@ -781,8 +695,8 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _yarnkgsController.dispose();
-    custidFocusNode.dispose();
+    _fabricgsmController.dispose();
+    GsmFocusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -924,7 +838,7 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Expanded(
                     //  width: maxwidth * .10,
-                    child: Text("Yarn Type",
+                    child: Text("Fabric Name",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -933,7 +847,7 @@ class HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     // width: maxwidth * .10,
-                    child: Text("Yarn Count",
+                    child: Text("Dia",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -942,25 +856,13 @@ class HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     // width: maxwidth * .10,
-                    child: Text("Yarn Color",
+                    child: Text("Fabric Color",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
                           color: widgetcolor,
                         )),
                   ),
-                  Expanded(
-                    // width: maxwidth * .10,
-                    child: Text("Yarn Mill",
-                        textScaleFactor: 1.7,
-                        textAlign: TextAlign.left,
-                        style: new TextStyle(
-                          color: widgetcolor,
-                        )),
-                  ),
-                  // SizedBox(
-                  //   width: 90,
-                  // ),
                   Expanded(
                     // width: maxwidth * .10,
                     child: Text("Action",
@@ -1216,7 +1118,9 @@ class HomePageState extends State<HomePage> {
                         custpageno = pageno;
                         custselectedtype = selectedtype;
                         getAddCustomerJson();
-                        getGroupMaster('');
+                        getfabricmaster("");
+                        getdiadetails("");
+                        getfabriccolormaster("");
                         //setState(() {
                         //   getCustomerJson();
                         // if ((_id != "") && (_id != null) && (_id != "0"))
@@ -1252,7 +1156,9 @@ class HomePageState extends State<HomePage> {
                                   custpageno = pageno;
                                   custselectedtype = selectedtype;
                                   getAddCustomerJson();
-                                  getGroupMaster('');
+                                  getfabricmaster("");
+                                  getdiadetails("");
+                                  getfabriccolormaster("");
                                   //setState(() {
                                   //   getCustomerJson();
                                   // if ((_id != "") &&
@@ -1385,7 +1291,7 @@ class HomePageState extends State<HomePage> {
         })); //);
   }
 
-  List<Yarn> _customers;
+  List<Fabric> _customers;
   Future<String> getCustomerJson() async {
     if (this.mounted) {
       setState(() {
@@ -1445,7 +1351,8 @@ class HomePageState extends State<HomePage> {
 
       convertDataToJson = json.decode(response.body);
       final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-      _reportItems = parsed.map<Yarn>((json) => Yarn.fromJSON(json)).toList();
+      _reportItems =
+          parsed.map<Fabric>((json) => Fabric.fromJSON(json)).toList();
 
       data = _reportItems;
     }
@@ -1483,7 +1390,7 @@ class HomePageState extends State<HomePage> {
                           Expanded(
                             child: Text(
                               _reportItems[index]
-                                  .yarntype
+                                  .fabricname
                                   .toLowerCase()
                                   .toString(),
                               textScaleFactor: 1.2,
@@ -1494,7 +1401,7 @@ class HomePageState extends State<HomePage> {
                             //width: maxwidth * .20,
                             child: Text(
                               _reportItems[index]
-                                  .counts
+                                  .fabriccolor
                                   .toLowerCase()
                                   .toString(),
                               textScaleFactor: 1.2,
@@ -1504,21 +1411,7 @@ class HomePageState extends State<HomePage> {
                           Expanded(
                             //width: maxwidth * .20,
                             child: Text(
-                              _reportItems[index]
-                                  .yarncolor
-                                  .toLowerCase()
-                                  .toString(),
-                              textScaleFactor: 1.2,
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
-                          Expanded(
-                            //width: maxwidth * .20,
-                            child: Text(
-                              _reportItems[index]
-                                  .yarnmill
-                                  .toLowerCase()
-                                  .toString(),
+                              _reportItems[index].dia.toLowerCase().toString(),
                               textScaleFactor: 1.2,
                               textAlign: TextAlign.left,
                             ),
@@ -1532,12 +1425,15 @@ class HomePageState extends State<HomePage> {
                                   color: widgetcolor),
                               onPressed: () {
                                 setState(() {
-                                  String id = _reportItems[index].yarnmasterid;
+                                  String id =
+                                      _reportItems[index].fabricmasterid;
                                   _id = id;
                                   custselectedtype = selectedtype;
                                   custpageno = pageno;
                                   getAddCustomerJson();
-                                  getGroupMaster('');
+                                  getfabricmaster("");
+                                  getdiadetails("");
+                                  getfabriccolormaster("");
                                   //setState(() {
                                   //   getCustomerJson();
                                   // if ((_id != "") &&
@@ -1569,7 +1465,7 @@ class HomePageState extends State<HomePage> {
                               icon: Image.asset('Images/delete.png',
                                   color: widgetcolor),
                               onPressed: () async {
-                                String id = _reportItems[index].yarnmasterid;
+                                String id = _reportItems[index].fabricmasterid;
 
                                 _id = id;
 

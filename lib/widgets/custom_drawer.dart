@@ -4,6 +4,7 @@ import 'package:touchwoodapp/screens/relative.dart' as relative;
 import 'package:touchwoodapp/Widgets/custom_expansion_tile.dart' as custom;
 import 'package:touchwoodapp/Widgets/sidebar.dart' as sidebar;
 import 'package:touchwoodapp/screens/AddYarn.dart' as Yarn;
+import 'package:touchwoodapp/screens/AddFabric.dart' as Fabric;
 
 void main() {
   runApp(MyApp());
@@ -126,7 +127,21 @@ class CustomDrawer extends StatelessWidget {
                       leading: Image.asset(
                         'images/group.png',
                       ),
-                      title: Text("Group"),
+                      title: Text("Yarn"),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        //Navigator.of(context).pop();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    Fabric.HomePage("10", 1)));
+                      },
+                      leading: Image.asset(
+                        'images/group.png',
+                      ),
+                      title: Text("Fabric"),
                     ),
                     ListTile(
                       onTap: () {
