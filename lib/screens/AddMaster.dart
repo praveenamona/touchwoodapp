@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sunparty/models/Master.dart';
+import 'package:touchwoodapp/models/Master.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:sunparty/repository/Master_repository.dart';
-import 'package:sunparty/widgets/custom_drawer.dart' as drawer;
-import 'package:sunparty/models/Paging.dart';
+import 'package:touchwoodapp/repository/Master_repository.dart';
+import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
+import 'package:touchwoodapp/models/Paging.dart';
 import 'dart:core';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:sunparty/main.dart';
+import 'package:touchwoodapp/screens/main.dart';
 
 void main() => runApp(new MaterialApp(
       home: new HomePage(),
