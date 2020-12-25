@@ -37,7 +37,7 @@ dependencies:
   relative_scale: ^1.1.0
   responsive_builder: ^0.3.0
   flutter_login: ^1.0.14
-  collapsible_sidebar: ^1.0.7+2
+  custom_navigation_drawer: ^0.0.1
   
 dev_dependencies:
   flutter_test:

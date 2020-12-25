@@ -43,13 +43,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0-nullsafety.1"
-  collapsible_sidebar:
-    dependency: "direct main"
-    description:
-      name: collapsible_sidebar
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.7+2"
   collection:
     dependency: transitive
     description:
@@ -64,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  custom_navigation_drawer:
+    dependency: "direct main"
+    description:
+      name: custom_navigation_drawer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1"
   dio:
     dependency: "direct main"
     description:
@@ -277,4 +277,4 @@ packages:
     version: "2.1.0-nullsafety.3"
 sdks:
   dart: ">=2.10.0-110 <=2.11.0-213.1.beta"
-  flutter: ">=1.17.0 <2.0.0"
+  flutter: ">=1.16.0 <2.0.0"

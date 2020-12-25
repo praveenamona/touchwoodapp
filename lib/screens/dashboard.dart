@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:touchwoodapp/models/Master.dart';
 import 'package:touchwoodapp/models/customer.dart';
 import 'package:touchwoodapp/models/Paging.dart';
-import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
+import 'package:touchwoodapp/widgets/sidebar.dart' as drawer;
 import 'package:touchwoodapp/repository/cutomer_repository.dart';
 import 'package:touchwoodapp/screens/AddCustomer.dart' as Addparty;
 import 'dart:convert';
@@ -17,14 +17,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:touchwoodapp/repository/cutomer_repository.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:touchwoodapp/repository/assigncolor.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -46,7 +44,7 @@ List<Customer> _reportItems = <Customer>[];
 Paging _pagingdetails = new Paging();
 List<Customer> data = <Customer>[];
 TextEditingController _GotoTextController;
-
+bool ShowAddWidget = false;
 List<Paging> paging = new List<Paging>();
 String selectedtype = "10";
 String totalCount;
@@ -69,7 +67,7 @@ TextStyle textStyle = new TextStyle(color: Colors.black);
 GlobalKey<AutoCompleteTextFieldState<customer.Customer>> custKey =
     new GlobalKey();
 AutoCompleteTextField<customer.Customer> textField;
-List<Master> typedetails = <Master>[];
+List<type.Customer> typedetails = <type.Customer>[];
 List<String> typedata = [];
 final _custNameController = TextEditingController();
 final _custIdController = TextEditingController();
@@ -517,6 +515,9 @@ class HomePageState extends State<HomePage> {
                                         color: Colors.white, fontSize: 20),
                                   ),
                                   onPressed: () {
+                                    setState(() {
+                                      ShowAddWidget = false;
+                                    });
                                     //clearData(context);
                                     Navigator.of(context, rootNavigator: true)
                                         .pop();
@@ -563,6 +564,10 @@ class HomePageState extends State<HomePage> {
               Container(
                 child: RaisedButton(
                     onPressed: () {
+                      setState(() {
+                        ShowAddWidget = false;
+                      });
+
                       clearData(context);
                       // saveItems();
                     },
@@ -589,7 +594,6 @@ class HomePageState extends State<HomePage> {
     String custId = _custIdController.text;
     String custName = _custNameController.text;
     String custMobile = _custMobileController.text;
-    // String custRemarks = _custRemarksController.text;
     String custGstin = _custGstinController.text;
     String custAdd1 = _custAdd1Controller.text;
     String custAdd2 = _custAdd2Controller.text;
@@ -597,8 +601,6 @@ class HomePageState extends State<HomePage> {
     String custAdd4 = _custAdd4Controller.text;
     String custemail = _custEmailController.text;
     if (custId != '' && custName != '') {
-      //   pr.show();
-
       try {
         Stream<String> stream = await insertCustomer(
             custId,
@@ -616,6 +618,9 @@ class HomePageState extends State<HomePage> {
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
+            setState(() {
+              ShowAddWidget = false;
+            });
             Alert(
                 context: context,
                 title: "Done!",
@@ -650,6 +655,9 @@ class HomePageState extends State<HomePage> {
                   )
                 ]).show();
           } else {
+            setState(() {
+              ShowAddWidget = false;
+            });
             Alert(
                     context: context,
                     type: AlertType.error,
@@ -659,12 +667,11 @@ class HomePageState extends State<HomePage> {
                 .show();
           }
         });
-      } on Exception catch (_) {
-        //  pr.dismiss();
-      }
-      //   pr.dismiss();
-      // clearData(context);
+      } on Exception catch (_) {}
     } else {
+      setState(() {
+        ShowAddWidget = true;
+      });
       Alert(
               context: context,
               type: AlertType.error,
@@ -687,9 +694,6 @@ class HomePageState extends State<HomePage> {
     _custMobileController.text = '';
     _custRemarksController.text = '';
     _id = '0';
-
-    // Navigator.pop(context);
-    //  FocusScope.of(context).requestFocus(custidFocusNode);
   }
 
   List<customer.Customer> data = new List<customer.Customer>();
@@ -698,7 +702,6 @@ class HomePageState extends State<HomePage> {
     setState(() {
       typedetails = [];
       typedata = [];
-      //  getitems = [];
     });
 
     final String customerurl =
@@ -888,72 +891,16 @@ class HomePageState extends State<HomePage> {
                 searchtext = value;
                 pageno = 1;
                 getCustomerJson();
-                //data = _reportItems;
-                // _reportItems = (data
-                //     .where((element) => element.customerName
-                //         .toLowerCase()
-                //         .contains(value.toLowerCase()))
-                //     .toList());
-                // if (value == "") _reportItems = data;
               });
-              // _reportItems = data;
             }),
-        // centerTitle: true,
       );
-
-      // AppBar(
-      //   //  titleSpacing: 0.2,
-      //   leading: Builder(
-      //     builder: (BuildContext context) {
-      //       return IconButton(
-      //         icon: Image.asset(
-      //           'images/menu.png',
-      //           color: widgetcolor,
-      //         ),
-      //         onPressed: () {
-      //           Scaffold.of(context).openDrawer();
-      //         },
-      //         tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-      //       );
-      //     },
-      //   ),
-      //   automaticallyImplyLeading: false,
-      //   title: Padding(
-      //     padding: EdgeInsets.only(
-      //       bottom: 30,
-      //     ),
-      //     child: Text(
-      //       'Customer Details',
-      //       style: TextStyle(color: Colors.black),
-      //     ),
-      //   ),
-      //   backgroundColor: appbarcolor,
-      //   centerTitle: true,
-      // );
     }
 
     Widget bodywid(double maxwidth, double maxheight) {
-      return
-          //Stack(children: <Widget>[
-          new SizedBox(
+      return new SizedBox(
         width: maxwidth, // * .40,
         height: maxheight,
         child: ListView(children: <Widget>[
-          // Row(
-          //   mainAxisSize: MainAxisSize.min,
-          //   children: <Widget>[
-          //     SizedBox(
-          //       width: maxwidth * .20,
-          //     ),
-          //   ],
-          // ),
-          // SizedBox(
-          //   height: 10,
-          // ),
-
-          // Flexible(
-          //   flex: 1,
-          //   child:
           Card(
               child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -961,7 +908,6 @@ class HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Expanded(
-                    //  width: maxwidth * .10,
                     child: Text("Type",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
@@ -970,7 +916,6 @@ class HomePageState extends State<HomePage> {
                         )),
                   ),
                   Expanded(
-                    // width: maxwidth * .10,
                     child: Text("Name",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
@@ -978,11 +923,7 @@ class HomePageState extends State<HomePage> {
                           color: widgetcolor,
                         )),
                   ),
-                  // SizedBox(
-                  //   width: 90,
-                  // ),
                   Expanded(
-                    // width: maxwidth * .10,
                     child: Text("Action",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
@@ -990,53 +931,6 @@ class HomePageState extends State<HomePage> {
                           color: widgetcolor,
                         )),
                   ),
-                  // Card(
-                  //   // child:
-                  //   //  Padding(
-                  //   //   padding: const EdgeInsets.all(8.0),
-                  //   child:
-                  //       // Row(
-                  //       //   children: <Widget>[
-                  //       Container(
-                  //           child: Row(
-                  //     children: [
-                  //       Container(
-                  //         width: maxwidth * .10,
-                  //         child: Text("Type",
-                  //             textScaleFactor: 1.5,
-                  //             textAlign: TextAlign.left,
-                  //             style: new TextStyle(
-                  //               color: widgetcolor,
-                  //             )),
-                  //       ),
-                  //       Container(
-                  //         width: maxwidth * .10,
-                  //         child: Text("Name",
-                  //             textScaleFactor: 1.5,
-                  //             textAlign: TextAlign.left,
-                  //             style: new TextStyle(
-                  //               color: widgetcolor,
-                  //             )),
-                  //       ),
-                  //       // SizedBox(
-                  //       //   width: 90,
-                  //       // ),
-                  //       Container(
-                  //         width: maxwidth * .10,
-                  //         child: Text("Action",
-                  //             textScaleFactor: 1.5,
-                  //             textAlign: TextAlign.left,
-                  //             style: new TextStyle(
-                  //               color: widgetcolor,
-                  //             )),
-                  //       )
-                  //     ],
-                  //   )),
-                  //   //   ],
-                  //   // ),
-                  //   //),
-                  // ),
-                  // //  ),
                 ]),
           )),
           //  ),
@@ -1047,8 +941,6 @@ class HomePageState extends State<HomePage> {
               controller: _controller,
               scrollDirection: Axis.horizontal,
               children: tableView(maxwidth, maxheight),
-
-              //children: tableView(),
               onPageChanged: (index) {
                 setState(() {
                   pageno = (index == 0 ? 1 : index);
@@ -1059,29 +951,15 @@ class HomePageState extends State<HomePage> {
           ),
         ]),
       );
-      //),
-      // new Align(
-      //   child: loadingIndicator,
-      //   alignment: FractionalOffset.center,
-      // ),
-      //    ]);
-      // });
     }
 
     @override
     Widget bottomapp(double width, double height) {
       return BottomAppBar(
               color: appbarcolor,
-              //    titleSpacing: 0.0,
-              //elevation: 5.0,
-              //  backgroundColor: Color(0xff201F23),
-              // title:
               shape: CircularNotchedRectangle(),
               notchMargin: 6,
-              //  color: Colors.blue,
-
               child: Row(children: <Widget>[
-                // Spacer(),
                 SizedBox(
                     width: width / 10,
                     child: IconButton(
@@ -1114,7 +992,6 @@ class HomePageState extends State<HomePage> {
                                     }),
                               )),
                     )),
-                // ),
                 Text('Rows/Page',
                     style: TextStyle(
                       fontSize: 11,
@@ -1124,15 +1001,11 @@ class HomePageState extends State<HomePage> {
                 ),
                 if (selectedtype != null)
                   SizedBox(
-//width: width * .50,
                     child: DropdownButton<String>(
                         value: selectedtype,
                         icon: Image.asset('Images/arrow_drop_down.png',
                             color: Colors.white),
-                        //iconSize: 10,
-                        hint: SizedBox(
-                            //  width: width * .20,
-                            child: Text('Rows Per Page')),
+                        hint: SizedBox(child: Text('Rows Per Page')),
                         items: ['5', '7', '10', '20', '30', '40', '50']
                             .map((String value) {
                           return new DropdownMenuItem<String>(
@@ -1154,11 +1027,6 @@ class HomePageState extends State<HomePage> {
                           });
                         }),
                   ),
-                //SizedBox(width: 10),
-                // // Text('No : ' + (pageno == 0 ? 1 : pageno).toString(),
-                // //     style: TextStyle(
-                // //       fontSize: 12,
-                // //     )),
                 SizedBox(
                   width: width / 40,
                 ),
@@ -1209,6 +1077,30 @@ class HomePageState extends State<HomePage> {
           ;
     }
 
+    Widget Addbutton() {
+      return FloatingActionButton(
+        backgroundColor: widgetcolor,
+        onPressed: () {},
+        tooltip: 'Add new customer entry',
+        child: IconButton(
+            icon: Image.asset('images/add.png', color: Colors.black),
+            onPressed: () {
+              setState(() {
+                ShowAddWidget = true;
+                _id = '0';
+                custpageno = pageno;
+                custselectedtype = selectedtype;
+                getAddCustomerJson();
+                getGroupMaster('');
+                //setState(() {
+                //   getCustomerJson();
+                if ((_id != "") && (_id != null) && (_id != "0"))
+                  _custIdController.text = _id.toString();
+              });
+            }),
+      );
+    }
+
     return MaterialApp(
         title: 'Sun Party',
         theme: new ThemeData(
@@ -1221,35 +1113,17 @@ class HomePageState extends State<HomePage> {
           var minheight = constraints.minHeight;
 
           return ScreenTypeLayout.builder(
-            mobile: (BuildContext context) => Scaffold(
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.miniEndDocked,
-              floatingActionButton: FloatingActionButton(
-                backgroundColor: widgetcolor,
-                onPressed: () {},
-                tooltip: 'Add new customer entry',
-                child: IconButton(
-                    icon: Image.asset('images/add.png', color: Colors.black),
-                    onPressed: () {
-                      setState(() {
-                        _id = '0';
-                        custpageno = pageno;
-                        custselectedtype = selectedtype;
-                        getAddCustomerJson();
-                        getGroupMaster('');
-                        //setState(() {
-                        //   getCustomerJson();
-                        if ((_id != "") && (_id != null) && (_id != "0"))
-                          _custIdController.text = _id.toString();
-                      });
-                    }),
-              ),
-              drawer: drawer.CustomDrawer(),
-              appBar: appbarwid(),
-              bottomNavigationBar: bottomapp(maxwidth, maxheight),
-              body: bodywid(maxwidth, maxheight),
-            ),
-            //    tablet: (BuildContext context) => dashboardscaffold(),
+            mobile: (BuildContext context) => ShowAddWidget == false
+                ? Scaffold(
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.miniEndDocked,
+                    floatingActionButton: Addbutton(),
+                    drawer: drawer.CustomDrawer(),
+                    appBar: appbarwid(),
+                    bottomNavigationBar: bottomapp(maxwidth, maxheight),
+                    body: bodywid(maxwidth, maxheight),
+                  )
+                : addcustomerwid(maxwidth, maxheight),
             desktop: (BuildContext context) => Container(
                 width: maxwidth,
                 height: maxheight,
@@ -1259,29 +1133,7 @@ class HomePageState extends State<HomePage> {
                       child: Scaffold(
                         floatingActionButtonLocation:
                             FloatingActionButtonLocation.miniEndDocked,
-                        floatingActionButton: FloatingActionButton(
-                          backgroundColor: widgetcolor,
-                          onPressed: () {},
-                          tooltip: 'Add new customer entry',
-                          child: IconButton(
-                              icon: Image.asset('images/add.png',
-                                  color: Colors.black),
-                              onPressed: () {
-                                setState(() {
-                                  _id = '0';
-                                  custpageno = pageno;
-                                  custselectedtype = selectedtype;
-                                  getAddCustomerJson();
-                                  getGroupMaster('');
-                                  //setState(() {
-                                  //   getCustomerJson();
-                                  if ((_id != "") &&
-                                      (_id != null) &&
-                                      (_id != "0"))
-                                    _custIdController.text = _id.toString();
-                                });
-                              }),
-                        ),
+                        floatingActionButton: Addbutton(),
                         drawer: drawer.CustomDrawer(),
                         appBar: appbarwid(),
                         bottomNavigationBar: bottomapp(maxwidth, maxheight),
@@ -1295,113 +1147,10 @@ class HomePageState extends State<HomePage> {
                   Expanded(
                     flex: 2,
                     child: addcustomerwid(maxwidth, maxheight),
-                    // LayoutBuilder(
-                    //     builder: (context, BoxConstraints constraints) {
-                    //   var maxwidth = constraints.maxWidth;
-                    //   var minwidth = constraints.minWidth;
-                    //   var maxheight = constraints.maxHeight;
-                    //   var minheight = constraints.minHeight;
-                    //   return Container(
-                    //     child: addcustomer(context, maxheight, maxwidth),
-                    //   );
-                    // })
                   )
                 ])),
-
-            // Scaffold(
-            //   drawer: drawer.CustomDrawer(),
-            //   appBar: appbarwid(),
-            //   bottomNavigationBar: Container(
-            //       width: maxwidth,
-            //       // height: maxheight,
-            //       child: Row(children: [
-            //         Expanded(
-            //           flex: 3,
-            //           // child: SingleChildScrollView(
-            //           child: bottomapp(maxwidth, maxheight),
-            //           //)
-            //         ),
-            //         Expanded(flex: 2, child: Text('test'))
-            //       ])),
-            //   body: Container(
-            //       width: maxwidth,
-            //       heght: maxheight,
-            //       child: Row(children: [
-            //         Expanded(
-            //             flex: 3,
-            //             child: SingleChildScrollView(
-            //               child: bodywid(maxwidth, maxheight),
-            //             )),
-            //         Expanded(
-            //             flex: 2,
-            //             child: SingleChildScrollView(
-            //                 child: Addparty.AddCustomer(
-            //               key: null,
-            //               title: "Add Customer",
-            //             )))
-            //       ])),
-            // ),
             watch: (BuildContext context) => Container(color: Colors.purple),
           );
-
-          // Scaffold(
-          //     floatingActionButtonLocation:
-          //         FloatingActionButtonLocation.miniEndDocked,
-          //     floatingActionButton: FloatingActionButton(
-          //       backgroundColor: widgetcolor,
-          //       onPressed: () {},
-          //       tooltip: 'Add new weight entry',
-          //       child: IconButton(
-          //           icon: Image.asset('images/add.png', color: Colors.black),
-          //           onPressed: () {
-          //             Addparty.AddCustomer ad = new Addparty.AddCustomer();
-          //             ad.id = '0';
-          //             ad.pageNo = pageno;
-          //             ad.selectedType = selectedtype;
-
-          //             ad.custid;
-          //             Navigator.push(
-          //                 context,
-          //                 MaterialPageRoute(
-          //                     builder: (context) => Addparty.AddCustomer(
-          //                           key: null,
-          //                           title: "Add Customer",
-          //                         )));
-          //           }),
-          //     ),
-          //   //  bottomNavigationBar:
-          //     //})
-          //     //]),
-
-          //     body: // Text('')
-          //         LayoutBuilder(builder: (context, BoxConstraints constraints) {
-          //       var maxwidth = constraints.maxWidth;
-          //       var minwidth = constraints.minWidth;
-          //       var maxheight = constraints.maxHeight;
-          //       var minheight = constraints.minHeight;
-          //       return ScreenTypeLayout.builder(
-          //         mobile: (BuildContext context) => bodywid(),
-          //         tablet: (BuildContext context) => bodywid(),
-          //         desktop: (BuildContext context) => Container(
-          //             child: Row(children: [
-          //           Expanded(
-          //               flex: 3,
-          //               child: SingleChildScrollView(
-          //                 child: bodywid(),
-          //               )),
-          //           Expanded(
-          //               flex: 1,
-          //               child: SingleChildScrollView(child: Text('test')
-          //                   // child: Addparty.AddCustomer(
-          //                   //   key: null,
-          //                   //   title: "Add Customer",
-          //                   // ),
-          //                   ))
-          //         ])),
-          //         watch: (BuildContext context) =>
-          //             Container(color: Colors.purple),
-          //       );
-          //     }));
         })); //);
   }
 
@@ -1413,8 +1162,6 @@ class HomePageState extends State<HomePage> {
         _pagingdetails = null;
         totalPages = null;
       });
-      //selectedtype = totalCount != null ? totalCount : selectedtype;
-      //  }
       String customerurl;
 
       if (searchtext == null || searchtext == '') {
@@ -1459,8 +1206,6 @@ class HomePageState extends State<HomePage> {
           });
         }
       }
-      //response.setHeader("Access-Control-Expose-Headers", "*");
-
       var convertDataToJson;
 
       convertDataToJson = json.decode(response.body);
@@ -1474,13 +1219,8 @@ class HomePageState extends State<HomePage> {
   }
 
   List<Widget> tableView(double maxwidth, double maxheight) {
-    /// getPagingDetails();
     List<Widget> widgets = <Widget>[];
-    //  totalPages = "14";
     if (totalPages != null) {
-      // setState(() {
-      //   _load = false;
-      // });
       for (int i = 0; i < int.parse(totalPages); i++) {
         if (_reportItems.length > 0) {
           widgets.add(SizedBox(
@@ -1539,6 +1279,7 @@ class HomePageState extends State<HomePage> {
                                   color: widgetcolor),
                               onPressed: () {
                                 setState(() {
+                                  ShowAddWidget = true;
                                   String id = _reportItems[index].custId;
                                   _id = id;
                                   custselectedtype = selectedtype;

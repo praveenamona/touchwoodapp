@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:touchwoodapp/models/Fabric.dart';
+import 'package:touchwoodapp/models/Granite.dart';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
 import 'dart:convert';
@@ -38,9 +38,9 @@ void main() => runApp(new MaterialApp(
       ),
     ));
 PageController controller = PageController();
-List<Fabric> _reportItems = <Fabric>[];
+List<Granite> _reportItems = <Granite>[];
 Paging _pagingdetails = new Paging();
-List<Fabric> data = <Fabric>[];
+List<Granite> data = <Granite>[];
 TextEditingController _GotoTextController;
 
 List<Paging> paging = new List<Paging>();
@@ -55,15 +55,18 @@ int pageno;
 FocusNode idFocusNode;
 String searchtext;
 
-String selectedfabriccolor;
-String selecteddia;
-String selectedfabric;
+String selectedgranitecolor;
+String selecteduom;
+String selectedgroup;
+String selectedgranitetype;
+String selectedmeasurement;
 
 String custselectedtype;
 int custpageno;
-String fabricid;
-String diaiid;
-String fabriccolorid;
+String groupid;
+String uomid;
+String granitecolorid;
+String measurementid;
 
 GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<customer.Customer>>();
 String _id = "";
@@ -72,14 +75,20 @@ GlobalKey<AutoCompleteTextFieldState<customer.Customer>> custKey =
     new GlobalKey();
 AutoCompleteTextField<customer.Customer> textField;
 
-List<Master.Master> fabricdetails = <Master.Master>[];
-List<Master.Master> diadetails = <Master.Master>[];
-List<Master.Master> fabriccolordetails = <Master.Master>[];
+List<Master.Master> groupdetails = <Master.Master>[];
+List<Master.Master> granitetypedetails = <Master.Master>[];
+List<Master.Master> measurementdetails = <Master.Master>[];
+List<Master.Master> uomdetails = <Master.Master>[];
+List<Master.Master> granitecolordetails = <Master.Master>[];
 List<String> typedata = [];
-List<String> fabricdiaid = [];
-List<String> fabriccolordata = [];
-List<String> fabricdata = [];
-final _fabricgsmController = TextEditingController();
+List<String> graniteuomdata = [];
+List<String> granitecolordata = [];
+List<String> granitegroupdata = [];
+List<String> granitetypedata = [];
+List<String> granitemeasurementdata = [];
+final _graniteproductcoceController = TextEditingController();
+final _graniteproductnameController = TextEditingController();
+
 ProgressDialog pr;
 FocusNode GsmFocusNode;
 double maxwidth;
@@ -102,7 +111,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  Widget addcustomerwid(double maxwidth, double maxheight) {
+  Widget addGranitewid(double maxwidth, double maxheight) {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -111,7 +120,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add Fabric',
+              'Add Granite',
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -152,158 +161,12 @@ class HomePageState extends State<HomePage> {
                                             MainAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            "Enter Fabric Details",
+                                            "Enter Granite Details",
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           SizedBox(
                                             height: 10,
                                           ),
-                                          if (fabricdata != null &&
-                                              fabricdata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Fabric",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabricdata,
-                                                label: "Fabric *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedfabric = val;
-
-                                                    fabricid = fabricdetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedfabric,
-                                              ),
-                                            ),
-                                          if (fabricdiaid != null &&
-                                              fabricdiaid.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Dia",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabricdiaid,
-                                                label: "Dia *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selecteddia = val;
-
-                                                    diaiid = diadetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selecteddia,
-                                              ),
-                                            ),
-                                          if (fabriccolordata != null &&
-                                              fabriccolordata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a FabricColor",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabriccolordata,
-                                                label: "Fabric Color *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedfabriccolor = val;
-
-                                                    fabriccolorid =
-                                                        fabriccolordetails
-                                                            .where((element) =>
-                                                                element
-                                                                    .columnname ==
-                                                                val)
-                                                            .map((e) => e
-                                                                .columnMasterid)
-                                                            .first
-                                                            .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem:
-                                                    selectedfabriccolor,
-                                              ),
-                                            ),
                                           Container(
                                             constraints: BoxConstraints(
                                               //minHeight: 20,
@@ -320,18 +183,293 @@ class HomePageState extends State<HomePage> {
                                                   ),
                                                   border: InputBorder.none,
                                                   //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                  labelText: "Gsm",
+                                                  labelText: "Product Code",
                                                   labelStyle: TextStyle(
                                                       fontSize: 20.0)),
                                               keyboardType: TextInputType.text,
                                               style: textStyle,
-                                              controller: _fabricgsmController,
+                                              controller:
+                                                  _graniteproductcoceController,
                                               focusNode: GsmFocusNode,
 
                                               readOnly: enable,
                                               //enableInteractiveSelection: enable,
                                             ),
                                           ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 300,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                  labelText: "Product Name",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _graniteproductnameController,
+                                              focusNode: GsmFocusNode,
+
+                                              readOnly: enable,
+                                              //enableInteractiveSelection: enable,
+                                            ),
+                                          ),
+                                          if (granitegroupdata != null &&
+                                              granitegroupdata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 200,
+                                                maxWidth: 380,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .7, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Group",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: granitegroupdata,
+                                                label: "Group *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedgroup = val;
+
+                                                    groupid = groupdetails
+                                                        .where((element) =>
+                                                            element
+                                                                .columnname ==
+                                                            val)
+                                                        .map((e) =>
+                                                            e.columnMasterid)
+                                                        .first
+                                                        .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem: selectedgroup,
+                                              ),
+                                            ),
+                                          if (graniteuomdata != null &&
+                                              graniteuomdata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 200,
+                                                maxWidth: 380,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .7, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Uom",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: graniteuomdata,
+                                                label: "Uom *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selecteduom = val;
+
+                                                    uomid = uomdetails
+                                                        .where((element) =>
+                                                            element
+                                                                .columnname ==
+                                                            val)
+                                                        .map((e) =>
+                                                            e.columnMasterid)
+                                                        .first
+                                                        .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem: selecteduom,
+                                              ),
+                                            ),
+                                          if (granitecolordata != null &&
+                                              granitecolordata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 200,
+                                                maxWidth: 380,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .7, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Color",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: granitecolordata,
+                                                label: "Color *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedgranitecolor = val;
+
+                                                    granitecolorid =
+                                                        granitecolordetails
+                                                            .where((element) =>
+                                                                element
+                                                                    .columnname ==
+                                                                val)
+                                                            .map((e) => e
+                                                                .columnMasterid)
+                                                            .first
+                                                            .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem:
+                                                    selectedgranitecolor,
+                                              ),
+                                            ),
+                                          if (granitetypedata != null &&
+                                              granitetypedata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 200,
+                                                maxWidth: 380,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .7, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Type",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: granitetypedata,
+                                                label: "Type *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedgranitetype = val;
+
+                                                    typeid = granitetypedetails
+                                                        .where((element) =>
+                                                            element
+                                                                .columnname ==
+                                                            val)
+                                                        .map((e) =>
+                                                            e.columnMasterid)
+                                                        .first
+                                                        .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem:
+                                                    selectedgranitetype,
+                                              ),
+                                            ),
+                                          if (granitemeasurementdata != null &&
+                                              granitemeasurementdata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 200,
+                                                maxWidth: 380,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .7, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Measurement",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: granitemeasurementdata,
+                                                label: "Measurement *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedmeasurement = val;
+
+                                                    measurementid =
+                                                        measurementdetails
+                                                            .where((element) =>
+                                                                element
+                                                                    .columnname ==
+                                                                val)
+                                                            .map((e) => e
+                                                                .columnMasterid)
+                                                            .first
+                                                            .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem:
+                                                    selectedmeasurement,
+                                              ),
+                                            ),
                                         ]),
                                   )))))
                 ] // )
@@ -402,7 +540,7 @@ class HomePageState extends State<HomePage> {
   }
 
   void saveItems() async {
-    String custGstin = _fabricgsmController.text;
+    String custGstin = _graniteproductcoceController.text;
     if (_id != '') {
       //   pr.show();
 
@@ -418,7 +556,7 @@ class HomePageState extends State<HomePage> {
             'custGstin',
             'custemail',
             "",
-            "selectedfabrictype",
+            "selectedgranitetype",
             typeid);
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
@@ -483,16 +621,16 @@ class HomePageState extends State<HomePage> {
   }
 
   void clearData(context) {
-    _fabricgsmController.text = '0';
+    _graniteproductcoceController.text = '0';
     _id = '0';
   }
 
-  List<Fabric> data = new List<Fabric>();
+  List<Granite> data = new List<Granite>();
 
-  Future<List<Master.Master>> getfabricmaster(String filter) async {
+  Future<List<Master.Master>> getgroupmaster(String filter) async {
     setState(() {
-      fabricdetails = [];
-      fabricdata = [];
+      groupdetails = [];
+      granitegroupdata = [];
       //  getitems = [];
     });
 
@@ -506,38 +644,38 @@ class HomePageState extends State<HomePage> {
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
     setState(() {
-      fabricdetails = parsed
+      groupdetails = parsed
           .map<Master.Master>((json) => Master.Master.fromJSON(json))
           .toList();
 
       if (filter != "")
-        fabricdetails = fabricdetails
+        groupdetails = groupdetails
             .where((element) =>
                 element.columnname
                     .toLowerCase()
                     .toString()
                     .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'fabric')
+                element.tablename == 'group')
             .toList();
 
-      fabricdata = fabricdetails.map((e) => e.columnname).toList();
-      if (fabricid == '' || fabricid == null || fabricid == '0')
-        selectedfabric = fabricdata.first;
+      granitegroupdata = groupdetails.map((e) => e.columnname).toList();
+      if (groupid == '' || groupid == null || groupid == '0')
+        selectedgroup = granitegroupdata.first;
 
-      fabricid = fabricdetails
-          .where((element) => element.columnname == selectedfabric)
+      groupid = groupdetails
+          .where((element) => element.columnname == selectedgroup)
           .map((e) => e.columnMasterid)
           .first
           .toString();
     });
 
-    return fabricdetails;
+    return typedetails;
   }
 
-  Future<List<Master.Master>> getdiadetails(String filter) async {
+  Future<List<Master.Master>> getuomdetails(String filter) async {
     setState(() {
-      diadetails = [];
-      fabricdiaid = [];
+      uomdetails = [];
+      graniteuomdata = [];
       //  getitems = [];
     });
 
@@ -551,38 +689,38 @@ class HomePageState extends State<HomePage> {
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
     setState(() {
-      diadetails = parsed
+      uomdetails = parsed
           .map<Master.Master>((json) => Master.Master.fromJSON(json))
           .toList();
 
       if (filter != "")
-        diadetails = diadetails
+        uomdetails = uomdetails
             .where((element) =>
                 element.columnname
                     .toLowerCase()
                     .toString()
                     .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'fabric mill')
+                element.tablename == 'uom')
             .toList();
 
-      fabricdiaid = diadetails.map((e) => e.columnname).toList();
-      if (diaiid == '' || diaiid == null || diaiid == '0')
-        selecteddia = fabricdiaid.first;
+      graniteuomdata = uomdetails.map((e) => e.columnname).toList();
+      if (uomid == '' || uomid == null || uomid == '0')
+        selecteduom = graniteuomdata.first;
 
-      diaiid = diadetails
-          .where((element) => element.columnname == selecteddia)
+      uomid = uomdetails
+          .where((element) => element.columnname == selecteduom)
           .map((e) => e.columnMasterid)
           .first
           .toString();
     });
 
-    return diadetails;
+    return uomdetails;
   }
 
-  Future<List<Master.Master>> getfabriccolormaster(String filter) async {
+  Future<List<Master.Master>> getgranitecolormaster(String filter) async {
     setState(() {
-      fabriccolordetails = [];
-      fabriccolordata = [];
+      granitecolordetails = [];
+      granitecolordata = [];
       //  getitems = [];
     });
 
@@ -596,32 +734,124 @@ class HomePageState extends State<HomePage> {
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
     setState(() {
-      fabriccolordetails = parsed
+      granitecolordetails = parsed
           .map<Master.Master>((json) => Master.Master.fromJSON(json))
           .toList();
 
       if (filter != "")
-        fabriccolordetails = fabriccolordetails
+        granitecolordetails = granitecolordetails
             .where((element) =>
                 element.columnname
                     .toLowerCase()
                     .toString()
                     .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'fabric color')
+                element.tablename == 'granite color')
             .toList();
 
-      fabriccolordata = fabriccolordetails.map((e) => e.columnname).toList();
-      if (fabriccolorid == '' || fabriccolorid == null || fabriccolorid == '0')
-        selectedfabriccolor = fabriccolordata.first;
+      granitecolordata = granitecolordetails.map((e) => e.columnname).toList();
+      if (granitecolorid == '' ||
+          granitecolorid == null ||
+          granitecolorid == '0') selectedgranitecolor = granitecolordata.first;
 
-      fabriccolorid = fabriccolordetails
-          .where((element) => element.columnname == selectedfabriccolor)
+      granitecolorid = granitecolordetails
+          .where((element) => element.columnname == selectedgranitecolor)
           .map((e) => e.columnMasterid)
           .first
           .toString();
     });
 
-    return fabriccolordetails;
+    return granitecolordetails;
+  }
+
+  Future<List<Master.Master>> getgranitetypemaster(String filter) async {
+    setState(() {
+      granitetypedetails = [];
+      granitetypedata = [];
+      //  getitems = [];
+    });
+
+    final String customerurl =
+        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      granitetypedetails = parsed
+          .map<Master.Master>((json) => Master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        granitetypedetails = granitetypedetails
+            .where((element) =>
+                element.columnname
+                    .toLowerCase()
+                    .toString()
+                    .contains(filter.toLowerCase().toString()) &&
+                element.tablename == 'type')
+            .toList();
+
+      granitetypedata = granitetypedetails.map((e) => e.columnname).toList();
+      if (typeid == '' || typeid == null || typeid == '0')
+        selectedgranitetype = granitetypedata.first;
+
+      typeid = granitetypedetails
+          .where((element) => element.columnname == selectedgranitetype)
+          .map((e) => e.columnMasterid)
+          .first
+          .toString();
+    });
+
+    return granitetypedetails;
+  }
+
+  Future<List<Master.Master>> getgranitemeasurementmaster(String filter) async {
+    setState(() {
+      measurementdetails = [];
+      granitemeasurementdata = [];
+      //  getitems = [];
+    });
+
+    final String customerurl =
+        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      measurementdetails = parsed
+          .map<Master.Master>((json) => Master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        measurementdetails = measurementdetails
+            .where((element) =>
+                element.columnname
+                    .toLowerCase()
+                    .toString()
+                    .contains(filter.toLowerCase().toString()) &&
+                element.tablename == 'type')
+            .toList();
+
+      granitemeasurementdata =
+          measurementdetails.map((e) => e.columnname).toList();
+      if (typeid == '' || typeid == null || typeid == '0')
+        selectedmeasurement = granitemeasurementdata.first;
+
+      measurementid = measurementdetails
+          .where((element) => element.columnname == selectedmeasurement)
+          .map((e) => e.columnMasterid)
+          .first
+          .toString();
+    });
+
+    return measurementdetails;
   }
 
   Future<customer.Customer> getAddCustomerJson() async {
@@ -645,24 +875,32 @@ class HomePageState extends State<HomePage> {
 
     var response = await http.get(Uri.encodeFull(customerurl),
         headers: {"Accept": "application/json"});
-    List<Fabric> _fabricdetails = new List<Fabric>();
+    List<Granite> _granitedetails = new List<Granite>();
 
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    _fabricdetails =
-        parsed.map<Fabric>((json) => Fabric.fromJSON(json)).toList();
-    data = _fabricdetails;
+    _granitedetails =
+        parsed.map<Granite>((json) => Granite.fromJSON(json)).toList();
+    data = _granitedetails;
     if (_id != "" && _id != "" && _id != null)
-      _fabricdetails
-          .where((element) => element.fabricmasterid == _id)
+      _granitedetails
+          .where((element) => element.masterid == _id)
           .forEach((element) => setState(() {
-                selecteddia = element.dia;
-                selectedfabric = element.fabricname;
-                selectedfabriccolor = element.fabriccolor;
-                _fabricgsmController.text = element.gsm.toString();
-                fabricid = element.fabricmasterid;
-                diaiid = element.diaid;
-                fabriccolorid = element.fabcolorid;
+                selecteduom = element.uom;
+                selectedgroup = element.group;
+                selectedgranitecolor = element.color;
+                selectedmeasurement = element.measurement;
+                selectedgranitetype = element.type;
+                _graniteproductcoceController.text =
+                    element.productcode.toString();
+
+                _graniteproductnameController.text =
+                    element.productname.toString();
+                groupid = element.groupid;
+                uomid = element.uomid;
+                typeid = element.typeid;
+                measurementid = element.measurementid;
+                granitecolorid = element.colorid;
               }));
   }
 
@@ -677,9 +915,12 @@ class HomePageState extends State<HomePage> {
     getCustomerJson();
     GsmFocusNode = FocusNode();
     //_custIdController.text = '0';
-    getfabricmaster("");
-    getdiadetails("");
-    getfabriccolormaster("");
+    getgroupmaster("");
+    getuomdetails("");
+    getgranitecolormaster("");
+    getgranitemeasurementmaster("");
+    getgranitetypemaster("");
+
     setState(() {
       getAddCustomerJson();
       // if ((_id != "") && (_id != null) && (_id != "0"))
@@ -695,7 +936,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _fabricgsmController.dispose();
+    _graniteproductcoceController.dispose();
     GsmFocusNode.dispose();
     _controller.dispose();
     super.dispose();
@@ -838,7 +1079,7 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Expanded(
                     //  width: maxwidth * .10,
-                    child: Text("Fabric Name",
+                    child: Text("Product Code",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -847,7 +1088,7 @@ class HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     // width: maxwidth * .10,
-                    child: Text("Dia",
+                    child: Text("Product NAme",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -856,7 +1097,16 @@ class HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     // width: maxwidth * .10,
-                    child: Text("Fabric Color",
+                    child: Text("Group",
+                        textScaleFactor: 1.7,
+                        textAlign: TextAlign.left,
+                        style: new TextStyle(
+                          color: widgetcolor,
+                        )),
+                  ),
+                  Expanded(
+                    // width: maxwidth * .10,
+                    child: Text("Type",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -1118,9 +1368,12 @@ class HomePageState extends State<HomePage> {
                         custpageno = pageno;
                         custselectedtype = selectedtype;
                         getAddCustomerJson();
-                        getfabricmaster("");
-                        getdiadetails("");
-                        getfabriccolormaster("");
+                        getgroupmaster("");
+                        getuomdetails("");
+                        getgranitecolormaster("");
+                        getgranitemeasurementmaster("");
+                        getgranitetypemaster("");
+
                         //setState(() {
                         //   getCustomerJson();
                         // if ((_id != "") && (_id != null) && (_id != "0"))
@@ -1156,9 +1409,12 @@ class HomePageState extends State<HomePage> {
                                   custpageno = pageno;
                                   custselectedtype = selectedtype;
                                   getAddCustomerJson();
-                                  getfabricmaster("");
-                                  getdiadetails("");
-                                  getfabriccolormaster("");
+                                  getgroupmaster("");
+                                  getuomdetails("");
+                                  getgranitemeasurementmaster("");
+                                  getgranitetypemaster("");
+
+                                  getgranitecolormaster("");
                                   //setState(() {
                                   //   getCustomerJson();
                                   // if ((_id != "") &&
@@ -1180,7 +1436,7 @@ class HomePageState extends State<HomePage> {
                       )),
                   Expanded(
                     flex: 2,
-                    child: addcustomerwid(maxwidth, maxheight),
+                    child: addGranitewid(maxwidth, maxheight),
                     // LayoutBuilder(
                     //     builder: (context, BoxConstraints constraints) {
                     //   var maxwidth = constraints.maxWidth;
@@ -1291,7 +1547,7 @@ class HomePageState extends State<HomePage> {
         })); //);
   }
 
-  List<Fabric> _customers;
+  List<Granite> _customers;
   Future<String> getCustomerJson() async {
     if (this.mounted) {
       setState(() {
@@ -1352,7 +1608,7 @@ class HomePageState extends State<HomePage> {
       convertDataToJson = json.decode(response.body);
       final parsed = convertDataToJson.cast<Map<String, dynamic>>();
       _reportItems =
-          parsed.map<Fabric>((json) => Fabric.fromJSON(json)).toList();
+          parsed.map<Granite>((json) => Granite.fromJSON(json)).toList();
 
       data = _reportItems;
     }
@@ -1390,7 +1646,7 @@ class HomePageState extends State<HomePage> {
                           Expanded(
                             child: Text(
                               _reportItems[index]
-                                  .fabricname
+                                  .productcode
                                   .toLowerCase()
                                   .toString(),
                               textScaleFactor: 1.2,
@@ -1401,7 +1657,7 @@ class HomePageState extends State<HomePage> {
                             //width: maxwidth * .20,
                             child: Text(
                               _reportItems[index]
-                                  .fabriccolor
+                                  .productname
                                   .toLowerCase()
                                   .toString(),
                               textScaleFactor: 1.2,
@@ -1411,7 +1667,18 @@ class HomePageState extends State<HomePage> {
                           Expanded(
                             //width: maxwidth * .20,
                             child: Text(
-                              _reportItems[index].dia.toLowerCase().toString(),
+                              _reportItems[index]
+                                  .group
+                                  .toLowerCase()
+                                  .toString(),
+                              textScaleFactor: 1.2,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          Expanded(
+                            //width: maxwidth * .20,
+                            child: Text(
+                              _reportItems[index].type.toLowerCase().toString(),
                               textScaleFactor: 1.2,
                               textAlign: TextAlign.left,
                             ),
@@ -1425,15 +1692,17 @@ class HomePageState extends State<HomePage> {
                                   color: widgetcolor),
                               onPressed: () {
                                 setState(() {
-                                  String id =
-                                      _reportItems[index].fabricmasterid;
+                                  String id = _reportItems[index].masterid;
                                   _id = id;
                                   custselectedtype = selectedtype;
                                   custpageno = pageno;
                                   getAddCustomerJson();
-                                  getfabricmaster("");
-                                  getdiadetails("");
-                                  getfabriccolormaster("");
+                                  getgroupmaster("");
+                                  getuomdetails("");
+                                  getgranitecolormaster("");
+                                  getgranitemeasurementmaster("");
+                                  getgranitetypemaster("");
+
                                   //setState(() {
                                   //   getCustomerJson();
                                   // if ((_id != "") &&
@@ -1465,7 +1734,7 @@ class HomePageState extends State<HomePage> {
                               icon: Image.asset('Images/delete.png',
                                   color: widgetcolor),
                               onPressed: () async {
-                                String id = _reportItems[index].fabricmasterid;
+                                String id = _reportItems[index].masterid;
 
                                 _id = id;
 

@@ -1,15 +1,19 @@
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/gestures.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:touchwoodapp/models/Fabric.dart';
+import 'package:touchwoodapp/models/Master.dart';
+import 'package:touchwoodapp/models/customer.dart';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
+import 'package:touchwoodapp/repository/cutomer_repository.dart';
+import 'package:touchwoodapp/screens/AddCustomer.dart' as Addparty;
 import 'dart:convert';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'dart:core';
+import 'dart:convert';
 import 'dart:io';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -23,12 +27,12 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:touchwoodapp/models/customer.dart' as customer;
 import 'package:touchwoodapp/screens/dashboard.dart';
 import 'package:dio/dio.dart';
 import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:touchwoodapp/models/Master.dart' as Master;
 
 void main() => runApp(new MaterialApp(
       home: new HomePage("10", 1),
@@ -38,11 +42,11 @@ void main() => runApp(new MaterialApp(
       ),
     ));
 PageController controller = PageController();
-List<Fabric> _reportItems = <Fabric>[];
+List<Customer> _reportItems = <Customer>[];
 Paging _pagingdetails = new Paging();
-List<Fabric> data = <Fabric>[];
+List<Customer> data = <Customer>[];
 TextEditingController _GotoTextController;
-
+bool ShowAddWidget = false;
 List<Paging> paging = new List<Paging>();
 String selectedtype = "10";
 String totalCount;
@@ -55,33 +59,32 @@ int pageno;
 FocusNode idFocusNode;
 String searchtext;
 
-String selectedfabriccolor;
-String selecteddia;
-String selectedfabric;
-
+String selectedcustomer;
 String custselectedtype;
 int custpageno;
-String fabricid;
-String diaiid;
-String fabriccolorid;
-
+String typeid;
 GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<customer.Customer>>();
 String _id = "";
 TextStyle textStyle = new TextStyle(color: Colors.black);
 GlobalKey<AutoCompleteTextFieldState<customer.Customer>> custKey =
     new GlobalKey();
 AutoCompleteTextField<customer.Customer> textField;
-
-List<Master.Master> fabricdetails = <Master.Master>[];
-List<Master.Master> diadetails = <Master.Master>[];
-List<Master.Master> fabriccolordetails = <Master.Master>[];
+List<Master> typedetails = <Master>[];
 List<String> typedata = [];
-List<String> fabricdiaid = [];
-List<String> fabriccolordata = [];
-List<String> fabricdata = [];
-final _fabricgsmController = TextEditingController();
+final _custNameController = TextEditingController();
+final _custIdController = TextEditingController();
+final _custemailController = TextEditingController();
+final _custcountryController = TextEditingController();
+final _custAdd1Controller = TextEditingController();
+final _custAdd2Controller = TextEditingController();
+final _custcontactpersonController = TextEditingController();
+final _custcontactnumberController = TextEditingController();
+final _custswiftcodeontroller = TextEditingController();
+final _custremarksController = TextEditingController();
+final _custAcnoController = TextEditingController();
+final _custbankaddressController = TextEditingController();
 ProgressDialog pr;
-FocusNode GsmFocusNode;
+FocusNode custidFocusNode;
 double maxwidth;
 double maxheight;
 
@@ -111,7 +114,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add Fabric',
+              'Add Customer',
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -152,158 +155,13 @@ class HomePageState extends State<HomePage> {
                                             MainAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            "Enter Fabric Details",
+                                            "Enter Customer Details",
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           SizedBox(
                                             height: 10,
                                           ),
-                                          if (fabricdata != null &&
-                                              fabricdata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Fabric",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabricdata,
-                                                label: "Fabric *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedfabric = val;
 
-                                                    fabricid = fabricdetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedfabric,
-                                              ),
-                                            ),
-                                          if (fabricdiaid != null &&
-                                              fabricdiaid.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Dia",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabricdiaid,
-                                                label: "Dia *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selecteddia = val;
-
-                                                    diaiid = diadetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selecteddia,
-                                              ),
-                                            ),
-                                          if (fabriccolordata != null &&
-                                              fabriccolordata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a FabricColor",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabriccolordata,
-                                                label: "Fabric Color *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedfabriccolor = val;
-
-                                                    fabriccolorid =
-                                                        fabriccolordetails
-                                                            .where((element) =>
-                                                                element
-                                                                    .columnname ==
-                                                                val)
-                                                            .map((e) => e
-                                                                .columnMasterid)
-                                                            .first
-                                                            .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem:
-                                                    selectedfabriccolor,
-                                              ),
-                                            ),
                                           Container(
                                             constraints: BoxConstraints(
                                               //minHeight: 20,
@@ -320,18 +178,338 @@ class HomePageState extends State<HomePage> {
                                                   ),
                                                   border: InputBorder.none,
                                                   //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                  labelText: "Gsm",
+                                                  labelText: "Name",
                                                   labelStyle: TextStyle(
                                                       fontSize: 20.0)),
                                               keyboardType: TextInputType.text,
                                               style: textStyle,
-                                              controller: _fabricgsmController,
-                                              focusNode: GsmFocusNode,
+                                              controller: _custNameController,
+                                              focusNode: custidFocusNode,
 
                                               readOnly: enable,
                                               //enableInteractiveSelection: enable,
                                             ),
                                           ),
+                                          // ]),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 380,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Add1",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller: _custAdd1Controller,
+                                              // focusNode: custidFocusNode,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 380,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Add2",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller: _custAdd2Controller,
+                                              //  focusNode: custidFocusNode,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 380,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Contact Person",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custcontactpersonController,
+                                              //focusNode: custidFocusNode,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 380,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Contact Number",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custcontactnumberController,
+                                              // focusNode: custidFocusNode,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 300,
+                                              //maxHeight: double.infinity
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Email",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              style: textStyle,
+                                              controller: _custemailController,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 300,
+                                              maxWidth: 300,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Bank Address",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custbankaddressController,
+                                              // focusNode: custidFocusNode,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 380,
+                                              //maxHeight: double.infinity
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Account Number",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller: _custAcnoController,
+                                              //focusNode: custidFocusNode,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Name of Bank",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custcountryController,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Branch",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custcountryController,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Country",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custcountryController,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Swift Code",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custswiftcodeontroller,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Remarks",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custremarksController,
+                                            ),
+                                          )
+
+                                          // ]),
+                                          // Row(children: [
+                                          // ]),
+                                          // Row(children: [
+                                          //   ]),
+                                          // Row(children: [
+                                          // ]),
+                                          // Row(children: [
+                                          // ]),
+                                          // Row(children: [
+                                          //  ]),
+                                          // Row(children: [
+                                          // ]),
+                                          // Row(children: [
+                                          //   ]),
+                                          // Row(children: [
+                                          //    ]),
+                                          // Row(children: [
+                                          //  ]),
+                                          // SizedBox(
+                                          //   height: 20.0,
+                                          // ),
                                         ]),
                                   )))))
                 ] // )
@@ -355,6 +533,59 @@ class HomePageState extends State<HomePage> {
                           enable = true;
                         });
                         saveItems();
+                      } else {
+                        final String customerurl =
+                            "http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=5&strPartyname=" +
+                                _custNameController.text;
+
+                        var response = await http.get(
+                            Uri.encodeFull(customerurl),
+                            headers: {"Accept": "application/json"});
+                        var convertDataToJson = json.decode(response.body);
+                        setState(() {
+                          enable = true;
+                        });
+                        if (convertDataToJson[0]
+                            .toString()
+                            .contains("Already Exists: Already Exists")) {
+                          Alert(
+                              context: context,
+                              title: "Alert",
+                              type: AlertType.warning,
+                              desc: "Already Exists",
+                              buttons: [
+                                DialogButton(
+                                  child: Text(
+                                    "Close",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      ShowAddWidget = false;
+                                    });
+                                    //clearData(context);
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pop();
+
+                                    // Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) => HomePage(
+                                    //             custselectedtype, custpageno)));
+                                  },
+                                  width: 120,
+                                )
+                              ]).show();
+                        } else {
+                          // pr.show();
+                          saveItems();
+
+                          // Function f;
+                          // f = await Navigator.pushNamed(context, 'Dashboard',
+                          //     arguments: {custselectedtype, custpageno});
+                          // f();
+                        }
                       }
                     },
                     child: Row(
@@ -379,6 +610,9 @@ class HomePageState extends State<HomePage> {
               Container(
                 child: RaisedButton(
                     onPressed: () {
+                      setState(() {
+                        ShowAddWidget = false;
+                      });
                       clearData(context);
                       // saveItems();
                     },
@@ -402,27 +636,39 @@ class HomePageState extends State<HomePage> {
   }
 
   void saveItems() async {
-    String custGstin = _fabricgsmController.text;
-    if (_id != '') {
+    String custId = _custIdController.text;
+    String custName = _custNameController.text;
+    String custMobile = _custemailController.text;
+    // String custRemarks = _custRemarksController.text;
+    String custGstin = _custbankaddressController.text;
+    String custAdd1 = _custAdd1Controller.text;
+    String custAdd2 = _custAdd2Controller.text;
+    String custAdd3 = _custcontactpersonController.text;
+    String custAdd4 = _custcontactnumberController.text;
+    String custemail = _custAcnoController.text;
+    if (custId != '' && custName != '') {
       //   pr.show();
 
       try {
         Stream<String> stream = await insertCustomer(
-            'custId',
-            'custName',
-            'custMobile',
-            'custAdd1',
-            'custAdd2',
-            'custAdd3',
-            'custAdd4',
-            'custGstin',
-            'custemail',
+            custId,
+            custName,
+            custMobile,
+            custAdd1,
+            custAdd2,
+            custAdd3,
+            custAdd4,
+            custGstin,
+            custemail,
             "",
-            "selectedfabrictype",
+            selectedcustomer,
             typeid);
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
+            setState(() {
+              ShowAddWidget = false;
+            });
             Alert(
                 context: context,
                 title: "Done!",
@@ -457,6 +703,9 @@ class HomePageState extends State<HomePage> {
                   )
                 ]).show();
           } else {
+            setState(() {
+              ShowAddWidget = false;
+            });
             Alert(
                     context: context,
                     type: AlertType.error,
@@ -472,6 +721,9 @@ class HomePageState extends State<HomePage> {
       //   pr.dismiss();
       // clearData(context);
     } else {
+      setState(() {
+        ShowAddWidget = false;
+      });
       Alert(
               context: context,
               type: AlertType.error,
@@ -483,146 +735,23 @@ class HomePageState extends State<HomePage> {
   }
 
   void clearData(context) {
-    _fabricgsmController.text = '0';
+    _custIdController.text = '0';
+    _custNameController.text = '';
+    _custAdd1Controller.text = '';
+    _custAdd2Controller.text = '';
+    _custcontactpersonController.text = '';
+    _custcontactnumberController.text = '';
+    _custAcnoController.text = '';
+    _custbankaddressController.text = '';
+    _custemailController.text = '';
+    _custcountryController.text = '';
     _id = '0';
+
+    // Navigator.pop(context);
+    //  FocusScope.of(context).requestFocus(custidFocusNode);
   }
 
-  List<Fabric> data = new List<Fabric>();
-
-  Future<List<Master.Master>> getfabricmaster(String filter) async {
-    setState(() {
-      fabricdetails = [];
-      fabricdata = [];
-      //  getitems = [];
-    });
-
-    final String customerurl =
-        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      fabricdetails = parsed
-          .map<Master.Master>((json) => Master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        fabricdetails = fabricdetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'fabric')
-            .toList();
-
-      fabricdata = fabricdetails.map((e) => e.columnname).toList();
-      if (fabricid == '' || fabricid == null || fabricid == '0')
-        selectedfabric = fabricdata.first;
-
-      fabricid = fabricdetails
-          .where((element) => element.columnname == selectedfabric)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return fabricdetails;
-  }
-
-  Future<List<Master.Master>> getdiadetails(String filter) async {
-    setState(() {
-      diadetails = [];
-      fabricdiaid = [];
-      //  getitems = [];
-    });
-
-    final String customerurl =
-        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      diadetails = parsed
-          .map<Master.Master>((json) => Master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        diadetails = diadetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'fabric mill')
-            .toList();
-
-      fabricdiaid = diadetails.map((e) => e.columnname).toList();
-      if (diaiid == '' || diaiid == null || diaiid == '0')
-        selecteddia = fabricdiaid.first;
-
-      diaiid = diadetails
-          .where((element) => element.columnname == selecteddia)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return diadetails;
-  }
-
-  Future<List<Master.Master>> getfabriccolormaster(String filter) async {
-    setState(() {
-      fabriccolordetails = [];
-      fabriccolordata = [];
-      //  getitems = [];
-    });
-
-    final String customerurl =
-        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      fabriccolordetails = parsed
-          .map<Master.Master>((json) => Master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        fabriccolordetails = fabriccolordetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'fabric color')
-            .toList();
-
-      fabriccolordata = fabriccolordetails.map((e) => e.columnname).toList();
-      if (fabriccolorid == '' || fabriccolorid == null || fabriccolorid == '0')
-        selectedfabriccolor = fabriccolordata.first;
-
-      fabriccolorid = fabriccolordetails
-          .where((element) => element.columnname == selectedfabriccolor)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return fabriccolordetails;
-  }
+  List<customer.Customer> data = new List<customer.Customer>();
 
   Future<customer.Customer> getAddCustomerJson() async {
     String customerurl;
@@ -645,24 +774,28 @@ class HomePageState extends State<HomePage> {
 
     var response = await http.get(Uri.encodeFull(customerurl),
         headers: {"Accept": "application/json"});
-    List<Fabric> _fabricdetails = new List<Fabric>();
+    List<customer.Customer> customer1 = new List<customer.Customer>();
 
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    _fabricdetails =
-        parsed.map<Fabric>((json) => Fabric.fromJSON(json)).toList();
-    data = _fabricdetails;
+    customer1 = parsed
+        .map<customer.Customer>((json) => customer.Customer.fromJSON(json))
+        .toList();
+    data = customer1;
     if (_id != "" && _id != "" && _id != null)
-      _fabricdetails
-          .where((element) => element.fabricmasterid == _id)
+      customer1
+          .where((element) => element.custId == _id)
           .forEach((element) => setState(() {
-                selecteddia = element.dia;
-                selectedfabric = element.fabricname;
-                selectedfabriccolor = element.fabriccolor;
-                _fabricgsmController.text = element.gsm.toString();
-                fabricid = element.fabricmasterid;
-                diaiid = element.diaid;
-                fabriccolorid = element.fabcolorid;
+                _custAdd1Controller.text = element.add1;
+                _custAdd2Controller.text = element.add2;
+                _custcontactpersonController.text = element.add3;
+                _custcontactnumberController.text = element.add4;
+                typeid = element.partytypeMasterID;
+                selectedcustomer = element.partytype;
+                _custAcnoController.text = element.email;
+                _custemailController.text = element.mobile;
+                _custbankaddressController.text = element.gstin;
+                _custNameController.text = element.customerName;
               }));
   }
 
@@ -675,15 +808,13 @@ class HomePageState extends State<HomePage> {
     //getPagingDetails();
     searchtext = '';
     getCustomerJson();
-    GsmFocusNode = FocusNode();
-    //_custIdController.text = '0';
-    getfabricmaster("");
-    getdiadetails("");
-    getfabriccolormaster("");
+    custidFocusNode = FocusNode();
+    _custIdController.text = '0';
+    //getGroupMaster('');
     setState(() {
       getAddCustomerJson();
-      // if ((_id != "") && (_id != null) && (_id != "0"))
-      //   _custIdController.text = _id.toString();
+      if ((_id != "") && (_id != null) && (_id != "0"))
+        _custIdController.text = _id.toString();
     });
 
     super.initState();
@@ -695,8 +826,17 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _fabricgsmController.dispose();
-    GsmFocusNode.dispose();
+    _custcountryController.dispose();
+    _custemailController.dispose();
+    _custNameController.dispose();
+    _custAdd1Controller.dispose();
+    _custAdd2Controller.dispose();
+    _custcontactpersonController.dispose();
+    _custcontactnumberController.dispose();
+    _custIdController.dispose();
+    _custbankaddressController.dispose();
+    _custAcnoController.dispose();
+    custidFocusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -724,6 +864,29 @@ class HomePageState extends State<HomePage> {
                 child: new Center(child: new CircularProgressIndicator())),
           )
         : new Container();
+
+    Widget Addbutton() {
+      return FloatingActionButton(
+        backgroundColor: widgetcolor,
+        onPressed: () {},
+        tooltip: 'Add new customer entry',
+        child: IconButton(
+            icon: Image.asset('images/add.png', color: Colors.black),
+            onPressed: () {
+              setState(() {
+                _id = '0';
+                custpageno = pageno;
+                custselectedtype = selectedtype;
+                getAddCustomerJson();
+                //  getGroupMaster('');
+                //setState(() {
+                //   getCustomerJson();
+                if ((_id != "") && (_id != null) && (_id != "0"))
+                  _custIdController.text = _id.toString();
+              });
+            }),
+      );
+    }
 
     Widget appbarwid() {
       return AppBar(
@@ -838,7 +1001,7 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Expanded(
                     //  width: maxwidth * .10,
-                    child: Text("Fabric Name",
+                    child: Text("Type",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -847,22 +1010,16 @@ class HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     // width: maxwidth * .10,
-                    child: Text("Dia",
+                    child: Text("Name",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
                           color: widgetcolor,
                         )),
                   ),
-                  Expanded(
-                    // width: maxwidth * .10,
-                    child: Text("Fabric Color",
-                        textScaleFactor: 1.7,
-                        textAlign: TextAlign.left,
-                        style: new TextStyle(
-                          color: widgetcolor,
-                        )),
-                  ),
+                  // SizedBox(
+                  //   width: 90,
+                  // ),
                   Expanded(
                     // width: maxwidth * .10,
                     child: Text("Action",
@@ -1103,36 +1260,17 @@ class HomePageState extends State<HomePage> {
           var minheight = constraints.minHeight;
 
           return ScreenTypeLayout.builder(
-            mobile: (BuildContext context) => Scaffold(
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.miniEndDocked,
-              floatingActionButton: FloatingActionButton(
-                backgroundColor: widgetcolor,
-                onPressed: () {},
-                tooltip: 'Add new customer entry',
-                child: IconButton(
-                    icon: Image.asset('images/add.png', color: Colors.black),
-                    onPressed: () {
-                      setState(() {
-                        _id = '0';
-                        custpageno = pageno;
-                        custselectedtype = selectedtype;
-                        getAddCustomerJson();
-                        getfabricmaster("");
-                        getdiadetails("");
-                        getfabriccolormaster("");
-                        //setState(() {
-                        //   getCustomerJson();
-                        // if ((_id != "") && (_id != null) && (_id != "0"))
-                        //_custIdController.text = _id.toString();
-                      });
-                    }),
-              ),
-              drawer: drawer.CustomDrawer(),
-              appBar: appbarwid(),
-              bottomNavigationBar: bottomapp(maxwidth, maxheight),
-              body: bodywid(maxwidth, maxheight),
-            ),
+            mobile: (BuildContext context) => ShowAddWidget == false
+                ? Scaffold(
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.miniEndDocked,
+                    floatingActionButton: Addbutton(),
+                    drawer: drawer.CustomDrawer(),
+                    appBar: appbarwid(),
+                    bottomNavigationBar: bottomapp(maxwidth, maxheight),
+                    body: bodywid(maxwidth, maxheight),
+                  )
+                : addcustomerwid(maxwidth, maxheight),
             //    tablet: (BuildContext context) => dashboardscaffold(),
             desktop: (BuildContext context) => Container(
                 width: maxwidth,
@@ -1143,31 +1281,7 @@ class HomePageState extends State<HomePage> {
                       child: Scaffold(
                         floatingActionButtonLocation:
                             FloatingActionButtonLocation.miniEndDocked,
-                        floatingActionButton: FloatingActionButton(
-                          backgroundColor: widgetcolor,
-                          onPressed: () {},
-                          tooltip: 'Add new customer entry',
-                          child: IconButton(
-                              icon: Image.asset('images/add.png',
-                                  color: Colors.black),
-                              onPressed: () {
-                                setState(() {
-                                  _id = '0';
-                                  custpageno = pageno;
-                                  custselectedtype = selectedtype;
-                                  getAddCustomerJson();
-                                  getfabricmaster("");
-                                  getdiadetails("");
-                                  getfabriccolormaster("");
-                                  //setState(() {
-                                  //   getCustomerJson();
-                                  // if ((_id != "") &&
-                                  //     (_id != null) &&
-                                  //     (_id != "0"))
-                                  //   _custIdController.text = _id.toString();
-                                });
-                              }),
-                        ),
+                        floatingActionButton: Addbutton(),
                         drawer: drawer.CustomDrawer(),
                         appBar: appbarwid(),
                         bottomNavigationBar: bottomapp(maxwidth, maxheight),
@@ -1291,7 +1405,7 @@ class HomePageState extends State<HomePage> {
         })); //);
   }
 
-  List<Fabric> _customers;
+  List<Customer> _customers;
   Future<String> getCustomerJson() async {
     if (this.mounted) {
       setState(() {
@@ -1352,7 +1466,7 @@ class HomePageState extends State<HomePage> {
       convertDataToJson = json.decode(response.body);
       final parsed = convertDataToJson.cast<Map<String, dynamic>>();
       _reportItems =
-          parsed.map<Fabric>((json) => Fabric.fromJSON(json)).toList();
+          parsed.map<Customer>((json) => Customer.fromJSON(json)).toList();
 
       data = _reportItems;
     }
@@ -1387,35 +1501,35 @@ class HomePageState extends State<HomePage> {
                           //   child:
                           Row(
                         children: <Widget>[
+                          // Container(
+                          //     child: Row(
+                          //   children: [
                           Expanded(
+                            //width: maxwidth * .20,
                             child: Text(
                               _reportItems[index]
-                                  .fabricname
+                                  .partytype
                                   .toLowerCase()
                                   .toString(),
                               textScaleFactor: 1.2,
                               textAlign: TextAlign.left,
                             ),
                           ),
+
+                          //Spacer(),
+                          // SizedBox(width: 25),
                           Expanded(
                             //width: maxwidth * .20,
                             child: Text(
                               _reportItems[index]
-                                  .fabriccolor
+                                  .customerName
                                   .toLowerCase()
                                   .toString(),
                               textScaleFactor: 1.2,
                               textAlign: TextAlign.left,
                             ),
                           ),
-                          Expanded(
-                            //width: maxwidth * .20,
-                            child: Text(
-                              _reportItems[index].dia.toLowerCase().toString(),
-                              textScaleFactor: 1.2,
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
+
                           //SizedBox(width: 90),
                           Expanded(
                               //width: maxwidth * .20,
@@ -1425,37 +1539,21 @@ class HomePageState extends State<HomePage> {
                                   color: widgetcolor),
                               onPressed: () {
                                 setState(() {
-                                  String id =
-                                      _reportItems[index].fabricmasterid;
+                                  String id = _reportItems[index].custId;
                                   _id = id;
                                   custselectedtype = selectedtype;
                                   custpageno = pageno;
                                   getAddCustomerJson();
-                                  getfabricmaster("");
-                                  getdiadetails("");
-                                  getfabriccolormaster("");
+                                  // getGroupMaster('');
                                   //setState(() {
                                   //   getCustomerJson();
-                                  // if ((_id != "") &&
-                                  //     (_id != null) &&
-                                  //     (_id != "0"))
-                                  //   _custIdController.text = _id.toString();
+                                  if ((_id != "") &&
+                                      (_id != null) &&
+                                      (_id != "0"))
+                                    _custIdController.text = _id.toString();
 
                                   /// });
                                 });
-
-                                // ad.custid;
-                                // if (id != '0' || id != null)
-                                //   Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(
-                                //           builder: (context) =>
-                                //               Addparty.AddCustomer(
-                                //                 key: null,
-                                //                 title: "Add Customer",
-                                //                 searchtext: searchtext,
-                                //               )));
-                                //
                               },
                               highlightColor: Colors.pink,
                             ),
@@ -1465,7 +1563,7 @@ class HomePageState extends State<HomePage> {
                               icon: Image.asset('Images/delete.png',
                                   color: widgetcolor),
                               onPressed: () async {
-                                String id = _reportItems[index].fabricmasterid;
+                                String id = _reportItems[index].custId;
 
                                 _id = id;
 
@@ -1600,5 +1698,37 @@ class HomePageState extends State<HomePage> {
       // return null;
     }
     return widgets;
+  }
+
+  List<Widget> generateTables() {
+    List<Widget> widgets = <Widget>[];
+    widgets.add(ListView.builder(
+        itemCount: _reportItems.length,
+        itemBuilder: (BuildContext ctxt, int index) {
+          return Expanded(
+            child: Text(
+              _reportItems[index].customerName.toString(),
+              textScaleFactor: 1.6,
+              textAlign: TextAlign.right,
+            ),
+          );
+        }));
+
+    //widgets.add(SizedBox(height: 2.0));
+    return widgets;
+  }
+
+  Widget generateChildTable() {
+    return ListView.builder(
+        itemCount: _reportItems.length,
+        itemBuilder: (BuildContext ctxt, int index) {
+          return Expanded(
+            child: Text(
+              _reportItems[index].customerName.toString(),
+              textScaleFactor: 1.6,
+              textAlign: TextAlign.right,
+            ),
+          );
+        });
   }
 }

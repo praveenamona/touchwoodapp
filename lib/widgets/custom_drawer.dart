@@ -5,6 +5,7 @@ import 'package:touchwoodapp/Widgets/custom_expansion_tile.dart' as custom;
 import 'package:touchwoodapp/Widgets/sidebar.dart' as sidebar;
 import 'package:touchwoodapp/screens/AddYarn.dart' as Yarn;
 import 'package:touchwoodapp/screens/AddFabric.dart' as Fabric;
+import 'package:touchwoodapp/screens/AddGranite.dart' as Granite;
 
 void main() {
   runApp(MyApp());
@@ -149,7 +150,35 @@ class CustomDrawer extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => sidebar.SidebarPage()));
+                                builder: (context) =>
+                                    Fabric.HomePage("10", 1)));
+                      },
+                      leading: Image.asset(
+                        'images/group.png',
+                      ),
+                      title: Text("Fabric"),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        //Navigator.of(context).pop();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    Granite.HomePage("10", 1)));
+                      },
+                      leading: Image.asset(
+                        'images/group.png',
+                      ),
+                      title: Text("Granite"),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        //Navigator.of(context).pop();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => sidebar.MyApp()));
                       },
                       leading: Image.asset(
                         'images/group.png',
@@ -233,63 +262,6 @@ class CustomDrawer extends StatelessWidget {
                 height: 1,
                 color: Colors.black,
               ),
-              // ListTile(
-              //   onTap: () {
-              //     debugPrint("User Management");
-              //   },
-              //   leading: Icon(Icons.supervised_user_circle),
-              //   title: Text("User Management"),
-              // ),
-              // Divider(
-              //   height: 1,
-              //   color: Colors.black,
-              // ),
-              // // ListTile(
-              //   onTap: () {
-              //     debugPrint("Tapped Notifications");
-              //   },
-              //   leading: Icon(Icons.settings_applications),
-              //   title: Text("Utilities"),
-              // ),
-              // Divider(
-              //   height: 1,
-              //   color: Colors.black,
-              // ),
-              // ExpansionTile(
-              //   title: ListTile(
-              //     onTap: () {
-              //       debugPrint("Tapped settings");
-              //     },
-              //     leading: Icon(Icons.settings),
-              //     title: Text("Reports"),
-              //   ),
-              //   children: [
-              //     ListTile(
-              //       onTap: () {
-              //         //Navigator.of(context).pop();
-              //         //Navigator.popAndPushNamed(context, Routes.Addparty(key: null,title:"Add Customer"));
-              //         // Navigator.push(
-              //         //     context,
-              //         //     MaterialPageRoute(
-              //         //         builder: (context) =>
-              //         //             PriceListReport.AddPricelistPage()));
-              //       },
-              //       leading: Icon(Icons.account_balance),
-              //       title: Text("Price List Report"),
-              //     ),
-              //   ],
-              // ),
-              // Divider(
-              //   height: 1,
-              //   color: Colors.black,
-              // ),
-              // ListTile(
-              //   onTap: () {
-              //     debugPrint("Tapped Log Out");
-              //   },
-              //   leading: Icon(Icons.exit_to_app),
-              //   title: Text("Log Out"),
-              // ),
             ],
           ),
         ));
