@@ -455,18 +455,18 @@ class HomePageState extends State<HomePage> {
 
       try {
         Stream<String> stream = await insertCustomer(
-            'custId',
-            'custName',
-            'custMobile',
-            'custAdd1',
-            'custAdd2',
-            'custAdd3',
-            'custAdd4',
-            'custGstin',
-            'custemail',
-            "",
-            selectedyarntype,
-            typeid);
+            1,
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "1",
+                                                      "",
+                                                      "","","","","","","","");
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
@@ -602,12 +602,10 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         yarncountdetails = yarncountdetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'yarn count')
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
             .toList();
 
       yarncountsdata = yarncountdetails.map((e) => e.columnname).toList();
@@ -647,12 +645,10 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         yarnmilldetails = yarnmilldetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'yarn mill')
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
             .toList();
 
       yarnmilldata = yarnmilldetails.map((e) => e.columnname).toList();
@@ -692,12 +688,10 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         yarncolordetails = yarncolordetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'yarn color')
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
             .toList();
 
       yarncolordata = yarncolordetails.map((e) => e.columnname).toList();
@@ -1596,7 +1590,7 @@ class HomePageState extends State<HomePage> {
                                             if (yesflag) {
                                               Stream<String> stream =
                                                   await insertCustomer(
-                                                      id,
+                                                 1,
                                                       "",
                                                       "",
                                                       "",
@@ -1607,7 +1601,7 @@ class HomePageState extends State<HomePage> {
                                                       "",
                                                       "1",
                                                       "",
-                                                      "");
+                                                      "","","","","","","","");
                                               stream.listen((String message) {
                                                 if (message.contains(
                                                         """[{"RESULT":1}]""") ||

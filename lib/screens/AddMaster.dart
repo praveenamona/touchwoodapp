@@ -10,9 +10,17 @@ import 'dart:core';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:touchwoodapp/screens/main.dart';
+import 'package:touchwoodapp/widgets/collapsing_navigation_drawer_widget.dart'
+    as drawer;
+import 'package:responsive_builder/responsive_builder.dart';
+import 'package:touchwoodapp/repository/assigncolor.dart';
+
+bool ShowAddWidget = false;
+
+bool enable = false;
 
 void main() => runApp(new MaterialApp(
-      home: new HomePage(),
+      home: new HomePage('', ''),
       theme: new ThemeData(
         brightness: Brightness.dark,
         primaryColor: Colors.lightBlue[800],
@@ -24,7 +32,7 @@ String name = "";
 
 TextEditingController _masterIdController;
 FocusNode idFocusNode;
-String id;
+String _id;
 String searchtext = '';
 
 PageController controller = PageController();
@@ -42,11 +50,20 @@ String currentPage;
 String totalPages;
 String previousPage;
 String nextPage;
-
+String tableName;
 Master _category;
+String headerName;
 
 class HomePage extends StatefulWidget {
   // reference to our single class that manages the database
+  String tablename;
+  String headername;
+  HomePage(this.tablename, this.headername);
+
+  String get gettablename {
+    tableName = tablename;
+    headerName = headername;
+  }
 
   @override
   HomePageState createState() => new HomePageState();
@@ -75,84 +92,74 @@ class HomePageState extends State<HomePage> {
 
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Group Master',
-      theme: new ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.black,
-        accentColor: Colors.black,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          leading: Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                icon: Image.asset(
-                  'images/menu.png',
-                  color: Colors.orange,
-                ),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-              );
-            },
-          ),
-          automaticallyImplyLeading: false,
-
-          title: TextField(
-              style: TextStyle(fontSize: 15),
-              decoration: InputDecoration(
-                hintText: "Search...",
-                suffixIcon: IconButton(
-                    icon:
-                        Image.asset('Images/search.png', color: Colors.orange),
-                    onPressed: () {
-                      setState(() {
-                        pageno = 1;
-                      });
-
-                      generateReport();
-                      getPagingDetails();
-                    }),
-              ),
-              keyboardType: TextInputType.text,
-              onChanged: (value) {
-                setState(() {
-                  pageno = 1;
-                  searchtext = value;
-                  //data = _reportItems;
-                  // _reportItems = (data
-                  //     .where((element) => element.columnname
-                  //         .toLowerCase()
-                  //         .contains(value.toLowerCase()))
-                  //     .toList());
-                  // if (value == "") _reportItems = data;
-                  generateReport();
-                  getPagingDetails();
-                });
-                // _reportItems = data;
-              }),
-          // centerTitle: true,
+        title: 'Sun Party',
+        theme: new ThemeData(
+          brightness: Brightness.light,
         ),
-        bottomNavigationBar: BottomAppBar(
-            //    titleSpacing: 0.0,
-            color: Colors.transparent,
-            //elevation: 5.0,
-            //  backgroundColor: Color(0xff201F23),
-            // title:
+        home: LayoutBuilder(builder: (context, BoxConstraints constraints) {
+          var maxwidth = constraints.maxWidth;
+          var minwidth = constraints.minWidth;
+          var maxheight = constraints.maxHeight;
+          var minheight = constraints.minHeight;
+
+          return ScreenTypeLayout.builder(
+            mobile: (BuildContext context) => ShowAddWidget == false
+                ? Scaffold(
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.miniEndDocked,
+                    floatingActionButton: Addbutton(),
+                    drawer: drawer.CollapsingNavigationDrawer(),
+                    appBar: appbarwid(),
+                    bottomNavigationBar: bottomapp(maxwidth, maxheight),
+                    body: bodywid(maxwidth, maxheight),
+                  )
+                : addcustomerwid(maxwidth, maxheight),
+            desktop: (BuildContext context) => Container(
+                width: maxwidth,
+                height: maxheight,
+                child: Row(children: [
+                  Expanded(
+                      flex: 3,
+                      child: Scaffold(
+                        floatingActionButtonLocation:
+                            FloatingActionButtonLocation.miniEndDocked,
+                        floatingActionButton: Addbutton(),
+                        drawer: drawer.CollapsingNavigationDrawer(),
+                        appBar: appbarwid(),
+                        bottomNavigationBar: bottomapp(maxwidth, maxheight),
+                        body: bodywid(maxwidth, maxheight),
+                      )),
+                  SizedBox(
+                      width: 5,
+                      child: Container(
+                        color: appbarcolor,
+                      )),
+                  Expanded(
+                    flex: 2,
+                    child: addcustomerwid(maxwidth, maxheight),
+                  )
+                ])),
+            watch: (BuildContext context) => Container(color: Colors.purple),
+          );
+        })); //);
+  }
+
+  Widget bottomapp(double width, double height) {
+    return BottomAppBar(
+            color: appbarcolor,
             shape: CircularNotchedRectangle(),
+            notchMargin: 6,
             child: Row(children: <Widget>[
               SizedBox(
-                  width: 50,
+                  width: width / 10,
                   child: IconButton(
-                    icon:
-                        Image.asset('Images/search.png', color: Colors.orange),
+                    icon: Image.asset('Images/search.png', color: widgetcolor),
                     onPressed: () => showModalBottomSheet(
                         context: context,
                         builder: (BuildContext context) => Container(
-                              height: 500,
+                              height: height * .20,
                               child: TextField(
-                                  // focusNode: idFocusNode,
+                                  focusNode: idFocusNode,
                                   style: TextStyle(fontSize: 15),
                                   decoration:
                                       InputDecoration(hintText: "GO TO"),
@@ -162,7 +169,7 @@ class HomePageState extends State<HomePage> {
                                         int.parse(totalPages)) {
                                       setState(() {
                                         pageno = int.parse(value);
-                                        generateReport();
+                                        //                    getCustomerJson();
                                         _controller.animateToPage(
                                           pageno,
                                           duration: Duration(milliseconds: 300),
@@ -178,46 +185,48 @@ class HomePageState extends State<HomePage> {
                     fontSize: 11,
                   )),
               SizedBox(
-                width: 10,
+                width: 20,
               ),
-              SizedBox(
-                width: 90,
-                child: DropdownButton<String>(
-                    icon: Image.asset('Images/arrow_drop_down.png',
-                        color: Colors.white),
-                    value: selectedtype,
-                    hint: SizedBox(width: 4, child: Text('Rows Per Page')),
-                    items: ['5', '7', '10', '20', '30', '40', '50']
-                        .map((String value) {
-                      return new DropdownMenuItem<String>(
-                        value: value,
-                        child: SizedBox(
-                          width: 60.0,
-                          child: new Text(
-                            value,
-                            textAlign: TextAlign.right,
+              if (selectedtype != null)
+                SizedBox(
+                  child: DropdownButton<String>(
+                      value: selectedtype,
+                      icon: Image.asset('Images/arrow_drop_down.png',
+                          color: Colors.white),
+                      hint: SizedBox(child: Text('Rows Per Page')),
+                      items: ['5', '7', '10', '20', '30', '40', '50']
+                          .map((String value) {
+                        return new DropdownMenuItem<String>(
+                          value: value,
+                          child: SizedBox(
+                            //  width: width * .60,
+                            child: new Text(
+                              value,
+                              textAlign: TextAlign.right,
+                            ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedtype = (value);
-                        getPagingDetails();
-                        generateReport();
-                      });
-                    }),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedtype = (value);
+                          //    getPagingDetails();
+                          //        getCustomerJson();
+                        });
+                      }),
+                ),
+              SizedBox(
+                width: width / 40,
               ),
               new IconButton(
-                icon:
-                    Image.asset('Images/Arrow-Left.png', color: Colors.orange),
+                icon: Image.asset('Images/Arrow-Left.png', color: widgetcolor),
                 iconSize: 20,
-                color: Colors.orange,
+                color: Colors.blue,
                 splashColor: Colors.green,
                 onPressed: () {
                   setState(() {
                     if ((pageno != 1) && (pageno != 0)) pageno = pageno - 1;
-                    generateReport();
+                    //    getCustomerJson();
                     _controller.animateToPage(
                       pageno,
                       duration: Duration(milliseconds: 300),
@@ -226,19 +235,20 @@ class HomePageState extends State<HomePage> {
                   });
                 },
               ),
-              Text((pageno == 0 ? 1 : pageno).toString() +
+              //    Spacer(),
+              Text(((pageno == 0) ? 1 : pageno).toString() +
                   '  of  ' +
-                  totalPages.toString()),
+                  (totalPages != 'null' ? totalPages : '1').toString()),
+              // Spacer(),
               new IconButton(
-                icon:
-                    Image.asset('Images/Arrow-Right.png', color: Colors.orange),
+                icon: Image.asset('Images/Arrow-Right.png', color: widgetcolor),
                 iconSize: 20,
-                color: Colors.orange,
+                color: Colors.blue,
                 splashColor: Colors.green,
                 onPressed: () {
                   setState(() {
                     if ((pageno < int.parse(totalPages))) pageno = pageno + 1;
-                    generateReport();
+                    //      getCustomerJson();
                     _controller.animateToPage(
                       pageno,
                       duration: Duration(milliseconds: 300),
@@ -247,214 +257,448 @@ class HomePageState extends State<HomePage> {
                   });
                 },
               ),
-            ])),
-        drawer: drawer.CustomDrawer(),
-        body: SingleChildScrollView(
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-              // SizedBox(
-              //   height: 20,
-              // ),
+              //  Spacer(),
+            ]))
+        //   ]),
+        ;
+  }
 
-              SizedBox(
-                height: 20,
-              ),
-
-              Row(children: [
-                Container(
-                  constraints: BoxConstraints(
-                      minHeight: 20,
-                      minWidth: 250,
-                      maxWidth: 400,
-                      // maxWidth: (MediaQuery.of(context).size.width) <= 280
-                      //     ? (MediaQuery.of(context).size.width)
-                      //     : (MediaQuery.of(context).size.width) * 0.,
-                      maxHeight: double.infinity),
-                  width: (MediaQuery.of(context).size.width),
-                  child: TextField(
-                    focusNode: idFocusNode,
-                    controller: _masterNameController,
-                    decoration: InputDecoration(
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.orange),
-                        ),
-                        border: InputBorder.none,
-                        labelText: 'Name',
-                        labelStyle: TextStyle(fontSize: 20.0)),
-                    onChanged: (value) {
-                      setState(() {
-                        name = value;
-                      });
-                    },
-                  ),
-                ),
-                Spacer(),
-              ]),
-              SizedBox(
-                height: 10,
-              ),
-
-              Row(children: [
-                Container(
-                  constraints: BoxConstraints(
-                      minHeight: 20,
-                      minWidth: 250,
-                      maxWidth: 400,
-                      maxHeight: double.infinity),
-                  width: (MediaQuery.of(context).size.width),
-                  height: 30,
-                  child: Row(
-                    children: <Widget>[
-                      // SizedBox(
-                      //   height: 10,
-                      //   width: 220,
-                      // ),
-                      Spacer(),
-                      RaisedButton(
-                        color: Colors.orange,
-                        textColor: Colors.white,
-                        disabledColor: Colors.grey,
-                        disabledTextColor: Colors.black,
-                        padding: EdgeInsets.all(8.0),
-                        splashColor: Colors.pink,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(10.0)),
-                        onPressed: () {
-                          if ((id == '0' || (id == null) || (id == "")) &&
-                              (_reportItems
-                                  .where((element) =>
-                                      element.columnname.toLowerCase() ==
-                                      _masterNameController.text.toLowerCase())
-                                  .isNotEmpty)) {
-                            Alert(
-                                context: context,
-                                title: "Alert",
-                                type: AlertType.warning,
-                                desc: "Already Exists",
-                                buttons: [
-                                  DialogButton(
-                                    child: Text(
-                                      "Close",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
-                                    onPressed: () {
-                                      clearData(context);
-                                      generateReport();
-
-                                      Navigator.of(context, rootNavigator: true)
-                                          .pop();
-                                    },
-                                    width: 120,
-                                  )
-                                ]).show();
-                            clearData(context);
-                          } else {
-                            _insert(false);
-                            generateReport();
-                            clearData(context);
-                          }
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Image.asset(
-                              'Images/save.png',
-                              color: Colors.black,
-                            ),
-                            SizedBox(width: 12.0),
-                            Text(
-                              "SAVE",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                        width: 10,
-                      ),
-                      RaisedButton(
-                        color: Colors.orange,
-                        textColor: Colors.white,
-                        disabledColor: Colors.grey,
-                        disabledTextColor: Colors.black,
-                        padding: EdgeInsets.all(8.0),
-                        splashColor: Colors.pink,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(10.0)),
-                        onPressed: () {
-                          clearData(context);
-                          idFocusNode.dispose();
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Image.asset('Images/cancel.png',
-                                color: Colors.black),
-                            SizedBox(width: 12.0),
-                            Text(
-                              "CANCEL",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      //tableView(),
-                    ],
-                  ),
-                ),
-              ]),
-              Divider(),
-
-              Row(children: [
-                Container(
-                  constraints: BoxConstraints(
-                      minHeight: 20,
-                      minWidth: 280,
-                      maxWidth: 500,
-                      maxHeight: double.infinity),
-                  width: (MediaQuery.of(context).size.width),
-                  height: (MediaQuery.of(context).size.height),
-                  child: PageView(
-                    controller: _controller,
-                    scrollDirection: Axis.horizontal,
-                    // pageSnapping: false,
-                    // dragStartBehavior: DragStartBehavior.start,
-                    children: tableView(),
-                    onPageChanged: (index) {
-                      setState(() {
-                        pageno = (index == 0 ? 1 : index);
-                        generateReport();
-                      });
-                    },
-                  ),
-                ),
-                Spacer(),
-              ])
-            ])),
-      ),
+  Widget Addbutton() {
+    return FloatingActionButton(
+      backgroundColor: widgetcolor,
+      onPressed: () {},
+      tooltip: 'Add new ' + headerName + ' entry',
+      child: IconButton(
+          icon: Image.asset('images/add.png', color: Colors.black),
+          onPressed: () {
+            setState(() {
+              //  ShowAddWidget = true;
+              // _id = '0';
+              // custpageno = pageno;
+              // custselectedtype = selectedtype;
+              // getAddCustomerJson();
+              // getGroupMaster('');
+              //setState(() {
+              //   getCustomerJson();
+              // if ((_id != "") && (_id != null) && (_id != "0"))
+              //   _custIdController.text = _id.toString();
+            });
+          }),
     );
   }
 
-  void _insert(bool del) async {
+  Widget appbarwid() {
+    return AppBar(
+      backgroundColor: appbarcolor,
+      leading: Builder(
+        builder: (BuildContext context) {
+          return IconButton(
+            icon: Image.asset(
+              'images/menu.png',
+              color: widgetcolor,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+          );
+        },
+      ),
+      automaticallyImplyLeading: false,
+      title: TextField(
+          style: TextStyle(fontSize: 15),
+          //focusNode: false,
+
+          decoration: InputDecoration(
+            hintText: "Search...",
+            suffixIcon: IconButton(
+                icon: Image.asset('Images/search.png', color: widgetcolor),
+                onPressed: () {
+                  // getCustomerJson();
+                  setState(() {
+                    pageno = 1;
+                  });
+                }),
+          ),
+          keyboardType: TextInputType.text,
+          onChanged: (value) {
+            setState(() {
+              searchtext = value;
+              pageno = 1;
+              //  getCustomerJson();
+            });
+          }),
+    );
+  }
+
+  Widget bodywid(double maxwidth, double maxheight) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Image.asset(
+                'images/menu.png',
+                color: Colors.orange,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+            );
+          },
+        ),
+        automaticallyImplyLeading: false,
+
+        title: TextField(
+            style: TextStyle(fontSize: 15),
+            decoration: InputDecoration(
+              hintText: "Search...",
+              suffixIcon: IconButton(
+                  icon: Image.asset('Images/search.png', color: Colors.orange),
+                  onPressed: () {
+                    setState(() {
+                      pageno = 1;
+                    });
+
+                    generateReport();
+                    getPagingDetails();
+                  }),
+            ),
+            keyboardType: TextInputType.text,
+            onChanged: (value) {
+              setState(() {
+                pageno = 1;
+                searchtext = value;
+                //data = _reportItems;
+                // _reportItems = (data
+                //     .where((element) => element.columnname
+                //         .toLowerCase()
+                //         .contains(value.toLowerCase()))
+                //     .toList());
+                // if (value == "") _reportItems = data;
+                generateReport();
+                getPagingDetails();
+              });
+              // _reportItems = data;
+            }),
+        // centerTitle: true,
+      ),
+      bottomNavigationBar: BottomAppBar(
+          //    titleSpacing: 0.0,
+          color: Colors.transparent,
+          //elevation: 5.0,
+          //  backgroundColor: Color(0xff201F23),
+          // title:
+          shape: CircularNotchedRectangle(),
+          child: Row(children: <Widget>[
+            SizedBox(
+                width: 50,
+                child: IconButton(
+                  icon: Image.asset('Images/search.png', color: Colors.orange),
+                  onPressed: () => showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) => Container(
+                            height: 500,
+                            child: TextField(
+                                // focusNode: idFocusNode,
+                                style: TextStyle(fontSize: 15),
+                                decoration: InputDecoration(hintText: "GO TO"),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  if (int.parse(value) <=
+                                      int.parse(totalPages)) {
+                                    setState(() {
+                                      pageno = int.parse(value);
+                                      generateReport();
+                                      _controller.animateToPage(
+                                        pageno,
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.linear,
+                                      );
+                                    });
+                                  }
+                                }),
+                          )),
+                )),
+            Text('Rows/Page',
+                style: TextStyle(
+                  fontSize: 11,
+                )),
+            SizedBox(
+              width: 10,
+            ),
+            SizedBox(
+              width: 90,
+              child: DropdownButton<String>(
+                  icon: Image.asset('Images/arrow_drop_down.png',
+                      color: Colors.white),
+                  value: selectedtype,
+                  hint: SizedBox(width: 4, child: Text('Rows Per Page')),
+                  items: ['5', '7', '10', '20', '30', '40', '50']
+                      .map((String value) {
+                    return new DropdownMenuItem<String>(
+                      value: value,
+                      child: SizedBox(
+                        width: 60.0,
+                        child: new Text(
+                          value,
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedtype = (value);
+                      getPagingDetails();
+                      generateReport();
+                    });
+                  }),
+            ),
+            new IconButton(
+              icon: Image.asset('Images/Arrow-Left.png', color: Colors.orange),
+              iconSize: 20,
+              color: Colors.orange,
+              splashColor: Colors.green,
+              onPressed: () {
+                setState(() {
+                  if ((pageno != 1) && (pageno != 0)) pageno = pageno - 1;
+                  generateReport();
+                  _controller.animateToPage(
+                    pageno,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.linear,
+                  );
+                });
+              },
+            ),
+            Text((pageno == 0 ? 1 : pageno).toString() +
+                '  of  ' +
+                totalPages.toString()),
+            new IconButton(
+              icon: Image.asset('Images/Arrow-Right.png', color: Colors.orange),
+              iconSize: 20,
+              color: Colors.orange,
+              splashColor: Colors.green,
+              onPressed: () {
+                setState(() {
+                  if ((pageno < int.parse(totalPages))) pageno = pageno + 1;
+                  generateReport();
+                  _controller.animateToPage(
+                    pageno,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.linear,
+                  );
+                });
+              },
+            ),
+          ])),
+      drawer: drawer.CustomDrawer(),
+      body: SingleChildScrollView(
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+            // SizedBox(
+            //   height: 20,
+            // ),
+
+            SizedBox(
+              height: 20,
+            ),
+
+            Row(children: [
+              Container(
+                constraints: BoxConstraints(
+                    minHeight: 20,
+                    minWidth: 250,
+                    maxWidth: 400,
+                    // maxWidth: (MediaQuery.of(context).size.width) <= 280
+                    //     ? (MediaQuery.of(context).size.width)
+                    //     : (MediaQuery.of(context).size.width) * 0.,
+                    maxHeight: double.infinity),
+                width: (MediaQuery.of(context).size.width),
+                child: TextField(
+                  focusNode: idFocusNode,
+                  controller: _masterNameController,
+                  decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.orange),
+                      ),
+                      border: InputBorder.none,
+                      labelText: 'Name',
+                      labelStyle: TextStyle(fontSize: 20.0)),
+                  onChanged: (value) {
+                    setState(() {
+                      name = value;
+                    });
+                  },
+                ),
+              ),
+              Spacer(),
+            ]),
+            SizedBox(
+              height: 10,
+            ),
+
+            Row(children: [
+              Container(
+                constraints: BoxConstraints(
+                    minHeight: 20,
+                    minWidth: 250,
+                    maxWidth: 400,
+                    maxHeight: double.infinity),
+                width: (MediaQuery.of(context).size.width),
+                height: 30,
+                child: Row(
+                  children: <Widget>[
+                    // SizedBox(
+                    //   height: 10,
+                    //   width: 220,
+                    // ),
+                    Spacer(),
+                    RaisedButton(
+                      color: Colors.orange,
+                      textColor: Colors.white,
+                      disabledColor: Colors.grey,
+                      disabledTextColor: Colors.black,
+                      padding: EdgeInsets.all(8.0),
+                      splashColor: Colors.pink,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0)),
+                      onPressed: () {
+                        if ((_id == '0' || (_id == null) || (_id == "")) &&
+                            (_reportItems
+                                .where((element) =>
+                                    element.columnname.toLowerCase() ==
+                                    _masterNameController.text.toLowerCase())
+                                .isNotEmpty)) {
+                          Alert(
+                              context: context,
+                              title: "Alert",
+                              type: AlertType.warning,
+                              desc: "Already Exists",
+                              buttons: [
+                                DialogButton(
+                                  child: Text(
+                                    "Close",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20),
+                                  ),
+                                  onPressed: () {
+                                    clearData(context);
+                                    generateReport();
+
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pop();
+                                  },
+                                  width: 120,
+                                )
+                              ]).show();
+                          clearData(context);
+                        } else {
+                          saveItems(false);
+                          generateReport();
+                          clearData(context);
+                        }
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset(
+                            'Images/save.png',
+                            color: Colors.black,
+                          ),
+                          SizedBox(width: 12.0),
+                          Text(
+                            "SAVE",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                      width: 10,
+                    ),
+                    RaisedButton(
+                      color: Colors.orange,
+                      textColor: Colors.white,
+                      disabledColor: Colors.grey,
+                      disabledTextColor: Colors.black,
+                      padding: EdgeInsets.all(8.0),
+                      splashColor: Colors.pink,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0)),
+                      onPressed: () {
+                        clearData(context);
+                        idFocusNode.dispose();
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset('Images/cancel.png', color: Colors.black),
+                          SizedBox(width: 12.0),
+                          Text(
+                            "CANCEL",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    //tableView(),
+                  ],
+                ),
+              ),
+            ]),
+            Divider(),
+
+            Row(children: [
+              Container(
+                constraints: BoxConstraints(
+                    minHeight: 20,
+                    minWidth: 280,
+                    maxWidth: 500,
+                    maxHeight: double.infinity),
+                width: (MediaQuery.of(context).size.width),
+                height: (MediaQuery.of(context).size.height),
+                child: PageView(
+                  controller: _controller,
+                  scrollDirection: Axis.horizontal,
+                  // pageSnapping: false,
+                  // dragStartBehavior: DragStartBehavior.start,
+                  children: tableView(),
+                  onPageChanged: (index) {
+                    setState(() {
+                      pageno = (index == 0 ? 1 : index);
+                      generateReport();
+                    });
+                  },
+                ),
+              ),
+              Spacer(),
+            ])
+          ])),
+    );
+  }
+
+  void saveItems(bool del) async {
     String custName = _masterNameController.text;
     //  String id = _masterIdController.text;
-    if (id == null || (id == '')) id = '0';
-    if (custName != '' && id != '') {
+    if (_id == null || (_id == '')) _id = '0';
+    if (custName != '' && _id != '') {
       Stream<String> stream = await insertMaster(
-          id, 'groupMaster', '1', custName, (del == true ? '1' : '0'));
+          _id, 'groupMaster', '1', custName, (del == true ? '1' : '0'));
       stream.listen((String message) => setState(() {
             if (message.contains("""[{"RESULT":1}]""") ||
                 message.contains("""[{"RESULT":2}]""")) {
@@ -532,8 +776,7 @@ class HomePageState extends State<HomePage> {
     String customerurl;
     if (searchtext == null || searchtext == '') {
       customerurl =
-          "https://cors-anywhere.herokuapp.com/http://posmmapi.suninfotechnologies.in/api/master?&intflag=4&strTableName=groupmaster&pagesize=" +
-              selectedtype.toString();
+          'https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=20&Mode=master&spname=GetAndSubmitMasterTable&intflag=1&strTableName=YarnCountMaster&strColumnData=30s&intOrganizationMasterID=1';
     } else {
       customerurl =
           "https://cors-anywhere.herokuapp.com/http://posmmapi.suninfotechnologies.in/api/master?&intflag=4&strTableName=groupmaster&pagesize=" +
@@ -566,7 +809,7 @@ class HomePageState extends State<HomePage> {
 
   void clearData(context) {
     _masterNameController.text = '';
-    id = '';
+    _id = '';
     // Navigator.pop(context);
     //  FocusScope.of(context).requestFocus(idFocusNode);
   }
@@ -613,12 +856,12 @@ class HomePageState extends State<HomePage> {
                                     color: Colors.orange),
                                 highlightColor: Colors.pink,
                                 onPressed: () {
-                                  id = _reportItems[index]
+                                  _id = _reportItems[index]
                                       .columnMasterid
                                       .toString();
                                   _masterNameController.text =
                                       _reportItems[index].columnname.toString();
-                                  // _insert();
+                                  // saveItems();
                                   setState(() {
                                     generateReport();
                                   });
@@ -634,7 +877,7 @@ class HomePageState extends State<HomePage> {
                               highlightColor: Colors.pink,
                               onPressed: () {
                                 clearData(context);
-                                id = _reportItems[index]
+                                _id = _reportItems[index]
                                     .columnMasterid
                                     .toString();
                                 _masterNameController.text =
@@ -660,8 +903,8 @@ class HomePageState extends State<HomePage> {
                                           yesflag = true;
                                           del = true;
                                           if (yesflag) {
-                                            if (id != '0' || id != null) {
-                                              _insert(true);
+                                            if (_id != '0' || _id != null) {
+                                              saveItems(true);
                                             }
                                           }
                                           getPagingDetails();
@@ -693,7 +936,7 @@ class HomePageState extends State<HomePage> {
                                     ]).show();
 
                                 // del = true;
-                                // _insert();
+                                // saveItems();
 
                                 // setState(() {
                                 //   generateReport();
@@ -722,6 +965,212 @@ class HomePageState extends State<HomePage> {
       // return null;
     }
     return widgets;
+  }
+
+  Widget addcustomerwid(double maxwidth, double maxheight) {
+    return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Padding(
+            padding: EdgeInsets.only(
+              bottom: 30,
+            ),
+            child: Text(
+              'Add ' + headerName,
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          backgroundColor: appbarcolor,
+          centerTitle: true,
+        ),
+        body: Container(
+          height: maxheight,
+          width: maxwidth,
+          child: Expanded(
+            child: Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Flexible(
+                      //flex: 2,
+                      child: FractionallySizedBox(
+                          widthFactor: 0.9,
+                          heightFactor: 1,
+                          child: Container(
+                              height: maxheight,
+                              width: maxwidth,
+
+                              //width: MediaQuery.of(context).size.width,5
+                              margin: EdgeInsets.only(top: 0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.white,
+                              ),
+                              child: Container(
+                                  margin: EdgeInsets.all(15.0),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.vertical,
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 300,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                  labelText: "Name",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              //style: textStyle,
+                                              controller: _masterIdController,
+                                              //focusNode: custidFocusNode,
+
+                                              readOnly: enable,
+                                              //enableInteractiveSelection: enable,
+                                            ),
+                                          ),
+                                        ]),
+                                  )))))
+                ] // )
+                ),
+          ),
+        ),
+        bottomNavigationBar: BottomAppBar(
+            color: Colors.tealAccent,
+            shape: CircularNotchedRectangle(),
+            notchMargin: 6,
+            child: Row(children: <Widget>[
+              Spacer(),
+              SizedBox(
+                width: 10,
+              ),
+              Container(
+                child: RaisedButton(
+                    onPressed: () async {
+                      if ((_id != "") && (_id != null) && (_id != "0")) {
+                        setState(() {
+                          enable = true;
+                        });
+                        saveItems(false);
+                      } else {
+                        final String customerurl =
+                            "http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=5&strPartyname=" +
+                                _masterIdController.text;
+
+                        var response = await http.get(
+                            Uri.encodeFull(customerurl),
+                            headers: {"Accept": "application/json"});
+                        var convertDataToJson = json.decode(response.body);
+                        setState(() {
+                          enable = true;
+                        });
+                        if (convertDataToJson[0]
+                            .toString()
+                            .contains("Already Exists: Already Exists")) {
+                          Alert(
+                              context: context,
+                              title: "Alert",
+                              type: AlertType.warning,
+                              desc: "Already Exists",
+                              buttons: [
+                                DialogButton(
+                                  child: Text(
+                                    "Close",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      ShowAddWidget = false;
+                                    });
+                                    //clearData(context);
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pop();
+
+                                    // Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) => HomePage(
+                                    //             custselectedtype, custpageno)));
+                                  },
+                                  width: 120,
+                                )
+                              ]).show();
+                        } else {
+                          // pr.show();
+                          saveItems(false);
+
+                          // Function f;
+                          // f = await Navigator.pushNamed(context, 'Dashboard',
+                          //     arguments: {custselectedtype, custpageno});
+                          // f();
+                        }
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset('Images/save.png', color: Colors.black),
+                        SizedBox(width: 10.0),
+                        Text(
+                          "SAVE",
+                          style: TextStyle(color: Colors.black),
+                        )
+                      ],
+                    ),
+                    color: widgetcolor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(10.0))),
+                padding: EdgeInsets.only(top: 5, bottom: 5),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Container(
+                child: RaisedButton(
+                    onPressed: () {
+                      setState(() {
+                        ShowAddWidget = false;
+                      });
+
+                      clearData(context);
+                      // saveItems();
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset('Images/cancel.png', color: Colors.black),
+                        SizedBox(width: 10.0),
+                        Text(
+                          "CANCEL",
+                          style: TextStyle(color: Colors.black),
+                        )
+                      ],
+                    ),
+                    color: widgetcolor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(10.0))),
+                padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
+              )
+            ])));
   }
 
   List<Master> _masters;
@@ -755,29 +1204,22 @@ class HomePageState extends State<HomePage> {
     setState(() {
       _reportItems = [];
     });
-//     Stream<Master> stream = await getMasters(
-//         pagesize: (selectedtype == "" ? '10' : selectedtype),
-//         pagenum: ((pageno.toString() != 'null' &&
-//                 pageno.toString() != '' &&
-//                 pageno.toString() != '0')
-//             ? pageno.toString()
-//             : '1'),
-//         text: searchtext);
-//     stream.forEach((element) => setState(() {
-//           _reportItems.add(element);
-//         }));
     String customerurl1;
 
     if (searchtext == null || searchtext == '') {
       customerurl1 =
-          "https://cors-anywhere.herokuapp.com/http://posmmapi.suninfotechnologies.in/api/master?&intflag=4&strTableName=groupmaster&pagesize=" +
-              selectedtype.toString() +
-              "&pagenumber=" +
+          'https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&pagenumber=' +
               ((pageno.toString() != 'null' &&
                       pageno.toString() != '' &&
                       pageno.toString() != '0')
                   ? pageno.toString()
-                  : '1');
+                  : '1') +
+              '&pagesize=' +
+              selectedtype.toString() +
+              '&Mode=master&spname=GetAndSubmitMasterTable&intflag=4' +
+              '&strTableName=' +
+              tableName +
+              '&intOrganizationMasterID=1&strcolumnname=test';
     } else {
       customerurl1 =
           "https://cors-anywhere.herokuapp.com/http://posmmapi.suninfotechnologies.in/api/master?&intflag=4&strTableName=groupmaster&pagesize=" +

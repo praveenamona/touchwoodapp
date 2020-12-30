@@ -9,7 +9,7 @@ import 'package:touchwoodapp/models/customer.dart';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
 import 'package:touchwoodapp/repository/cutomer_repository.dart';
-import 'package:touchwoodapp/screens/AddCustomer.dart' as Addparty;
+
 import 'dart:convert';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'dart:core';
@@ -650,19 +650,8 @@ class HomePageState extends State<HomePage> {
       //   pr.show();
 
       try {
-        Stream<String> stream = await insertCustomer(
-            custId,
-            custName,
-            custMobile,
-            custAdd1,
-            custAdd2,
-            custAdd3,
-            custAdd4,
-            custGstin,
-            custemail,
-            "",
-            selectedcustomer,
-            typeid);
+        Stream<String> stream = await insertCustomer(1, "", "", "", "", "", "",
+            "", "", "1", "", "", "", "", "", "", "", "", "");
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
@@ -1590,7 +1579,7 @@ class HomePageState extends State<HomePage> {
                                             if (yesflag) {
                                               Stream<String> stream =
                                                   await insertCustomer(
-                                                      id,
+                                                      1,
                                                       "",
                                                       "",
                                                       "",
@@ -1600,6 +1589,13 @@ class HomePageState extends State<HomePage> {
                                                       "",
                                                       "",
                                                       "1",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
                                                       "",
                                                       "");
                                               stream.listen((String message) {

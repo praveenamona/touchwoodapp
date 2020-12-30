@@ -7,15 +7,19 @@ Future<Stream<Master>> getMasters(
     {String pagesize = '10',
     String pagenum = '1',
     String text = '',
+    String tablename = '',
     String all = '0'}) async {
   String url;
   if (text == '' || text == null) {
     url = MyHome.BASE_URL +
-        '/master?&intflag=4&strTableName=groupmaster&pagesize=' +
-        pagesize +
-        '&pagenumber=' +
+        '/touch?&pagenumber=' +
         pagenum +
-        (all == '1' ? '&records=ALL' : '');
+        '&pagesize=' +
+        pagesize +
+        '&Mode=master&spname=GetAndSubmitMasterTable&intflag=4&strTableName=' +
+        tablename +
+        '' +
+        '&intOrganizationMasterID=1';
   } else {
     url = MyHome.BASE_URL +
         '/master?&intflag=4&strTableName=groupmaster&pagesize=' +
@@ -37,9 +41,14 @@ Future<Stream<Master>> getMasters(
       .map((data) => Master.fromJSON(data));
 }
 
-Future<Stream<Master>> getMaster(String id) async {
+Future<Stream<Master>> getMaster(String id, String tablename) async {
   final String url = MyHome.BASE_URL +
-      '/master?&intflag=4&strTableName=groupmaster&pagesize=10000';
+      '/touch?&pagenumber=1&pagesize=20&Mode=master&spname=GetAndSubmitMasterTable&intflag=4&strTableName=' +
+      tablename +
+      '' +
+      '&intOrganizationMasterID=1&intmasterid=' +
+      id +
+      '';
 
   final client = new http.Client();
   final streamedRest = await client.send(http.Request('get', Uri.parse(url)));
@@ -65,19 +74,12 @@ Future<Stream<String>> insertMaster(
     }
   }
   final String url = MyHome.BASE_URL +
-      '/master?&intflag=' +
-      intflag +
-      '&strTableName=' +
+      '/touch?&pagenumber=1&pagesize=20&Mode=master&spname=GetAndSubmitMasterTable&intflag=1&strTableName=' +
       name +
-      '&' +
-      'intMasterID=' +
       '' +
-      masterid.toString() +
-      '' +
-      '&intUserID=' +
-      userid +
-      '&strColumnData=' +
-      columndata;
+      '&intOrganizationMasterID=1&strcolumnname=' +
+      columndata +
+      '';
   print(url);
   final client = new http.Client();
   final streamedRest = await client.send(http.Request('get', Uri.parse(url)));

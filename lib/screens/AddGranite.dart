@@ -546,18 +546,18 @@ class HomePageState extends State<HomePage> {
 
       try {
         Stream<String> stream = await insertCustomer(
-            'custId',
-            'custName',
-            'custMobile',
-            'custAdd1',
-            'custAdd2',
-            'custAdd3',
-            'custAdd4',
-            'custGstin',
-            'custemail',
-            "",
-            "selectedgranitetype",
-            typeid);
+         1,
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "1",
+                                                      "",
+                                                      "","","","","","","","");
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
@@ -650,12 +650,10 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         groupdetails = groupdetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'group')
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
             .toList();
 
       granitegroupdata = groupdetails.map((e) => e.columnname).toList();
@@ -669,7 +667,7 @@ class HomePageState extends State<HomePage> {
           .toString();
     });
 
-    return typedetails;
+    return groupdetails;
   }
 
   Future<List<Master.Master>> getuomdetails(String filter) async {
@@ -695,12 +693,10 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         uomdetails = uomdetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'uom')
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
             .toList();
 
       graniteuomdata = uomdetails.map((e) => e.columnname).toList();
@@ -740,12 +736,10 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         granitecolordetails = granitecolordetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'granite color')
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
             .toList();
 
       granitecolordata = granitecolordetails.map((e) => e.columnname).toList();
@@ -786,12 +780,10 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         granitetypedetails = granitetypedetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'type')
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
             .toList();
 
       granitetypedata = granitetypedetails.map((e) => e.columnname).toList();
@@ -831,12 +823,10 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         measurementdetails = measurementdetails
-            .where((element) =>
-                element.columnname
-                    .toLowerCase()
-                    .toString()
-                    .contains(filter.toLowerCase().toString()) &&
-                element.tablename == 'type')
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
             .toList();
 
       granitemeasurementdata =
@@ -1761,7 +1751,7 @@ class HomePageState extends State<HomePage> {
                                             if (yesflag) {
                                               Stream<String> stream =
                                                   await insertCustomer(
-                                                      id,
+                                                    1,
                                                       "",
                                                       "",
                                                       "",
@@ -1772,7 +1762,7 @@ class HomePageState extends State<HomePage> {
                                                       "",
                                                       "1",
                                                       "",
-                                                      "");
+                                                      "","","","","","","","");
                                               stream.listen((String message) {
                                                 if (message.contains(
                                                         """[{"RESULT":1}]""") ||

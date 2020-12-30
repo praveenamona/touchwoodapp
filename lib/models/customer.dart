@@ -9,18 +9,32 @@ class Customer {
   final String add3;
   final String add4;
   final String partytype;
+  final String contactperson;
+  final String bankname;
+  final String bankaddress;
+  final String bankbranch;
+  final String country;
+  final String swiftcode;
+  final String remarks;
   final String gstin;
 
   Customer.fromJSON(Map<String, dynamic> jsonMap)
-      : add1 = jsonMap['Add1'].toString(),
-        add2 = jsonMap['Add2'].toString(),
-        email = jsonMap['EmailID'].toString(),
-        gstin = jsonMap['Gstin'].toString(),
-        add3 = jsonMap['Add3'].toString(),
-        add4 = jsonMap['Add4'].toString(),
-        custId = jsonMap['PartyMasterID'].toString(),
-        customerName = jsonMap['Partyname'].toString(),
-        mobile = jsonMap['Mobileno'].toString(),
-        partytypeMasterID = jsonMap['PartytypeMasterID'].toString(),
-        partytype = jsonMap['Partytype'].toString();
+      : add1 = jsonMap['add1'].toString(),
+        add2 = jsonMap['add2'].toString(),
+        email = jsonMap['emailid'].toString(),
+        gstin = jsonMap['taxcode'].toString(),
+        add3 = jsonMap['add3'].toString(),
+        add4 = jsonMap['add4'].toString(),
+        contactperson = jsonMap['contactperson'].toString(),
+        custId = jsonMap['party_id'].toString(),
+        customerName = jsonMap['partyname'].toString(),
+        mobile = jsonMap['mobileno'].toString(),
+        partytypeMasterID = jsonMap['partytype_id'].toString(),
+        partytype = jsonMap['partytype'].toString(),
+        bankname = jsonMap['bankname'].toString(),
+        bankaddress = jsonMap['bankaddress'].toString(),
+        bankbranch = jsonMap['bankbranch'].toString(),
+        country = jsonMap['country'].toString(),
+        swiftcode = jsonMap['swiftcode'].toString(),
+        remarks = jsonMap['remarks'].toString();
 }

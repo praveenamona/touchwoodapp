@@ -30,8 +30,26 @@ Future<Stream<Customer>> getCustomer(String id) async {
       .where((e) => e.custId == id);
 }
 
-Future<Stream<String>> insertCustomer(custId, custName, mobile, add1, add2,
-    add3, add4, gstin, email, del, type, typeid) async {
+Future<Stream<String>> insertCustomer(
+    custId,
+    custName,
+    mobile,
+    add1,
+    add2,
+    add3,
+    add4,
+    gstin,
+    email,
+    del,
+    contact,
+    taxcode,
+    remarks,
+    bankname,
+    bankaddress,
+    bankbranch,
+    country,
+    swiftcode,
+    typeid) async {
   String intflag = "";
   if (del == "1") {
     intflag = "3";
@@ -43,37 +61,48 @@ Future<Stream<String>> insertCustomer(custId, custName, mobile, add1, add2,
     }
   }
   final String url = MyHome.BASE_URL +
-      '/partymaster?&intflag=' +
+      '/touch?&pagenumber=1&pagesize=20&Mode=partymaster&spname=GetAndSubmitPartymaster' +
+      '&intflag=' +
       intflag +
       '&intPartyMasterID=' +
       custId +
-      '&' +
-      'strPartyname=' +
-      '' +
-      custName.toString() +
-      '' +
+      '&strPartyname=' +
+      custName +
       '&strAdd1=' +
-      add1.toString() +
-      '' +
+      add1 +
       '&strAdd2=' +
-      add2.toString() +
-      '&strAdd3=' +
-      add3.toString() +
+      add2 +
+      '&' +
+      'strAdd3=' +
+      add3 +
       '&strAdd4=' +
-      add4.toString() +
+      add4 +
+      '&strContactperson=' +
+      contact +
       '&strMobileno=' +
-      mobile.toString() +
+      mobile +
       '&strEmailID=' +
-      email.toString() +
-      '&strGstin=' +
-      gstin.toString() +
-      '&intOrganizationMasterID=1' +
-      '&intPartytypeMasterID=' +
-      typeid.toString() +
-      '&intUserID=1';
+      email +
+      '&strTaxcode=' +
+      taxcode +
+      '&strRemarks=' +
+      remarks +
+      '&strBankname=' +
+      bankname +
+      '' +
+      '&strBankaddress=' +
+      bankaddress +
+      '&strBankBranch=' +
+      bankbranch +
+      '&strCountry=' +
+      country +
+      '&strSwiftcode=' +
+      swiftcode +
+      '' +
+      '&intOrgID=1&intPartytypeID=1&intUserID=1';
   print(url);
   final client = new http.Client();
   final streamedRest = await client.send(http.Request('get', Uri.parse(url)));
 
-  return streamedRest.stream.transform(utf8.decoder);
+  return streamedRest.stream.asBroadcastStream().transform(utf8.decoder);
 }

@@ -7,9 +7,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:touchwoodapp/models/Master.dart';
 import 'package:touchwoodapp/models/customer.dart';
 import 'package:touchwoodapp/models/Paging.dart';
-import 'package:touchwoodapp/widgets/sidebar.dart' as drawer;
+import 'package:touchwoodapp/widgets/collapsing_navigation_drawer_widget.dart'
+    as drawer;
 import 'package:touchwoodapp/repository/cutomer_repository.dart';
-import 'package:touchwoodapp/screens/AddCustomer.dart' as Addparty;
+
 import 'dart:convert';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'dart:core';
@@ -79,6 +80,12 @@ final _custAdd3Controller = TextEditingController();
 final _custAdd4Controller = TextEditingController();
 final _custEmailController = TextEditingController();
 final _custGstinController = TextEditingController();
+final _custContactPersonController = TextEditingController();
+final _custBanknameController = TextEditingController();
+final _custBankAddressController = TextEditingController();
+final _custBankBranchController = TextEditingController();
+final _custCountryController = TextEditingController();
+final _custSwiftCodeController = TextEditingController();
 ProgressDialog pr;
 FocusNode custidFocusNode;
 double maxwidth;
@@ -197,11 +204,9 @@ class HomePageState extends State<HomePage> {
 
                                                     typeid = typedetails
                                                         .where((element) =>
-                                                            element
-                                                                .columnname ==
+                                                            element.ptyname ==
                                                             val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
+                                                        .map((e) => e.partyid)
                                                         .first
                                                         .toString();
                                                   });
@@ -345,8 +350,35 @@ class HomePageState extends State<HomePage> {
                                           ),
                                           Container(
                                             constraints: BoxConstraints(
-                                              //  minHeight: 20,
                                               minWidth: 300,
+                                              //  minHeight: 20,
+                                              maxWidth: 300,
+                                              //maxHeight: double.infinity
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Contact Person",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              style: textStyle,
+                                              controller:
+                                                  _custContactPersonController,
+                                            ),
+                                          ),
+
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 300,
+                                              //  minHeight: 20,
                                               maxWidth: 300,
                                               //maxHeight: double.infinity
                                             ),
@@ -382,7 +414,7 @@ class HomePageState extends State<HomePage> {
                                                         color: widgetcolor),
                                                   ),
                                                   border: InputBorder.none,
-                                                  labelText: "GSTIN",
+                                                  labelText: "Tax Code",
                                                   labelStyle: TextStyle(
                                                       fontSize: 20.0)),
 
@@ -416,6 +448,127 @@ class HomePageState extends State<HomePage> {
                                               style: textStyle,
                                               controller: _custEmailController,
                                               //focusNode: custidFocusNode,
+                                            ),
+                                          ),
+
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Bank Name",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custBanknameController,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Bank Address",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custBankAddressController,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Bank Branch",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custBankBranchController,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Country",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custCountryController,
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Swift Code",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custSwiftCodeController,
                                             ),
                                           ),
                                           Container(
@@ -600,6 +753,14 @@ class HomePageState extends State<HomePage> {
     String custAdd3 = _custAdd3Controller.text;
     String custAdd4 = _custAdd4Controller.text;
     String custemail = _custEmailController.text;
+    String custcontact = _custContactPersonController.text;
+    String custRemarks = _custRemarksController.text;
+    String custBankName = _custBanknameController.text;
+    String custBankAddress = _custBankAddressController.text;
+    String custBankBranch = _custBankBranchController.text;
+    String custCountry = _custCountryController.text;
+    String custSwiftCode = _custSwiftCodeController.text;
+
     if (custId != '' && custName != '') {
       try {
         Stream<String> stream = await insertCustomer(
@@ -612,10 +773,17 @@ class HomePageState extends State<HomePage> {
             custAdd4,
             custGstin,
             custemail,
-            "",
-            selectedcustomer,
+            0,
+            custcontact,
+            custGstin,
+            custRemarks,
+            custBankName,
+            custBankAddress,
+            custBankBranch,
+            custCountry,
+            custSwiftCode,
             typeid);
-        stream.listen((String message) {
+        stream.asBroadcastStream().listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
             setState(() {
@@ -698,7 +866,7 @@ class HomePageState extends State<HomePage> {
 
   List<customer.Customer> data = new List<customer.Customer>();
 
-  Future<List<Master>> getGroupMaster(String filter) async {
+  Future<List<type.Customer>> getGroupMaster(String filter) async {
     setState(() {
       typedetails = [];
       typedata = [];
@@ -720,19 +888,19 @@ class HomePageState extends State<HomePage> {
 
       if (filter != "")
         typedetails = typedetails
-            .where((element) => element.columnname
+            .where((element) => element.ptyname
                 .toLowerCase()
                 .toString()
                 .contains(filter.toLowerCase().toString()))
             .toList();
 
-      typedata = typedetails.map((e) => e.columnname).toList();
+      typedata = typedetails.map((e) => e.ptyname).toList();
       if (typeid == '' || typeid == null || typeid == '0')
         selectedcustomer = typedata.first;
 
       typeid = typeid = typedetails
-          .where((element) => element.columnname == selectedcustomer)
-          .map((e) => e.columnMasterid)
+          .where((element) => element.ptyname == selectedcustomer)
+          .map((e) => e.partyid)
           .first
           .toString();
     });
@@ -745,13 +913,13 @@ class HomePageState extends State<HomePage> {
 
     if (searchtext == '' || searchtext == null) {
       customerurl =
-          'http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=4&pagesize=' +
+          'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&pagesize=' +
               custselectedtype +
               '&pagenumber=' +
               custpageno.toString();
     } else {
       customerurl =
-          'http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=4&pagesize=' +
+          'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&pagesize=' +
               custselectedtype +
               '&pagenumber=' +
               custpageno.toString() +
@@ -783,6 +951,13 @@ class HomePageState extends State<HomePage> {
                 _custMobileController.text = element.mobile;
                 _custGstinController.text = element.gstin;
                 _custNameController.text = element.customerName;
+                _custContactPersonController.text = element.contactperson;
+                _custBanknameController.text = element.bankname;
+                _custBankAddressController.text = element.bankaddress;
+                _custBankBranchController.text = element.bankbranch;
+                _custCountryController.text = element.country;
+                _custSwiftCodeController.text = element.swiftcode;
+                _custRemarksController.text = element.remarks;
               }));
   }
 
@@ -908,7 +1083,7 @@ class HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Expanded(
-                    child: Text("Type",
+                    child: Text("Name",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -916,7 +1091,23 @@ class HomePageState extends State<HomePage> {
                         )),
                   ),
                   Expanded(
-                    child: Text("Name",
+                    child: Text("Email",
+                        textScaleFactor: 1.7,
+                        textAlign: TextAlign.left,
+                        style: new TextStyle(
+                          color: widgetcolor,
+                        )),
+                  ),
+                  Expanded(
+                    child: Text("Mobile No",
+                        textScaleFactor: 1.7,
+                        textAlign: TextAlign.left,
+                        style: new TextStyle(
+                          color: widgetcolor,
+                        )),
+                  ),
+                  Expanded(
+                    child: Text("Country",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -1118,7 +1309,7 @@ class HomePageState extends State<HomePage> {
                     floatingActionButtonLocation:
                         FloatingActionButtonLocation.miniEndDocked,
                     floatingActionButton: Addbutton(),
-                    drawer: drawer.CustomDrawer(),
+                    drawer: drawer.CollapsingNavigationDrawer(),
                     appBar: appbarwid(),
                     bottomNavigationBar: bottomapp(maxwidth, maxheight),
                     body: bodywid(maxwidth, maxheight),
@@ -1134,7 +1325,7 @@ class HomePageState extends State<HomePage> {
                         floatingActionButtonLocation:
                             FloatingActionButtonLocation.miniEndDocked,
                         floatingActionButton: Addbutton(),
-                        drawer: drawer.CustomDrawer(),
+                        drawer: drawer.CollapsingNavigationDrawer(),
                         appBar: appbarwid(),
                         bottomNavigationBar: bottomapp(maxwidth, maxheight),
                         body: bodywid(maxwidth, maxheight),
@@ -1166,7 +1357,7 @@ class HomePageState extends State<HomePage> {
 
       if (searchtext == null || searchtext == '') {
         customerurl =
-            "https://cors-anywhere.herokuapp.com/http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=4&pagesize=" +
+            "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intPartytypeID=1&intUserID=1&pagesize=" +
                 (selectedtype).toString() +
                 "&pagenumber=" +
                 ((pageno.toString() != 'null' &&
@@ -1248,7 +1439,7 @@ class HomePageState extends State<HomePage> {
                             //width: maxwidth * .20,
                             child: Text(
                               _reportItems[index]
-                                  .partytype
+                                  .customerName
                                   .toLowerCase()
                                   .toString(),
                               textScaleFactor: 1.2,
@@ -1262,7 +1453,33 @@ class HomePageState extends State<HomePage> {
                             //width: maxwidth * .20,
                             child: Text(
                               _reportItems[index]
-                                  .customerName
+                                  .email
+                                  .toLowerCase()
+                                  .toString(),
+                              textScaleFactor: 1.2,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+
+                          // SizedBox(width: 25),
+                          Expanded(
+                            //width: maxwidth * .20,
+                            child: Text(
+                              _reportItems[index]
+                                  .mobile
+                                  .toLowerCase()
+                                  .toString(),
+                              textScaleFactor: 1.2,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+
+                          // SizedBox(width: 25),
+                          Expanded(
+                            //width: maxwidth * .20,
+                            child: Text(
+                              _reportItems[index]
+                                  .country
                                   .toLowerCase()
                                   .toString(),
                               textScaleFactor: 1.2,
@@ -1355,8 +1572,17 @@ class HomePageState extends State<HomePage> {
                                                       "",
                                                       "1",
                                                       "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
                                                       "");
-                                              stream.listen((String message) {
+                                              stream
+                                                  .asBroadcastStream()
+                                                  .listen((String message) {
                                                 if (message.contains(
                                                         """[{"RESULT":1}]""") ||
                                                     message.contains(
@@ -1380,6 +1606,11 @@ class HomePageState extends State<HomePage> {
                                                           ),
                                                           onPressed: () {
                                                             getCustomerJson();
+                                                            Navigator.of(
+                                                                    context,
+                                                                    rootNavigator:
+                                                                        true)
+                                                                .pop();
                                                             // Navigator.push(
                                                             //     context,
                                                             //     MaterialPageRoute(
@@ -1421,7 +1652,9 @@ class HomePageState extends State<HomePage> {
                                           ),
                                           onPressed: () {
                                             yesflag = false;
-                                            Navigator.pop(context);
+                                            Navigator.of(context,
+                                                    rootNavigator: true)
+                                                .pop();
                                           },
                                           width: 120,
                                         )

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:touchwoodapp/screens/Customer.dart' as dashboard;
 import 'package:touchwoodapp/screens/relative.dart' as relative;
 import 'package:touchwoodapp/Widgets/custom_expansion_tile.dart' as custom;
 import 'package:touchwoodapp/Widgets/sidebar.dart' as sidebar;
