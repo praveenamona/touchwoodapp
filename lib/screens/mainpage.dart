@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:touchwoodapp/screens/dashboard.dart' as dashboard;
+import 'package:touchwoodapp/screens/Supplierdashboard.dart' as dashboard;
 
 void main() => runApp(MyApp());
 

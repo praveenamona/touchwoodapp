@@ -28,7 +28,7 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:touchwoodapp/models/customer.dart' as customer;
-import 'package:touchwoodapp/screens/dashboard.dart';
+import 'package:touchwoodapp/screens/Supplierdashboard.dart';
 import 'package:dio/dio.dart';
 import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:dropdown_search/dropdown_search.dart';
@@ -61,7 +61,7 @@ String searchtext;
 String selectedcustomer;
 String custselectedtype;
 int custpageno;
-String typeid;
+String typeid = "2";
 GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<customer.Customer>>();
 String _id = "";
 TextStyle textStyle = new TextStyle(color: Colors.black);
@@ -117,7 +117,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add Customer',
+              'Add Supplier',
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -158,7 +158,7 @@ class HomePageState extends State<HomePage> {
                                             MainAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            "Enter Customer Details",
+                                            "Enter Supplier Details",
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           SizedBox(
@@ -170,52 +170,52 @@ class HomePageState extends State<HomePage> {
                                           //     spacing: 150,
                                           //     //   runSpacing: 200,
                                           //children: [
-                                          if (typedata != null &&
-                                              typedata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Type",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: typedata,
-                                                label: "Type *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedcustomer = val;
+                                          // if (typedata != null &&
+                                          //     typedata.isNotEmpty)
+                                          //   Container(
+                                          //     constraints: BoxConstraints(
+                                          //       minWidth: 200,
+                                          //       maxWidth: 380,
+                                          //     ),
+                                          //     //padding: EdgeInsets.,
+                                          //     width: maxwidth * .7, //* 0.50,
+                                          //     child: DropdownSearch<String>(
+                                          //       dropDownButton: Image.asset(
+                                          //           'Images/arrow_drop_down.png',
+                                          //           color: Colors.white),
+                                          //       validator: (v) => v == null
+                                          //           ? "required field"
+                                          //           : null,
+                                          //       hint: "Select a Type",
+                                          //       mode: Mode.MENU,
+                                          //       enabled: (_id != null &&
+                                          //               _id != '' &&
+                                          //               _id != '0')
+                                          //           ? false
+                                          //           : true,
+                                          //       showSelectedItem: true,
+                                          //       showSearchBox: true,
+                                          //       items: typedata,
+                                          //       label: "Type *",
+                                          //       showClearButton: false,
+                                          //       onChanged: (val) {
+                                          //         setState(() {
+                                          //           selectedcustomer = val;
 
-                                                    typeid = typedetails
-                                                        .where((element) =>
-                                                            element.ptyname ==
-                                                            val)
-                                                        .map((e) => e.partyid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedcustomer,
-                                              ),
-                                            ),
+                                          //           typeid = typedetails
+                                          //               .where((element) =>
+                                          //                   element.ptyname ==
+                                          //                   val)
+                                          //               .map((e) => e.partyid)
+                                          //               .first
+                                          //               .toString();
+                                          //         });
+                                          //       },
+                                          //       popupItemDisabled: (String s) =>
+                                          //           s.startsWith('I'),
+                                          //       selectedItem: selectedcustomer,
+                                          //     ),
+                                          //   ),
 
                                           // Wrap(spacing: 20, children: [
 
@@ -782,7 +782,7 @@ class HomePageState extends State<HomePage> {
             custBankBranch,
             custCountry,
             custSwiftCode,
-            typeid);
+            "2");
         stream.asBroadcastStream().listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
@@ -866,54 +866,54 @@ class HomePageState extends State<HomePage> {
 
   List<customer.Customer> data = new List<customer.Customer>();
 
-  Future<List<type.Customer>> getGroupMaster(String filter) async {
-    setState(() {
-      typedetails = [];
-      typedata = [];
-    });
+  // Future<List<type.Customer>> getGroupMaster(String filter) async {
+  //   setState(() {
+  //     typedetails = [];
+  //     typedata = [];
+  //   });
 
-    final String customerurl =
-        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
+  //   final String customerurl =
+  //       "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
 
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
+  //   var response = await http.get(Uri.encodeFull(customerurl),
+  //       headers: {"Accept": "application/json"});
+  //   //List<ItemMaster> customer1 = new List<ItemMaster>();
 
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      typedetails = parsed
-          .map<type.Customer>((json) => type.Customer.fromJSON(json))
-          .toList();
+  //   var convertDataToJson = json.decode(response.body);
+  //   final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+  //   setState(() {
+  //     typedetails = parsed
+  //         .map<type.Customer>((json) => type.Customer.fromJSON(json))
+  //         .toList();
 
-      if (filter != "")
-        typedetails = typedetails
-            .where((element) => element.ptyname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
+  //     if (filter != "")
+  //       typedetails = typedetails
+  //           .where((element) => element.ptyname
+  //               .toLowerCase()
+  //               .toString()
+  //               .contains(filter.toLowerCase().toString()))
+  //           .toList();
 
-      typedata = typedetails.map((e) => e.ptyname).toList();
-      if (typeid == '' || typeid == null || typeid == '0')
-        selectedcustomer = typedata.first;
+  //     typedata = typedetails.map((e) => e.ptyname).toList();
+  //     if (typeid == '' || typeid == null || typeid == '0')
+  //       selectedcustomer = typedata.first;
 
-      typeid = typeid = typedetails
-          .where((element) => element.ptyname == selectedcustomer)
-          .map((e) => e.partyid)
-          .first
-          .toString();
-    });
+  //     typeid = typeid = typedetails
+  //         .where((element) => element.ptyname == selectedcustomer)
+  //         .map((e) => e.partyid)
+  //         .first
+  //         .toString();
+  //   });
 
-    return typedetails;
-  }
+  //   return typedetails;
+  // }
 
   Future<customer.Customer> getAddCustomerJson() async {
     String customerurl;
 
     if (searchtext == '' || searchtext == null) {
       customerurl =
-          'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&pagesize=' +
+          'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&intPartytypeID=2&pagesize=' +
               custselectedtype +
               '&pagenumber=' +
               custpageno.toString();
@@ -972,7 +972,7 @@ class HomePageState extends State<HomePage> {
     getCustomerJson();
     custidFocusNode = FocusNode();
     _custIdController.text = '0';
-    getGroupMaster('');
+    //getGroupMaster('');
     setState(() {
       getAddCustomerJson();
       if ((_id != "") && (_id != null) && (_id != "0"))
@@ -1282,7 +1282,7 @@ class HomePageState extends State<HomePage> {
                 custpageno = pageno;
                 custselectedtype = selectedtype;
                 getAddCustomerJson();
-                getGroupMaster('');
+                // getGroupMaster('');
                 //setState(() {
                 //   getCustomerJson();
                 if ((_id != "") && (_id != null) && (_id != "0"))
@@ -1357,7 +1357,7 @@ class HomePageState extends State<HomePage> {
 
       if (searchtext == null || searchtext == '') {
         customerurl =
-            "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intPartytypeID=1&intUserID=1&pagesize=" +
+            "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intPartytypeID=2&intUserID=1&pagesize=" +
                 (selectedtype).toString() +
                 "&pagenumber=" +
                 ((pageno.toString() != 'null' &&
@@ -1446,9 +1446,6 @@ class HomePageState extends State<HomePage> {
                               textAlign: TextAlign.left,
                             ),
                           ),
-
-                          //Spacer(),
-                          // SizedBox(width: 25),
                           Expanded(
                             //width: maxwidth * .20,
                             child: Text(
@@ -1460,8 +1457,6 @@ class HomePageState extends State<HomePage> {
                               textAlign: TextAlign.left,
                             ),
                           ),
-
-                          // SizedBox(width: 25),
                           Expanded(
                             //width: maxwidth * .20,
                             child: Text(
@@ -1502,7 +1497,7 @@ class HomePageState extends State<HomePage> {
                                   custselectedtype = selectedtype;
                                   custpageno = pageno;
                                   getAddCustomerJson();
-                                  getGroupMaster('');
+                                  // getGroupMaster('');
                                   //setState(() {
                                   //   getCustomerJson();
                                   if ((_id != "") &&

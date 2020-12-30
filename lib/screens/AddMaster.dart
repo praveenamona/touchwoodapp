@@ -20,7 +20,7 @@ bool ShowAddWidget = false;
 bool enable = false;
 
 void main() => runApp(new MaterialApp(
-      home: new HomePage('', ''),
+      home: new HomePage(),
       theme: new ThemeData(
         brightness: Brightness.dark,
         primaryColor: Colors.lightBlue[800],
@@ -58,7 +58,7 @@ class HomePage extends StatefulWidget {
   // reference to our single class that manages the database
   String tablename;
   String headername;
-  HomePage(this.tablename, this.headername);
+  HomePage({Key key, this.tablename, this.headername}) : super(key: key);
 
   String get gettablename {
     tableName = tablename;
@@ -71,6 +71,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final _masterNameController = TextEditingController();
+
   @override
   void initState() {
     generateReport();
@@ -332,364 +333,201 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget bodywid(double maxwidth, double maxheight) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: Image.asset(
-                'images/menu.png',
-                color: Colors.orange,
-              ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-            );
-          },
-        ),
-        automaticallyImplyLeading: false,
+    return SingleChildScrollView(
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+          // SizedBox(
+          //   height: 20,
+          // ),
 
-        title: TextField(
-            style: TextStyle(fontSize: 15),
-            decoration: InputDecoration(
-              hintText: "Search...",
-              suffixIcon: IconButton(
-                  icon: Image.asset('Images/search.png', color: Colors.orange),
-                  onPressed: () {
-                    setState(() {
-                      pageno = 1;
-                    });
+          SizedBox(
+            height: 20,
+          ),
 
-                    generateReport();
-                    getPagingDetails();
-                  }),
-            ),
-            keyboardType: TextInputType.text,
-            onChanged: (value) {
-              setState(() {
-                pageno = 1;
-                searchtext = value;
-                //data = _reportItems;
-                // _reportItems = (data
-                //     .where((element) => element.columnname
-                //         .toLowerCase()
-                //         .contains(value.toLowerCase()))
-                //     .toList());
-                // if (value == "") _reportItems = data;
-                generateReport();
-                getPagingDetails();
-              });
-              // _reportItems = data;
-            }),
-        // centerTitle: true,
-      ),
-      bottomNavigationBar: BottomAppBar(
-          //    titleSpacing: 0.0,
-          color: Colors.transparent,
-          //elevation: 5.0,
-          //  backgroundColor: Color(0xff201F23),
-          // title:
-          shape: CircularNotchedRectangle(),
-          child: Row(children: <Widget>[
-            SizedBox(
-                width: 50,
-                child: IconButton(
-                  icon: Image.asset('Images/search.png', color: Colors.orange),
-                  onPressed: () => showModalBottomSheet(
-                      context: context,
-                      builder: (BuildContext context) => Container(
-                            height: 500,
-                            child: TextField(
-                                // focusNode: idFocusNode,
-                                style: TextStyle(fontSize: 15),
-                                decoration: InputDecoration(hintText: "GO TO"),
-                                keyboardType: TextInputType.text,
-                                onChanged: (value) {
-                                  if (int.parse(value) <=
-                                      int.parse(totalPages)) {
-                                    setState(() {
-                                      pageno = int.parse(value);
-                                      generateReport();
-                                      _controller.animateToPage(
-                                        pageno,
-                                        duration: Duration(milliseconds: 300),
-                                        curve: Curves.linear,
-                                      );
-                                    });
-                                  }
-                                }),
-                          )),
-                )),
-            Text('Rows/Page',
-                style: TextStyle(
-                  fontSize: 11,
-                )),
-            SizedBox(
-              width: 10,
-            ),
-            SizedBox(
-              width: 90,
-              child: DropdownButton<String>(
-                  icon: Image.asset('Images/arrow_drop_down.png',
-                      color: Colors.white),
-                  value: selectedtype,
-                  hint: SizedBox(width: 4, child: Text('Rows Per Page')),
-                  items: ['5', '7', '10', '20', '30', '40', '50']
-                      .map((String value) {
-                    return new DropdownMenuItem<String>(
-                      value: value,
-                      child: SizedBox(
-                        width: 60.0,
-                        child: new Text(
-                          value,
-                          textAlign: TextAlign.right,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedtype = (value);
-                      getPagingDetails();
-                      generateReport();
-                    });
-                  }),
-            ),
-            new IconButton(
-              icon: Image.asset('Images/Arrow-Left.png', color: Colors.orange),
-              iconSize: 20,
-              color: Colors.orange,
-              splashColor: Colors.green,
-              onPressed: () {
-                setState(() {
-                  if ((pageno != 1) && (pageno != 0)) pageno = pageno - 1;
-                  generateReport();
-                  _controller.animateToPage(
-                    pageno,
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.linear,
-                  );
-                });
-              },
-            ),
-            Text((pageno == 0 ? 1 : pageno).toString() +
-                '  of  ' +
-                totalPages.toString()),
-            new IconButton(
-              icon: Image.asset('Images/Arrow-Right.png', color: Colors.orange),
-              iconSize: 20,
-              color: Colors.orange,
-              splashColor: Colors.green,
-              onPressed: () {
-                setState(() {
-                  if ((pageno < int.parse(totalPages))) pageno = pageno + 1;
-                  generateReport();
-                  _controller.animateToPage(
-                    pageno,
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.linear,
-                  );
-                });
-              },
-            ),
-          ])),
-      drawer: drawer.CustomDrawer(),
-      body: SingleChildScrollView(
-          child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-            // SizedBox(
-            //   height: 20,
-            // ),
-
-            SizedBox(
-              height: 20,
-            ),
-
-            Row(children: [
-              Container(
-                constraints: BoxConstraints(
-                    minHeight: 20,
-                    minWidth: 250,
-                    maxWidth: 400,
-                    // maxWidth: (MediaQuery.of(context).size.width) <= 280
-                    //     ? (MediaQuery.of(context).size.width)
-                    //     : (MediaQuery.of(context).size.width) * 0.,
-                    maxHeight: double.infinity),
-                width: (MediaQuery.of(context).size.width),
-                child: TextField(
-                  focusNode: idFocusNode,
-                  controller: _masterNameController,
-                  decoration: InputDecoration(
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.orange),
-                      ),
-                      border: InputBorder.none,
-                      labelText: 'Name',
-                      labelStyle: TextStyle(fontSize: 20.0)),
-                  onChanged: (value) {
-                    setState(() {
-                      name = value;
-                    });
-                  },
-                ),
-              ),
-              Spacer(),
-            ]),
-            SizedBox(
-              height: 10,
-            ),
-
-            Row(children: [
-              Container(
-                constraints: BoxConstraints(
-                    minHeight: 20,
-                    minWidth: 250,
-                    maxWidth: 400,
-                    maxHeight: double.infinity),
-                width: (MediaQuery.of(context).size.width),
-                height: 30,
-                child: Row(
-                  children: <Widget>[
-                    // SizedBox(
-                    //   height: 10,
-                    //   width: 220,
-                    // ),
-                    Spacer(),
-                    RaisedButton(
-                      color: Colors.orange,
-                      textColor: Colors.white,
-                      disabledColor: Colors.grey,
-                      disabledTextColor: Colors.black,
-                      padding: EdgeInsets.all(8.0),
-                      splashColor: Colors.pink,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(10.0)),
-                      onPressed: () {
-                        if ((_id == '0' || (_id == null) || (_id == "")) &&
-                            (_reportItems
-                                .where((element) =>
-                                    element.columnname.toLowerCase() ==
-                                    _masterNameController.text.toLowerCase())
-                                .isNotEmpty)) {
-                          Alert(
-                              context: context,
-                              title: "Alert",
-                              type: AlertType.warning,
-                              desc: "Already Exists",
-                              buttons: [
-                                DialogButton(
-                                  child: Text(
-                                    "Close",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20),
-                                  ),
-                                  onPressed: () {
-                                    clearData(context);
-                                    generateReport();
-
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop();
-                                  },
-                                  width: 120,
-                                )
-                              ]).show();
-                          clearData(context);
-                        } else {
-                          saveItems(false);
-                          generateReport();
-                          clearData(context);
-                        }
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Image.asset(
-                            'Images/save.png',
-                            color: Colors.black,
-                          ),
-                          SizedBox(width: 12.0),
-                          Text(
-                            "SAVE",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
+          Row(children: [
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: 20,
+                  minWidth: 250,
+                  maxWidth: 400,
+                  // maxWidth: (MediaQuery.of(context).size.width) <= 280
+                  //     ? (MediaQuery.of(context).size.width)
+                  //     : (MediaQuery.of(context).size.width) * 0.,
+                  maxHeight: double.infinity),
+              width: (MediaQuery.of(context).size.width),
+              child: TextField(
+                focusNode: idFocusNode,
+                controller: _masterNameController,
+                decoration: InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.orange),
                     ),
-                    SizedBox(
-                      height: 10,
-                      width: 10,
-                    ),
-                    RaisedButton(
-                      color: Colors.orange,
-                      textColor: Colors.white,
-                      disabledColor: Colors.grey,
-                      disabledTextColor: Colors.black,
-                      padding: EdgeInsets.all(8.0),
-                      splashColor: Colors.pink,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(10.0)),
-                      onPressed: () {
+                    border: InputBorder.none,
+                    labelText: 'Name',
+                    labelStyle: TextStyle(fontSize: 20.0)),
+                onChanged: (value) {
+                  setState(() {
+                    name = value;
+                  });
+                },
+              ),
+            ),
+            Spacer(),
+          ]),
+          SizedBox(
+            height: 10,
+          ),
+
+          Row(children: [
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: 20,
+                  minWidth: 250,
+                  maxWidth: 400,
+                  maxHeight: double.infinity),
+              width: (MediaQuery.of(context).size.width),
+              height: 30,
+              child: Row(
+                children: <Widget>[
+                  // SizedBox(
+                  //   height: 10,
+                  //   width: 220,
+                  // ),
+                  Spacer(),
+                  RaisedButton(
+                    color: Colors.orange,
+                    textColor: Colors.white,
+                    disabledColor: Colors.grey,
+                    disabledTextColor: Colors.black,
+                    padding: EdgeInsets.all(8.0),
+                    splashColor: Colors.pink,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(10.0)),
+                    onPressed: () {
+                      if ((_id == '0' || (_id == null) || (_id == "")) &&
+                          (_reportItems
+                              .where((element) =>
+                                  element.columnname.toLowerCase() ==
+                                  _masterNameController.text.toLowerCase())
+                              .isNotEmpty)) {
+                        Alert(
+                            context: context,
+                            title: "Alert",
+                            type: AlertType.warning,
+                            desc: "Already Exists",
+                            buttons: [
+                              DialogButton(
+                                child: Text(
+                                  "Close",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                onPressed: () {
+                                  clearData(context);
+                                  generateReport();
+
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+                                },
+                                width: 120,
+                              )
+                            ]).show();
                         clearData(context);
-                        idFocusNode.dispose();
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Image.asset('Images/cancel.png', color: Colors.black),
-                          SizedBox(width: 12.0),
-                          Text(
-                            "CANCEL",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
+                      } else {
+                        saveItems(false);
+                        generateReport();
+                        clearData(context);
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset(
+                          'Images/save.png',
+                          color: Colors.black,
+                        ),
+                        SizedBox(width: 12.0),
+                        Text(
+                          "SAVE",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
-                    SizedBox(
-                      height: 10,
+                  ),
+                  SizedBox(
+                    height: 10,
+                    width: 10,
+                  ),
+                  RaisedButton(
+                    color: Colors.orange,
+                    textColor: Colors.white,
+                    disabledColor: Colors.grey,
+                    disabledTextColor: Colors.black,
+                    padding: EdgeInsets.all(8.0),
+                    splashColor: Colors.pink,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(10.0)),
+                    onPressed: () {
+                      clearData(context);
+                      idFocusNode.dispose();
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset('Images/cancel.png', color: Colors.black),
+                        SizedBox(width: 12.0),
+                        Text(
+                          "CANCEL",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
-                    //tableView(),
-                  ],
-                ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  //tableView(),
+                ],
               ),
-            ]),
-            Divider(),
+            ),
+          ]),
+          Divider(),
 
-            Row(children: [
-              Container(
-                constraints: BoxConstraints(
-                    minHeight: 20,
-                    minWidth: 280,
-                    maxWidth: 500,
-                    maxHeight: double.infinity),
-                width: (MediaQuery.of(context).size.width),
-                height: (MediaQuery.of(context).size.height),
-                child: PageView(
-                  controller: _controller,
-                  scrollDirection: Axis.horizontal,
-                  // pageSnapping: false,
-                  // dragStartBehavior: DragStartBehavior.start,
-                  children: tableView(),
-                  onPageChanged: (index) {
-                    setState(() {
-                      pageno = (index == 0 ? 1 : index);
-                      generateReport();
-                    });
-                  },
-                ),
+          Row(children: [
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: 20,
+                  minWidth: 280,
+                  maxWidth: 500,
+                  maxHeight: double.infinity),
+              width: (MediaQuery.of(context).size.width),
+              height: (MediaQuery.of(context).size.height),
+              child: PageView(
+                controller: _controller,
+                scrollDirection: Axis.horizontal,
+                // pageSnapping: false,
+                // dragStartBehavior: DragStartBehavior.start,
+                children: tableView(),
+                onPageChanged: (index) {
+                  setState(() {
+                    pageno = (index == 0 ? 1 : index);
+                    generateReport();
+                  });
+                },
               ),
-              Spacer(),
-            ])
-          ])),
-    );
+            ),
+            Spacer(),
+          ])
+        ]));
+    // );
   }
 
   void saveItems(bool del) async {

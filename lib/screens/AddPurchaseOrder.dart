@@ -28,7 +28,7 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:touchwoodapp/models/customer.dart' as customer;
-import 'package:touchwoodapp/screens/dashboard.dart';
+import 'package:touchwoodapp/screens/Supplierdashboard.dart';
 import 'package:dio/dio.dart';
 import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:dropdown_search/dropdown_search.dart';
@@ -691,19 +691,8 @@ class HomePageState extends State<HomePage> {
     String custemail = _custEmailController.text;
     if (custId != '' && custName != '') {
       try {
-        Stream<String> stream = await insertCustomer(
-           1,
-                                                      "",
-                                                      "",
-                                                      "",
-                                                      "",
-                                                      "",
-                                                      "",
-                                                      "",
-                                                      "",
-                                                      "1",
-                                                      "",
-                                                      "","","","","","","","");
+        Stream<String> stream = await insertCustomer(1, "", "", "", "", "", "",
+            "", "", "1", "", "", "", "", "", "", "", "", "");
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
@@ -1525,7 +1514,7 @@ class HomePageState extends State<HomePage> {
                                             if (yesflag) {
                                               Stream<String> stream =
                                                   await insertCustomer(
-                                                     1,
+                                                      1,
                                                       "",
                                                       "",
                                                       "",
@@ -1536,7 +1525,14 @@ class HomePageState extends State<HomePage> {
                                                       "",
                                                       "1",
                                                       "",
-                                                      "","","","","","","","");
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "",
+                                                      "");
                                               stream.listen((String message) {
                                                 if (message.contains(
                                                         """[{"RESULT":1}]""") ||

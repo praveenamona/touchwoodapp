@@ -99,7 +99,9 @@ Future<Stream<String>> insertCustomer(
       '&strSwiftcode=' +
       swiftcode +
       '' +
-      '&intOrgID=1&intPartytypeID=1&intUserID=1';
+      '&intOrgID=1&intPartytypeID=' +
+      typeid +
+      '&intUserID=1';
   print(url);
   final client = new http.Client();
   final streamedRest = await client.send(http.Request('get', Uri.parse(url)));

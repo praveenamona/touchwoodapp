@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:touchwoodapp/models/navigation_model.dart';
 import 'package:touchwoodapp/widgets/collapsing_list_tile_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:touchwoodapp/screens/dashboard.dart' as dashboard;
+import 'package:touchwoodapp/screens/Supplierdashboard.dart' as supplier;
+import 'package:touchwoodapp/screens/CustomerDashboard.dart' as customer;
 import 'package:touchwoodapp/screens/relative.dart' as relative;
 import 'package:touchwoodapp/Widgets/custom_expansion_tile.dart' as custom;
 import 'package:touchwoodapp/Widgets/sidebar.dart' as sidebar;
@@ -336,19 +337,101 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                 ),
                                 iconColor: appbarcolor,
                                 children: <Widget>[
-                                  ListTile(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  dashboard.HomePage("10", 1)));
-                                    },
-                                    leading: Image.asset(
-                                      'images/people.png',
-                                    ),
-                                    title: Text("Party"),
-                                  ),
+                                  custom.ExpansionTile(
+                                      backgroundColor: Colors.blueAccent,
+                                      // initiallyExpanded: true,
+                                      headerBackgroundColor: widgetcolor,
+                                      title: ListTile(
+                                        //   tileColor: Colors.pink,
+                                        onTap: () {
+                                          //  mastertapped = (mastertapped) ? false : true;
+                                        },
+                                        //  leading: Icon(Icons.settings_applications),
+                                        title: Text("Yarn Master"),
+                                      ),
+                                      iconColor: appbarcolor,
+                                      children: <Widget>[
+                                        ListTile(
+                                          onTap: () {
+                                            Master.HomePage ad =
+                                                new Master.HomePage();
+                                            ad.tablename = "yarncountmaster";
+
+                                            ad.headername = "Yarn Count";
+                                            ad.gettablename;
+
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Master.HomePage(
+                                                            tablename:
+                                                                "yarncountmaster",
+                                                            headername:
+                                                                "Yarn Count")));
+                                          },
+                                          leading: Image.asset(
+                                            'images/people.png',
+                                          ),
+                                          title: Text("Counts"),
+                                        ),
+                                        ListTile(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Master.HomePage()));
+                                          },
+                                          leading: Image.asset(
+                                            'images/people.png',
+                                          ),
+                                          title: Text("Yarn Type"),
+                                        ),
+                                      ]),
+                                  custom.ExpansionTile(
+                                      backgroundColor: Colors.blueAccent,
+                                      // initiallyExpanded: true,
+                                      headerBackgroundColor: widgetcolor,
+                                      title: ListTile(
+                                        //   tileColor: Colors.pink,
+                                        onTap: () {
+                                          //  mastertapped = (mastertapped) ? false : true;
+                                        },
+                                        //  leading: Icon(Icons.settings_applications),
+                                        title: Text("Party"),
+                                      ),
+                                      iconColor: appbarcolor,
+                                      children: <Widget>[
+                                        ListTile(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        supplier.HomePage(
+                                                            "10", 1)));
+                                          },
+                                          leading: Image.asset(
+                                            'images/people.png',
+                                          ),
+                                          title: Text("Supplier"),
+                                        ),
+                                        ListTile(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        customer.HomePage(
+                                                            "10", 1)));
+                                          },
+                                          leading: Image.asset(
+                                            'images/people.png',
+                                          ),
+                                          title: Text("Customer"),
+                                        ),
+                                      ]),
                                   ListTile(
                                     onTap: () {
                                       //Navigator.of(context).pop();
@@ -356,8 +439,7 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  Master.HomePage("yarntype",
-                                                      "Yarn Type")));
+                                                  Master.HomePage()));
                                     },
                                     leading: Image.asset(
                                       'images/group.png',
