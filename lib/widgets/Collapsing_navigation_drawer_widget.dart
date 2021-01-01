@@ -381,18 +381,59 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                         ),
                                         ListTile(
                                           onTap: () {
+                                            Master.HomePage ad =
+                                                new Master.HomePage(
+                                              selectedType: "10",
+                                              pageNo: 1,
+                                              headername: "Yarn Type",
+                                              tablename: "yarntypemaster",
+                                            );
+                                            ad.custid;
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
                                                         Master.HomePage(
-                                                            selectedType: "10",
-                                                            pageNo: 1)));
+                                                          selectedType: "10",
+                                                          pageNo: 1,
+                                                          headername:
+                                                              "Yarn Type",
+                                                          tablename:
+                                                              "yarntypemaster",
+                                                        )));
                                           },
                                           // leading: Image.asset(
                                           //   'images/people.png',
                                           // ),
                                           title: Text("Yarn Type"),
+                                        ),
+                                        ListTile(
+                                          onTap: () {
+                                            Master.HomePage ad =
+                                                new Master.HomePage(
+                                              selectedType: "10",
+                                              pageNo: 1,
+                                              headername: "Yarn Mill",
+                                              tablename: "yarnmillmaster",
+                                            );
+                                            ad.custid;
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Master.HomePage(
+                                                          selectedType: "10",
+                                                          pageNo: 1,
+                                                          headername:
+                                                              "Yarn Mill",
+                                                          tablename:
+                                                              "yarnmillmaster",
+                                                        )));
+                                          },
+                                          // leading: Image.asset(
+                                          //   'images/people.png',
+                                          // ),
+                                          title: Text("Yarn Mill"),
                                         ),
                                       ]),
                                   custom.ExpansionTile(

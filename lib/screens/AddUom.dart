@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:touchwoodapp/models/Master.dart';
+import 'package:touchwoodapp/models/uom.dart';
 import 'package:touchwoodapp/repository/assigncolor.dart';
 import 'package:touchwoodapp/models/customer.dart';
 import 'package:touchwoodapp/models/Paging.dart';
@@ -29,7 +29,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:touchwoodapp/models/master.dart' as master;
+import 'package:touchwoodapp/models/uom.dart' as master;
 import 'package:touchwoodapp/screens/Supplierdashboard.dart';
 import 'package:dio/dio.dart';
 import 'package:touchwoodapp/models/partytype.dart' as type;
@@ -43,7 +43,7 @@ void main() => runApp(new MaterialApp(
       ),
     ));
 PageController controller = PageController();
-List<master.Master> _reportItems = <master.Master>[];
+List<master.Uom> _reportItems = <master.Uom>[];
 Paging _pagingdetails = new Paging();
 List<Customer> data = <Customer>[];
 TextEditingController _GotoTextController;
@@ -64,16 +64,16 @@ FocusNode _nameFocus;
 FocusNode _add2Focus;
 
 int custpageno;
-GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<master.Master>>();
+GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<master.Uom>>();
 
 TextStyle textStyle = new TextStyle(color: Colors.black);
-GlobalKey<AutoCompleteTextFieldState<master.Master>> custKey = new GlobalKey();
-AutoCompleteTextField<master.Master> textField;
+GlobalKey<AutoCompleteTextFieldState<master.Uom>> custKey = new GlobalKey();
+AutoCompleteTextField<master.Uom> textField;
 List<type.Customer> typedetails = <type.Customer>[];
 List<String> typedata = [];
 final _custNameController = TextEditingController();
 final _custIdController = TextEditingController();
-final _custMobileController = TextEditingController();
+final _custnoofDecimalController = TextEditingController();
 ProgressDialog pr;
 String headerName;
 String tableName;
@@ -201,6 +201,48 @@ class HomePageState extends State<HomePage> {
                                               //enableInteractiveSelection: enable,
                                             ),
                                           ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 300,
+                                            ),
+                                            width: maxwidth * .7,
+                                            // child: RawKeyboardListener(
+                                            //   onKey: (dynamic key) {
+                                            //     if (key.data.key == "Tab") {
+                                            //       // FocusScope.of(context)
+                                            //       //     .requestFocus(_add1Focus);
+                                            //     }
+                                            //   },
+                                            //   focusNode: _nameFocus,
+                                            child: TextField(
+                                              //  focusNode: _nameFocus,
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                  labelText: "no of Decimal",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller:
+                                                  _custnoofDecimalController,
+                                              // focusNode: custidFocusNode,
+
+                                              readOnly: enable,
+                                              //enableInteractiveSelection: enable,
+                                            ),
+                                          ),
+
                                           //),
                                           // ]),
                                         ]),
@@ -407,11 +449,11 @@ class HomePageState extends State<HomePage> {
   void clearData(context) {
     _custIdController.text = '0';
     _custNameController.text = '';
-    _custMobileController.text = '';
+    _custnoofDecimalController.text = '';
     _id = '0';
   }
 
-  List<master.Master> data = new List<master.Master>();
+  List<master.Uom> data = new List<master.Uom>();
 
   // Future<List<type.Customer>> getGroupMaster(String filter) async {
   //   setState(() {
@@ -455,7 +497,7 @@ class HomePageState extends State<HomePage> {
   //   return typedetails;
   // }
 
-  Future<master.Master> getAddCustomerJson() async {
+  Future<master.Uom> getAddCustomerJson() async {
     String customerurl;
 
     if (searchtext == '' || searchtext == null) {
@@ -477,13 +519,12 @@ class HomePageState extends State<HomePage> {
 
     var response = await http.get(Uri.encodeFull(customerurl),
         headers: {"Accept": "application/json"});
-    List<master.Master> customer1 = new List<master.Master>();
+    List<master.Uom> customer1 = new List<master.Uom>();
 
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    customer1 = parsed
-        .map<master.Master>((json) => master.Master.fromJSON(json))
-        .toList();
+    customer1 =
+        parsed.map<master.Uom>((json) => master.Uom.fromJSON(json)).toList();
     data = customer1;
     if (_id != "" && _id != "" && _id != null)
       customer1
@@ -523,7 +564,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _custMobileController.dispose();
+    _custnoofDecimalController.dispose();
     _nameFocus.dispose();
     _add2Focus.dispose();
     _custNameController.dispose();
@@ -859,7 +900,7 @@ class HomePageState extends State<HomePage> {
         })); //);
   }
 
-  List<master.Master> _customers;
+  List<master.Uom> _customers;
   Future<String> getCustomerJson() async {
     if (this.mounted) {
       setState(() {
@@ -918,9 +959,8 @@ class HomePageState extends State<HomePage> {
 
       convertDataToJson = json.decode(response.body);
       final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-      _reportItems = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
+      _reportItems =
+          parsed.map<master.Uom>((json) => master.Uom.fromJSON(json)).toList();
 
       data = _reportItems;
     }

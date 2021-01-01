@@ -199,6 +199,7 @@ class HomePageState extends State<HomePage> {
                                                       .requestFocus(_add1Focus);
                                                 }
                                               },
+                                              autofocus: true,
                                               focusNode: _nameFocus,
                                               child: TextField(
                                                 //  focusNode: _nameFocus,
@@ -1038,6 +1039,8 @@ class HomePageState extends State<HomePage> {
     _custMobileController.text = '';
     _custRemarksController.text = '';
     _id = '0';
+    _nameFocus.requestFocus();
+    // FocusScope.of(context).requestFocus(_nameFocus);
   }
 
   List<customer.Customer> data = new List<customer.Customer>();
@@ -1490,6 +1493,7 @@ class HomePageState extends State<HomePage> {
                 custselectedtype = selectedtype;
                 getAddCustomerJson();
                 clearData(context);
+
                 // getGroupMaster('');
                 //setState(() {
                 //   getCustomerJson();
