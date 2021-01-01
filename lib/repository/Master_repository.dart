@@ -61,8 +61,7 @@ Future<Stream<Master>> getMaster(String id, String tablename) async {
       .where((e) => e.columnMasterid == id);
 }
 
-Future<Stream<String>> insertMaster(
-    masterid, name, userid, columndata, del) async {
+Future<Stream<String>> insertMaster(masterid, name, columndata, del) async {
   String intflag = "";
   if (del == "1") {
     intflag = "3";
@@ -84,5 +83,5 @@ Future<Stream<String>> insertMaster(
   final client = new http.Client();
   final streamedRest = await client.send(http.Request('get', Uri.parse(url)));
 
-  return streamedRest.stream.transform(utf8.decoder);
+  return streamedRest.stream.asBroadcastStream().transform(utf8.decoder);
 }

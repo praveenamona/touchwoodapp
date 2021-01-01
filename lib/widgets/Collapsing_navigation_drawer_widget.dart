@@ -338,7 +338,7 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                 iconColor: appbarcolor,
                                 children: <Widget>[
                                   custom.ExpansionTile(
-                                      backgroundColor: Colors.blueAccent,
+                                      backgroundColor: menucolor,
                                       // initiallyExpanded: true,
                                       headerBackgroundColor: widgetcolor,
                                       title: ListTile(
@@ -354,25 +354,29 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                         ListTile(
                                           onTap: () {
                                             Master.HomePage ad =
-                                                new Master.HomePage();
-                                            ad.tablename = "yarncountmaster";
-
-                                            ad.headername = "Yarn Count";
-                                            ad.gettablename;
-
+                                                new Master.HomePage(
+                                              selectedType: "10",
+                                              pageNo: 1,
+                                              headername: "Yarn Count",
+                                              tablename: "yarncountmaster",
+                                            );
+                                            ad.custid;
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
                                                         Master.HomePage(
-                                                            tablename:
-                                                                "yarncountmaster",
-                                                            headername:
-                                                                "Yarn Count")));
+                                                          selectedType: "10",
+                                                          pageNo: 1,
+                                                          headername:
+                                                              "Yarn Count",
+                                                          tablename:
+                                                              "yarncountmaster",
+                                                        )));
                                           },
-                                          leading: Image.asset(
-                                            'images/people.png',
-                                          ),
+                                          // leading: Image.asset(
+                                          //   'images/people.png',
+                                          // ),
                                           title: Text("Counts"),
                                         ),
                                         ListTile(
@@ -381,16 +385,18 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        Master.HomePage()));
+                                                        Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1)));
                                           },
-                                          leading: Image.asset(
-                                            'images/people.png',
-                                          ),
+                                          // leading: Image.asset(
+                                          //   'images/people.png',
+                                          // ),
                                           title: Text("Yarn Type"),
                                         ),
                                       ]),
                                   custom.ExpansionTile(
-                                      backgroundColor: Colors.blueAccent,
+                                      backgroundColor: menucolor,
                                       // initiallyExpanded: true,
                                       headerBackgroundColor: widgetcolor,
                                       title: ListTile(
@@ -412,9 +418,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                                         supplier.HomePage(
                                                             "10", 1)));
                                           },
-                                          leading: Image.asset(
-                                            'images/people.png',
-                                          ),
+                                          // leading: Image.asset(
+                                          //   'images/people.png',
+                                          // ),
                                           title: Text("Supplier"),
                                         ),
                                         ListTile(
@@ -426,9 +432,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                                         customer.HomePage(
                                                             "10", 1)));
                                           },
-                                          leading: Image.asset(
-                                            'images/people.png',
-                                          ),
+                                          // leading: Image.asset(
+                                          //   'images/people.png',
+                                          // ),
                                           title: Text("Customer"),
                                         ),
                                       ]),
@@ -439,11 +445,13 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  Master.HomePage()));
+                                                  Master.HomePage(
+                                                      selectedType: "10",
+                                                      pageNo: 1)));
                                     },
-                                    leading: Image.asset(
-                                      'images/group.png',
-                                    ),
+                                    // leading: Image.asset(
+                                    //   'images/group.png',
+                                    // ),
                                     title: Text("Yarn Type"),
                                   ),
                                   ListTile(
@@ -455,9 +463,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                               builder: (context) =>
                                                   Fabric.HomePage("10", 1)));
                                     },
-                                    leading: Image.asset(
-                                      'images/group.png',
-                                    ),
+                                    // leading: Image.asset(
+                                    //   'images/group.png',
+                                    // ),
                                     title: Text("Fabric"),
                                   ),
                                   ListTile(
@@ -469,9 +477,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                               builder: (context) =>
                                                   Fabric.HomePage("10", 1)));
                                     },
-                                    leading: Image.asset(
-                                      'images/group.png',
-                                    ),
+                                    // leading: Image.asset(
+                                    //   'images/group.png',
+                                    // ),
                                     title: Text("Fabric"),
                                   ),
                                   ListTile(
@@ -483,9 +491,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                               builder: (context) =>
                                                   Granite.HomePage("10", 1)));
                                     },
-                                    leading: Image.asset(
-                                      'images/group.png',
-                                    ),
+                                    // leading: Image.asset(
+                                    //   'images/group.png',
+                                    // ),
                                     title: Text("Granite"),
                                   ),
                                   ListTile(
@@ -497,9 +505,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                               builder: (context) =>
                                                   sidebar.MyApp()));
                                     },
-                                    leading: Image.asset(
-                                      'images/group.png',
-                                    ),
+                                    // leading: Image.asset(
+                                    //   'images/group.png',
+                                    // ),
                                     title: Text("side bar"),
                                   ),
                                   ListTile(
@@ -507,7 +515,7 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                       //Navigator.of(context).pop();
                                       //Navigator.popAndPushNamed(context, Routes.Addparty(key: null,title:"Add Customer"));
                                     },
-                                    leading: Image.asset('images/uom.png'),
+                                    // leading: Image.asset('images/uom.png'),
                                     title: Text("UOM"),
                                   ),
                                   ListTile(
@@ -515,7 +523,7 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                       //Navigator.of(context).pop();
                                       //Navigator.popAndPushNamed(context, Routes.Addparty(key: null,title:"Add Customer"));
                                     },
-                                    leading: Image.asset('images/uom.png'),
+                                    // leading: Image.asset('images/uom.png'),
                                     title: Text("Rapid Test"),
                                   ),
                                   ListTile(
@@ -523,7 +531,7 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                       //Navigator.of(context).pop();
                                       //Navigator.popAndPushNamed(context, Routes.Addparty(key: null,title:"Add Customer"));
                                     },
-                                    leading: Image.asset('images/additem.png'),
+                                    // leading: Image.asset('images/additem.png'),
                                     title: Text("Item"),
                                   ),
                                   ListTile(),
@@ -547,9 +555,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                     //Navigator.of(context).pop();
                                     //Navigator.popAndPushNamed(context, Routes.Addparty(key: null,title:"Add Customer"));
                                   },
-                                  leading: Image.asset(
-                                    'images/pricelist.png',
-                                  ),
+                                  // leading: Image.asset(
+                                  //   'images/pricelist.png',
+                                  // ),
                                   title: Text("Price List"),
                                 ),
                               ],
@@ -570,9 +578,9 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                               children: [
                                 ListTile(
                                   onTap: () {},
-                                  leading: Image.asset(
-                                    'images/pricelist.png',
-                                  ),
+                                  // leading: Image.asset(
+                                  //   'images/pricelist.png',
+                                  // ),
                                   title: Text("PriceList Report"),
                                 ),
                               ],

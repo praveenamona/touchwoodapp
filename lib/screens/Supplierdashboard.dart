@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/gestures.dart';
 import 'package:http/http.dart' as http;
@@ -57,6 +58,21 @@ String nextPage;
 int pageno;
 FocusNode idFocusNode;
 String searchtext;
+FocusNode _nameFocus;
+FocusNode _add2Focus;
+FocusNode _remarksFocus;
+FocusNode _mobileFocus;
+FocusNode _add1Focus;
+FocusNode _add4Focus;
+FocusNode _add3Focus;
+FocusNode _emailFocus;
+FocusNode _gstinFocus;
+FocusNode _contactpersonFocus;
+FocusNode _banknameFocus;
+FocusNode _bankaddressFocus;
+FocusNode _bankbranchFocus;
+FocusNode _swiftFocus;
+FocusNode _countryFocus;
 
 String selectedcustomer;
 String custselectedtype;
@@ -109,6 +125,11 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   Widget addcustomerwid(double maxwidth, double maxheight) {
+    // document.addEventListener('keydown', (dynamic event) {
+    //   if (event.code == 'Tab') {
+    //     //  event.preventDefault();
+    //   }
+    // });
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -164,63 +185,6 @@ class HomePageState extends State<HomePage> {
                                           SizedBox(
                                             height: 10,
                                           ),
-
-                                          // Wrap(
-                                          //     alignment: WrapAlignment.start,
-                                          //     spacing: 150,
-                                          //     //   runSpacing: 200,
-                                          //children: [
-                                          // if (typedata != null &&
-                                          //     typedata.isNotEmpty)
-                                          //   Container(
-                                          //     constraints: BoxConstraints(
-                                          //       minWidth: 200,
-                                          //       maxWidth: 380,
-                                          //     ),
-                                          //     //padding: EdgeInsets.,
-                                          //     width: maxwidth * .7, //* 0.50,
-                                          //     child: DropdownSearch<String>(
-                                          //       dropDownButton: Image.asset(
-                                          //           'Images/arrow_drop_down.png',
-                                          //           color: Colors.white),
-                                          //       validator: (v) => v == null
-                                          //           ? "required field"
-                                          //           : null,
-                                          //       hint: "Select a Type",
-                                          //       mode: Mode.MENU,
-                                          //       enabled: (_id != null &&
-                                          //               _id != '' &&
-                                          //               _id != '0')
-                                          //           ? false
-                                          //           : true,
-                                          //       showSelectedItem: true,
-                                          //       showSearchBox: true,
-                                          //       items: typedata,
-                                          //       label: "Type *",
-                                          //       showClearButton: false,
-                                          //       onChanged: (val) {
-                                          //         setState(() {
-                                          //           selectedcustomer = val;
-
-                                          //           typeid = typedetails
-                                          //               .where((element) =>
-                                          //                   element.ptyname ==
-                                          //                   val)
-                                          //               .map((e) => e.partyid)
-                                          //               .first
-                                          //               .toString();
-                                          //         });
-                                          //       },
-                                          //       popupItemDisabled: (String s) =>
-                                          //           s.startsWith('I'),
-                                          //       selectedItem: selectedcustomer,
-                                          //     ),
-                                          //   ),
-
-                                          // Wrap(spacing: 20, children: [
-
-                                          // Text.rich('/'),
-                                          // TextField(controller:  'Name'),
                                           Container(
                                             constraints: BoxConstraints(
                                               //minHeight: 20,
@@ -228,25 +192,39 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 300,
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                  labelText: "Name",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller: _custNameController,
-                                              focusNode: custidFocusNode,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(_add1Focus);
+                                                }
+                                              },
+                                              focusNode: _nameFocus,
+                                              child: TextField(
+                                                //  focusNode: _nameFocus,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                        labelText: "Name",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller: _custNameController,
+                                                // focusNode: custidFocusNode,
 
-                                              readOnly: enable,
-                                              //enableInteractiveSelection: enable,
+                                                readOnly: enable,
+                                                //enableInteractiveSelection: enable,
+                                              ),
                                             ),
                                           ),
                                           // ]),
@@ -257,21 +235,36 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 380,
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Add1",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller: _custAdd1Controller,
-                                              // focusNode: custidFocusNode,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(_add2Focus);
+                                                }
+                                              },
+                                              focusNode: _add1Focus,
+                                              child: TextField(
+                                                //    FocusScope.of(context).requestFocus(myFocusNode);
+                                                // focusNode: _add1Focus,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Add1",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller: _custAdd1Controller,
+                                                // focusNode: custidFocusNode,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -281,22 +274,36 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 380,
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Add2",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(_add3Focus);
+                                                }
+                                              },
+                                              focusNode: _add2Focus,
+                                              child: TextField(
+                                                //    focusNode: _add2Focus,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Add2",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
 
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller: _custAdd2Controller,
-                                              //  focusNode: custidFocusNode,
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller: _custAdd2Controller,
+                                                //  focusNode: custidFocusNode,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -306,21 +313,34 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 380,
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Add3",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller: _custAdd3Controller,
-                                              //focusNode: custidFocusNode,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(_add4Focus);
+                                                }
+                                              },
+                                              focusNode: _add3Focus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Add3",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller: _custAdd3Controller,
+                                                //focusNode: custidFocusNode,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -330,22 +350,36 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 380,
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Add4",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _contactpersonFocus);
+                                                }
+                                              },
+                                              focusNode: _add4Focus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Add4",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
 
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller: _custAdd4Controller,
-                                              // focusNode: custidFocusNode,
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller: _custAdd4Controller,
+                                                // focusNode: custidFocusNode,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -356,22 +390,36 @@ class HomePageState extends State<HomePage> {
                                               //maxHeight: double.infinity
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Contact Person",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              style: textStyle,
-                                              controller:
-                                                  _custContactPersonController,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _mobileFocus);
+                                                }
+                                              },
+                                              focusNode: _contactpersonFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText:
+                                                            "Contact Person",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                style: textStyle,
+                                                controller:
+                                                    _custContactPersonController,
+                                              ),
                                             ),
                                           ),
 
@@ -383,21 +431,35 @@ class HomePageState extends State<HomePage> {
                                               //maxHeight: double.infinity
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Mobile",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              style: textStyle,
-                                              controller: _custMobileController,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _gstinFocus);
+                                                }
+                                              },
+                                              focusNode: _mobileFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Mobile",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                style: textStyle,
+                                                controller:
+                                                    _custMobileController,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -406,22 +468,37 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 300,
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Tax Code",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _emailFocus);
+                                                }
+                                              },
+                                              focusNode: _gstinFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Tax Code",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
 
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller: _custGstinController,
-                                              // focusNode: custidFocusNode,
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custGstinController,
+                                                // focusNode: custidFocusNode,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -432,47 +509,37 @@ class HomePageState extends State<HomePage> {
                                               //maxHeight: double.infinity
                                             ),
                                             width: maxwidth * .7,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Email",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _banknameFocus);
+                                                }
+                                              },
+                                              focusNode: _emailFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Email",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
 
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller: _custEmailController,
-                                              //focusNode: custidFocusNode,
-                                            ),
-                                          ),
-
-                                          Container(
-                                            constraints: BoxConstraints(
-                                              //  minHeight: 20,
-                                              minWidth: 300,
-                                              maxWidth: 700,
-                                            ),
-                                            width: maxwidth * .8,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Bank Name",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller:
-                                                  _custBanknameController,
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custEmailController,
+                                                //focusNode: custidFocusNode,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -482,21 +549,35 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 700,
                                             ),
                                             width: maxwidth * .8,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Bank Address",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller:
-                                                  _custBankAddressController,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _bankaddressFocus);
+                                                }
+                                              },
+                                              focusNode: _banknameFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Bank Name",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custBanknameController,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -506,21 +587,36 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 700,
                                             ),
                                             width: maxwidth * .8,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Bank Branch",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller:
-                                                  _custBankBranchController,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _bankbranchFocus);
+                                                }
+                                              },
+                                              focusNode: _bankaddressFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText:
+                                                            "Bank Address",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custBankAddressController,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -530,21 +626,36 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 700,
                                             ),
                                             width: maxwidth * .8,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Country",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller:
-                                                  _custCountryController,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _countryFocus);
+                                                }
+                                              },
+                                              focusNode: _bankbranchFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText:
+                                                            "Bank Branch",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custBankBranchController,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -554,21 +665,35 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 700,
                                             ),
                                             width: maxwidth * .8,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Swift Code",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller:
-                                                  _custSwiftCodeController,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _swiftFocus);
+                                                }
+                                              },
+                                              focusNode: _countryFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Country",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custCountryController,
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -578,21 +703,72 @@ class HomePageState extends State<HomePage> {
                                               maxWidth: 700,
                                             ),
                                             width: maxwidth * .8,
-                                            child: TextField(
-                                              decoration: const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color: widgetcolor),
-                                                  ),
-                                                  border: InputBorder.none,
-                                                  labelText: "Remarks",
-                                                  labelStyle: TextStyle(
-                                                      fontSize: 20.0)),
-                                              keyboardType: TextInputType.text,
-                                              style: textStyle,
-                                              controller:
-                                                  _custRemarksController,
+                                            child: RawKeyboardListener(
+                                              onKey: (dynamic key) {
+                                                if (key.data.key == "Tab") {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _remarksFocus);
+                                                }
+                                              },
+                                              focusNode: _swiftFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Swift Code",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custSwiftCodeController,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //  minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 700,
+                                            ),
+                                            width: maxwidth * .8,
+                                            child: RawKeyboardListener(
+                                              // onKey: (dynamic key) {
+                                              //   if (key.data.key == "Tab") {
+                                              //     FocusScope.of(context)
+                                              //         .requestFocus(_add2Focus);
+                                              //   }
+                                              // },
+                                              focusNode: _nameFocus,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        labelText: "Remarks",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custRemarksController,
+                                              ),
                                             ),
                                           )
                                           // ]),
@@ -980,6 +1156,21 @@ class HomePageState extends State<HomePage> {
     });
 
     super.initState();
+    _nameFocus = FocusNode();
+    _add2Focus = FocusNode();
+    _remarksFocus = FocusNode();
+    _mobileFocus = FocusNode();
+    _add1Focus = FocusNode();
+    _add3Focus = FocusNode();
+    _add4Focus = FocusNode();
+    _emailFocus = FocusNode();
+    _gstinFocus = FocusNode();
+    _contactpersonFocus = FocusNode();
+    _banknameFocus = FocusNode();
+    _bankbranchFocus = FocusNode();
+    _bankaddressFocus = FocusNode();
+    _swiftFocus = FocusNode();
+    _countryFocus = FocusNode();
   }
 
   PageController _controller = PageController(
@@ -990,6 +1181,22 @@ class HomePageState extends State<HomePage> {
   void dispose() {
     _custRemarksController.dispose();
     _custMobileController.dispose();
+    _nameFocus.dispose();
+    _add2Focus.dispose();
+    _remarksFocus.dispose();
+    _mobileFocus.dispose();
+    _add1Focus.dispose();
+    _add4Focus.dispose();
+    _add3Focus.dispose();
+    _emailFocus.dispose();
+    _gstinFocus.dispose();
+    _contactpersonFocus.dispose();
+    _banknameFocus.dispose();
+    _bankaddressFocus.dispose();
+    _bankbranchFocus.dispose();
+    _swiftFocus.dispose();
+    _countryFocus.dispose();
+
     _custNameController.dispose();
     _custAdd1Controller.dispose();
     _custAdd2Controller.dispose();
@@ -1282,6 +1489,7 @@ class HomePageState extends State<HomePage> {
                 custpageno = pageno;
                 custselectedtype = selectedtype;
                 getAddCustomerJson();
+                clearData(context);
                 // getGroupMaster('');
                 //setState(() {
                 //   getCustomerJson();

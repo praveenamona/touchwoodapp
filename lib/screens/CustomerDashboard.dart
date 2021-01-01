@@ -241,6 +241,32 @@ class HomePageState extends State<HomePage> {
                                               //  focusNode: custidFocusNode,
                                             ),
                                           ),
+
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 300,
+                                              maxWidth: 380,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  labelText: "Add3",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller: _custAdd3Controller,
+                                              //  focusNode: custidFocusNode,
+                                            ),
+                                          ),
                                           Container(
                                             constraints: BoxConstraints(
                                               //minHeight: 20,
@@ -644,7 +670,7 @@ class HomePageState extends State<HomePage> {
     String custGstin = _custtaxcodeController.text;
     String custAdd1 = _custAdd1Controller.text;
     String custAdd2 = _custAdd2Controller.text;
-    String custAdd3 = _custcontactpersonController.text;
+    String custAdd3 = _custAdd3Controller.text;
     String custcontactperson = _custcontactpersonController.text;
     String custemail = _custemailController.text;
     if (custId != '' && custName != '') {
@@ -887,6 +913,7 @@ class HomePageState extends State<HomePage> {
                 custpageno = pageno;
                 custselectedtype = selectedtype;
                 getAddCustomerJson();
+                clearData(context);
                 //  getGroupMaster('');
                 //setState(() {
                 //   getCustomerJson();
