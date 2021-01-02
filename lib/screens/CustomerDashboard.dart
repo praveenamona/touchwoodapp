@@ -9,6 +9,7 @@ import 'package:touchwoodapp/models/customer.dart';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'package:touchwoodapp/widgets/collapsing_navigation_drawer_widget.dart'
     as drawer;
+import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:touchwoodapp/repository/cutomer_repository.dart';
 
 import 'dart:convert';
@@ -43,6 +44,7 @@ void main() => runApp(new MaterialApp(
       ),
     ));
 PageController controller = PageController();
+List<type.Customer> partytypedetails = <type.Customer>[];
 List<Customer> _reportItems = <Customer>[];
 Paging _pagingdetails = new Paging();
 List<Customer> data = <Customer>[];
@@ -50,6 +52,8 @@ TextEditingController _GotoTextController;
 bool ShowAddWidget = false;
 List<Paging> paging = new List<Paging>();
 String selectedtype = "10";
+List<String> partytypedata = [];
+String selectedcompany;
 String totalCount;
 String pageSize;
 String currentPage;
@@ -60,7 +64,9 @@ int pageno;
 FocusNode idFocusNode;
 String searchtext;
 
-String selectedcustomer;
+String partytypeid;
+
+String selectedpartytype;
 String custselectedtype;
 int custpageno;
 String typeid;
@@ -162,6 +168,54 @@ class HomePageState extends State<HomePage> {
                                           SizedBox(
                                             height: 10,
                                           ),
+                                          if (partytypedata != null &&
+                                              partytypedata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 200,
+                                                maxWidth: 380,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .7, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Type",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: partytypedata,
+                                                label: "Type *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedpartytype = val;
+
+                                                    partytypeid = partytypedetails
+                                                        .where((element) =>
+                                                            element.ptyname ==
+                                                            val)
+                                                        .map((e) => e.partyid)
+                                                        .first
+                                                        .toString();
+
+                                                    getCustomerJson();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem: selectedpartytype,
+                                              ),
+                                            ),
 
                                           Container(
                                             constraints: BoxConstraints(
@@ -696,7 +750,7 @@ class HomePageState extends State<HomePage> {
             "",
             "",
             "",
-            "1");
+            partytypeid);
         stream.listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
@@ -787,6 +841,50 @@ class HomePageState extends State<HomePage> {
 
   List<customer.Customer> data = new List<customer.Customer>();
 
+  Future<List<type.Customer>> getpartytypeMaster(String filter) async {
+    setState(() {
+      partytypedetails = [];
+      partytypedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=20&Mode=PARTYTYPE&spname=GetAndSubmitPartytype&intflag=4&intUserID=1";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      partytypedetails = parsed
+          .map<type.Customer>((json) => type.Customer.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        partytypedetails = partytypedetails
+            .where((element) =>
+                element.ptyname
+                    .toLowerCase()
+                    .toString()
+                    .contains(filter.toLowerCase().toString()) &&
+                element.ptyname.toLowerCase() != 'supplier'.toLowerCase())
+            .toList();
+
+      partytypedata = partytypedetails.map((e) => e.ptyname).toList();
+      if (partytypeid == '' || partytypeid == null || partytypeid == '0')
+        selectedcompany = partytypedata.first;
+
+      partytypeid = partytypedetails
+          .where((element) => element.ptyname == selectedcompany)
+          .map((e) => e.partyid)
+          .first
+          .toString();
+    });
+
+    return partytypedetails;
+  }
+
   Future<customer.Customer> getAddCustomerJson() async {
     String customerurl;
 
@@ -825,7 +923,7 @@ class HomePageState extends State<HomePage> {
                 _custcontactpersonController.text = element.contactperson;
                 _custcontactnumberController.text = element.mobile;
                 typeid = element.partytypeMasterID;
-                selectedcustomer = element.partytype;
+                selectedpartytype = element.partytype;
                 _custtaxcodeController.text = element.gstin;
                 _custemailController.text = element.email;
                 _custAdd3Controller.text = element.add3;
@@ -842,6 +940,7 @@ class HomePageState extends State<HomePage> {
     //getPagingDetails();
     searchtext = '';
     getCustomerJson();
+    getpartytypeMaster('');
     custidFocusNode = FocusNode();
     _custIdController.text = '0';
     //getGroupMaster('');
@@ -913,6 +1012,7 @@ class HomePageState extends State<HomePage> {
                 custpageno = pageno;
                 custselectedtype = selectedtype;
                 getAddCustomerJson();
+                getpartytypeMaster('');
                 clearData(context);
                 //  getGroupMaster('');
                 //setState(() {
@@ -1037,7 +1137,7 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Expanded(
                     //  width: maxwidth * .10,
-                    child: Text("Type",
+                    child: Text("Name",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -1046,7 +1146,7 @@ class HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     // width: maxwidth * .10,
-                    child: Text("Name",
+                    child: Text("Email",
                         textScaleFactor: 1.7,
                         textAlign: TextAlign.left,
                         style: new TextStyle(
@@ -1455,7 +1555,13 @@ class HomePageState extends State<HomePage> {
 
       if (searchtext == null || searchtext == '') {
         customerurl =
-            "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intPartytypeID=1&intUserID=1&pagesize=" +
+            "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intPartytypeID=" +
+                ((partytypeid.toString() != 'null' &&
+                        partytypeid.toString() != '' &&
+                        partytypeid.toString() != '0')
+                    ? partytypeid.toString()
+                    : '1') +
+                "&intUserID=1&pagesize=" +
                 (selectedtype).toString() +
                 "&pagenumber=" +
                 ((pageno.toString() != 'null' &&
@@ -1540,17 +1646,6 @@ class HomePageState extends State<HomePage> {
                           // Container(
                           //     child: Row(
                           //   children: [
-                          Expanded(
-                            //width: maxwidth * .20,
-                            child: Text(
-                              _reportItems[index]
-                                  .partytype
-                                  .toLowerCase()
-                                  .toString(),
-                              textScaleFactor: 1.2,
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
 
                           //Spacer(),
                           // SizedBox(width: 25),
@@ -1566,6 +1661,17 @@ class HomePageState extends State<HomePage> {
                             ),
                           ),
 
+                          Expanded(
+                            //width: maxwidth * .20,
+                            child: Text(
+                              _reportItems[index]
+                                  .email
+                                  .toLowerCase()
+                                  .toString(),
+                              textScaleFactor: 1.2,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
                           //SizedBox(width: 90),
                           Expanded(
                               //width: maxwidth * .20,
@@ -1581,6 +1687,7 @@ class HomePageState extends State<HomePage> {
                                   custselectedtype = selectedtype;
                                   custpageno = pageno;
                                   getAddCustomerJson();
+                                  getpartytypeMaster('');
                                   // getGroupMaster('');
                                   //setState(() {
                                   //   getCustomerJson();

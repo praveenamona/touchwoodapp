@@ -5,13 +5,13 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:touchwoodapp/models/uom.dart';
+import 'package:touchwoodapp/models/Master.dart';
 import 'package:touchwoodapp/repository/assigncolor.dart';
 import 'package:touchwoodapp/models/customer.dart';
 import 'package:touchwoodapp/models/Paging.dart';
 import 'package:touchwoodapp/widgets/collapsing_navigation_drawer_widget.dart'
     as drawer;
-import 'package:touchwoodapp/repository/master_repository.dart';
+import 'package:touchwoodapp/repository/uom_repository.dart';
 
 import 'dart:convert';
 import 'package:touchwoodapp/models/Paging.dart';
@@ -61,7 +61,7 @@ String nextPage;
 int pageno;
 String searchtext;
 FocusNode _nameFocus;
-FocusNode _add2Focus;
+FocusNode _noofdecimalFocus;
 
 int custpageno;
 GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<master.Uom>>();
@@ -73,7 +73,7 @@ List<type.Customer> typedetails = <type.Customer>[];
 List<String> typedata = [];
 final _custNameController = TextEditingController();
 final _custIdController = TextEditingController();
-final _custnoofDecimalController = TextEditingController();
+final _custnoofdecimalController = TextEditingController();
 ProgressDialog pr;
 String headerName;
 String tableName;
@@ -115,7 +115,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add Supplier',
+              'UOM',
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -136,7 +136,7 @@ class HomePageState extends State<HomePage> {
                       //flex: 2,
                       child: FractionallySizedBox(
                           widthFactor: 0.9,
-                          heightFactor: 0.5,
+                          heightFactor: 0.6,
                           child: Container(
                               height: maxheight,
                               width: maxwidth,
@@ -158,7 +158,7 @@ class HomePageState extends State<HomePage> {
                                             MainAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            "Enter Master Details",
+                                            "Enter UOM Details",
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           SizedBox(
@@ -180,7 +180,7 @@ class HomePageState extends State<HomePage> {
                                             //   },
                                             //   focusNode: _nameFocus,
                                             child: TextField(
-                                              //  focusNode: _nameFocus,
+                                              focusNode: _nameFocus,
                                               decoration: const InputDecoration(
                                                   focusedBorder:
                                                       UnderlineInputBorder(
@@ -201,6 +201,7 @@ class HomePageState extends State<HomePage> {
                                               //enableInteractiveSelection: enable,
                                             ),
                                           ),
+
                                           SizedBox(
                                             height: 10,
                                           ),
@@ -220,7 +221,7 @@ class HomePageState extends State<HomePage> {
                                             //   },
                                             //   focusNode: _nameFocus,
                                             child: TextField(
-                                              //  focusNode: _nameFocus,
+                                              focusNode: _noofdecimalFocus,
                                               decoration: const InputDecoration(
                                                   focusedBorder:
                                                       UnderlineInputBorder(
@@ -229,13 +230,13 @@ class HomePageState extends State<HomePage> {
                                                   ),
                                                   border: InputBorder.none,
                                                   //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                  labelText: "no of Decimal",
+                                                  labelText: "No of Decimal",
                                                   labelStyle: TextStyle(
                                                       fontSize: 20.0)),
                                               keyboardType: TextInputType.text,
                                               style: textStyle,
                                               controller:
-                                                  _custnoofDecimalController,
+                                                  _custnoofdecimalController,
                                               // focusNode: custidFocusNode,
 
                                               readOnly: enable,
@@ -246,139 +247,153 @@ class HomePageState extends State<HomePage> {
                                           //),
                                           // ]),
                                         ]),
-                                  )))))
+                                  ))))),
+                  SizedBox(height: 20),
+                  Flexible(
+                    child: FractionallySizedBox(
+                      widthFactor: 0.9,
+                      // heightFactor: 0.3,
+                      child: Container(
+                          child: Row(children: <Widget>[
+                        Spacer(),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          child: RaisedButton(
+                              onPressed: () async {
+                                if ((_id != "") &&
+                                    (_id != null) &&
+                                    (_id != "0")) {
+                                  setState(() {
+                                    enable = true;
+                                  });
+                                  saveItems();
+                                } else {
+                                  final String customerurl =
+                                      "http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=5&strPartyname=" +
+                                          _custNameController.text;
+
+                                  var response = await http.get(
+                                      Uri.encodeFull(customerurl),
+                                      headers: {"Accept": "application/json"});
+                                  var convertDataToJson =
+                                      json.decode(response.body);
+                                  setState(() {
+                                    enable = true;
+                                  });
+                                  if (convertDataToJson[0].toString().contains(
+                                      "Already Exists: Already Exists")) {
+                                    Alert(
+                                        context: context,
+                                        title: "Alert",
+                                        type: AlertType.warning,
+                                        desc: "Already Exists",
+                                        buttons: [
+                                          DialogButton(
+                                            child: Text(
+                                              "Close",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20),
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                ShowAddWidget = false;
+                                              });
+                                              //clearData(context);
+                                              Navigator.of(context,
+                                                      rootNavigator: true)
+                                                  .pop();
+
+                                              // Navigator.push(
+                                              //     context,
+                                              //     MaterialPageRoute(
+                                              //         builder: (context) => HomePage(
+                                              //             custselectedtype, custpageno)));
+                                            },
+                                            width: 120,
+                                          )
+                                        ]).show();
+                                  } else {
+                                    // pr.show();
+                                    saveItems();
+
+                                    // Function f;
+                                    // f = await Navigator.pushNamed(context, 'Dashboard',
+                                    //     arguments: {custselectedtype, custpageno});
+                                    // f();
+                                  }
+                                }
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Image.asset('Images/save.png',
+                                      color: Colors.black),
+                                  SizedBox(width: 10.0),
+                                  Text(
+                                    "SAVE",
+                                    style: TextStyle(color: Colors.black),
+                                  )
+                                ],
+                              ),
+                              color: widgetcolor,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(10.0))),
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          child: RaisedButton(
+                              onPressed: () {
+                                setState(() {
+                                  ShowAddWidget = false;
+                                });
+
+                                clearData(context);
+                                // saveItems();
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Image.asset('Images/cancel.png',
+                                      color: Colors.black),
+                                  SizedBox(width: 10.0),
+                                  Text(
+                                    "CANCEL",
+                                    style: TextStyle(color: Colors.black),
+                                  )
+                                ],
+                              ),
+                              color: widgetcolor,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(10.0))),
+                          padding:
+                              EdgeInsets.only(top: 5, bottom: 5, right: 10),
+                        )
+                      ])),
+                    ),
+                  ),
                 ] // )
                 ),
           ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-            color: appbarcolor,
-            shape: CircularNotchedRectangle(),
-            notchMargin: 6,
-            child: Row(children: <Widget>[
-              Spacer(),
-              SizedBox(
-                width: 10,
-              ),
-              Container(
-                child: RaisedButton(
-                    onPressed: () async {
-                      if ((_id != "") && (_id != null) && (_id != "0")) {
-                        setState(() {
-                          enable = true;
-                        });
-                        saveItems();
-                      } else {
-                        final String customerurl =
-                            "http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=5&strPartyname=" +
-                                _custNameController.text;
-
-                        var response = await http.get(
-                            Uri.encodeFull(customerurl),
-                            headers: {"Accept": "application/json"});
-                        var convertDataToJson = json.decode(response.body);
-                        setState(() {
-                          enable = true;
-                        });
-                        if (convertDataToJson[0]
-                            .toString()
-                            .contains("Already Exists: Already Exists")) {
-                          Alert(
-                              context: context,
-                              title: "Alert",
-                              type: AlertType.warning,
-                              desc: "Already Exists",
-                              buttons: [
-                                DialogButton(
-                                  child: Text(
-                                    "Close",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      ShowAddWidget = false;
-                                    });
-                                    //clearData(context);
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop();
-
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) => HomePage(
-                                    //             custselectedtype, custpageno)));
-                                  },
-                                  width: 120,
-                                )
-                              ]).show();
-                        } else {
-                          // pr.show();
-                          saveItems();
-
-                          // Function f;
-                          // f = await Navigator.pushNamed(context, 'Dashboard',
-                          //     arguments: {custselectedtype, custpageno});
-                          // f();
-                        }
-                      }
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset('Images/save.png', color: Colors.black),
-                        SizedBox(width: 10.0),
-                        Text(
-                          "SAVE",
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
-                    ),
-                    color: widgetcolor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10.0))),
-                padding: EdgeInsets.only(top: 5, bottom: 5),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Container(
-                child: RaisedButton(
-                    onPressed: () {
-                      setState(() {
-                        ShowAddWidget = false;
-                      });
-
-                      clearData(context);
-                      // saveItems();
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset('Images/cancel.png', color: Colors.black),
-                        SizedBox(width: 10.0),
-                        Text(
-                          "CANCEL",
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
-                    ),
-                    color: widgetcolor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10.0))),
-                padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
-              )
-            ])));
+        ));
   }
 
   void saveItems() async {
     String custId = _custIdController.text;
     String custName = _custNameController.text;
+    String noofdecimal = _custnoofdecimalController.text;
 
     if (custId != '' && custName != '') {
       try {
         Stream<String> stream =
-            await insertMaster(custId, tableName, custName, "0");
+            await insertUom(custId, noofdecimal, custName, "0");
         stream.asBroadcastStream().listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
@@ -449,8 +464,10 @@ class HomePageState extends State<HomePage> {
   void clearData(context) {
     _custIdController.text = '0';
     _custNameController.text = '';
-    _custnoofDecimalController.text = '';
+    _custnoofdecimalController.text = '';
     _id = '0';
+    enable = false;
+    _nameFocus.requestFocus();
   }
 
   List<master.Uom> data = new List<master.Uom>();
@@ -502,9 +519,8 @@ class HomePageState extends State<HomePage> {
 
     if (searchtext == '' || searchtext == null) {
       customerurl =
-          'http://tap.suninfotechnologies.in/api/touch?&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=' +
-              tableName +
-              '&pagesize=10&pagenumber=1&intMasterid=' +
+          'http://tap.suninfotechnologies.in/api/touch?&Mode=uom&spname=GetAndSubmituommaster&intOrgID=1&intUserID=1&intflag=4' +
+              '&pagesize=10&pagenumber=1&intuomMasterid=' +
               _id +
               '';
     } else {
@@ -532,6 +548,7 @@ class HomePageState extends State<HomePage> {
           .forEach((element) => setState(() {
                 masterid = element.columnMasterid;
                 _custNameController.text = element.columnname;
+                _custnoofdecimalController.text = element.noofDecimal;
               }));
   }
 
@@ -555,7 +572,7 @@ class HomePageState extends State<HomePage> {
 
     super.initState();
     _nameFocus = FocusNode();
-    _add2Focus = FocusNode();
+    _noofdecimalFocus = FocusNode();
   }
 
   PageController _controller = PageController(
@@ -564,9 +581,9 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _custnoofDecimalController.dispose();
+    _custnoofdecimalController.dispose();
     _nameFocus.dispose();
-    _add2Focus.dispose();
+    _noofdecimalFocus.dispose();
     _custNameController.dispose();
     _custIdController.dispose();
     custidFocusNode.dispose();
@@ -666,6 +683,15 @@ class HomePageState extends State<HomePage> {
                             color: widgetcolor,
                           )),
                     ),
+                    Expanded(
+                      child: Text("No of Decimal",
+                          textScaleFactor: 1.7,
+                          textAlign: TextAlign.left,
+                          style: new TextStyle(
+                            color: widgetcolor,
+                          )),
+                    ),
+                    Spacer(),
                     Expanded(
                       child: Text("Action",
                           textScaleFactor: 1.7,
@@ -912,8 +938,7 @@ class HomePageState extends State<HomePage> {
 
       if (searchtext == null || searchtext == '') {
         customerurl =
-            "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=" +
-                tableName +
+            "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&Mode=UOM&spname=GetAndSubmitUomMaster&intflag=4&intOrgID=1&intUserID=1" +
                 "&pagesize=" +
                 (selectedtype).toString() +
                 "&pagenumber=" +
@@ -984,33 +1009,36 @@ class HomePageState extends State<HomePage> {
                     width: maxwidth,
                     height: 50,
                     child: Card(
-                      child:
-                          // Padding(
-                          //   padding: const EdgeInsets.all(8.0),
-                          //   child:
-                          Row(
+                      child: Row(
                         children: <Widget>[
-                          // Container(
-                          //     child: Row(
-                          //   children: [
-                          // SizedBox(width: 1),
                           Expanded(
-                            //width: maxwidth * .20,
                             child: Text(
                               '    ' +
                                   _reportItems[index]
                                       .columnname
                                       .toLowerCase()
                                       .toString(),
-                              textScaleFactor: 1.2,
+                              textScaleFactor: 1.3,
                               textAlign: TextAlign.left,
                             ),
                           ),
-                          //SizedBox(width: 90),
+                          Expanded(
+                            child: Text(
+                              '    ' +
+                                  _reportItems[index]
+                                      .noofDecimal
+                                      .toLowerCase()
+                                      .toString(),
+                              textScaleFactor: 1.3,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          Spacer(),
                           Expanded(
                               //width: maxwidth * .20,
                               child: Row(children: [
                             new IconButton(
+                              alignment: Alignment.bottomRight,
                               icon: Image.asset('Images/edit.png',
                                   color: widgetcolor),
                               onPressed: () {
@@ -1049,9 +1077,10 @@ class HomePageState extends State<HomePage> {
                               },
                               highlightColor: Colors.pink,
                             ),
-                            SizedBox(width: 1),
+                            SizedBox(width: 3),
                             // Spacer(),
                             new IconButton(
+                              alignment: Alignment.bottomRight,
                               icon: Image.asset('Images/delete.png',
                                   color: widgetcolor),
                               onPressed: () async {
@@ -1081,7 +1110,7 @@ class HomePageState extends State<HomePage> {
 
                                             if (yesflag) {
                                               Stream<String> stream =
-                                                  await insertMaster(
+                                                  await insertUom(
                                                       id, "", "", "1");
                                               stream
                                                   .asBroadcastStream()
@@ -1188,37 +1217,5 @@ class HomePageState extends State<HomePage> {
       // return null;
     }
     return widgets;
-  }
-
-  List<Widget> generateTables() {
-    List<Widget> widgets = <Widget>[];
-    widgets.add(ListView.builder(
-        itemCount: _reportItems.length,
-        itemBuilder: (BuildContext ctxt, int index) {
-          return Expanded(
-            child: Text(
-              _reportItems[index].columnname.toString(),
-              textScaleFactor: 1.6,
-              textAlign: TextAlign.right,
-            ),
-          );
-        }));
-
-    //widgets.add(SizedBox(height: 2.0));
-    return widgets;
-  }
-
-  Widget generateChildTable() {
-    return ListView.builder(
-        itemCount: _reportItems.length,
-        itemBuilder: (BuildContext ctxt, int index) {
-          return Expanded(
-            child: Text(
-              _reportItems[index].columnname.toString(),
-              textScaleFactor: 1.6,
-              textAlign: TextAlign.right,
-            ),
-          );
-        });
   }
 }

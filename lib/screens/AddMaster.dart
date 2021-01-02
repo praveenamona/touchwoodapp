@@ -115,7 +115,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add Supplier',
+              headerName,
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -136,7 +136,7 @@ class HomePageState extends State<HomePage> {
                       //flex: 2,
                       child: FractionallySizedBox(
                           widthFactor: 0.9,
-                          heightFactor: 0.5,
+                          heightFactor: 0.4,
                           child: Container(
                               height: maxheight,
                               width: maxwidth,
@@ -158,7 +158,7 @@ class HomePageState extends State<HomePage> {
                                             MainAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            "Enter Master Details",
+                                            "Enter " + headerName + " Details",
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           SizedBox(
@@ -180,7 +180,7 @@ class HomePageState extends State<HomePage> {
                                             //   },
                                             //   focusNode: _nameFocus,
                                             child: TextField(
-                                              //  focusNode: _nameFocus,
+                                              focusNode: _nameFocus,
                                               decoration: const InputDecoration(
                                                   focusedBorder:
                                                       UnderlineInputBorder(
@@ -201,132 +201,265 @@ class HomePageState extends State<HomePage> {
                                               //enableInteractiveSelection: enable,
                                             ),
                                           ),
+
                                           //),
                                           // ]),
                                         ]),
-                                  )))))
+                                  ))))),
+                  SizedBox(height: 20),
+                  Flexible(
+                    child: FractionallySizedBox(
+                      widthFactor: 0.9,
+                      // heightFactor: 0.3,
+                      child: Container(
+                          child: Row(children: <Widget>[
+                        Spacer(),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          child: RaisedButton(
+                              onPressed: () async {
+                                if ((_id != "") &&
+                                    (_id != null) &&
+                                    (_id != "0")) {
+                                  setState(() {
+                                    enable = true;
+                                  });
+                                  saveItems();
+                                } else {
+                                  final String customerurl =
+                                      "http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=5&strPartyname=" +
+                                          _custNameController.text;
+
+                                  var response = await http.get(
+                                      Uri.encodeFull(customerurl),
+                                      headers: {"Accept": "application/json"});
+                                  var convertDataToJson =
+                                      json.decode(response.body);
+                                  setState(() {
+                                    enable = true;
+                                  });
+                                  if (convertDataToJson[0].toString().contains(
+                                      "Already Exists: Already Exists")) {
+                                    Alert(
+                                        context: context,
+                                        title: "Alert",
+                                        type: AlertType.warning,
+                                        desc: "Already Exists",
+                                        buttons: [
+                                          DialogButton(
+                                            child: Text(
+                                              "Close",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20),
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                ShowAddWidget = false;
+                                              });
+                                              //clearData(context);
+                                              Navigator.of(context,
+                                                      rootNavigator: true)
+                                                  .pop();
+
+                                              // Navigator.push(
+                                              //     context,
+                                              //     MaterialPageRoute(
+                                              //         builder: (context) => HomePage(
+                                              //             custselectedtype, custpageno)));
+                                            },
+                                            width: 120,
+                                          )
+                                        ]).show();
+                                  } else {
+                                    // pr.show();
+                                    saveItems();
+
+                                    // Function f;
+                                    // f = await Navigator.pushNamed(context, 'Dashboard',
+                                    //     arguments: {custselectedtype, custpageno});
+                                    // f();
+                                  }
+                                }
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Image.asset('Images/save.png',
+                                      color: Colors.black),
+                                  SizedBox(width: 10.0),
+                                  Text(
+                                    "SAVE",
+                                    style: TextStyle(color: Colors.black),
+                                  )
+                                ],
+                              ),
+                              color: widgetcolor,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(10.0))),
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          child: RaisedButton(
+                              onPressed: () {
+                                setState(() {
+                                  ShowAddWidget = false;
+                                });
+
+                                clearData(context);
+                                // saveItems();
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Image.asset('Images/cancel.png',
+                                      color: Colors.black),
+                                  SizedBox(width: 10.0),
+                                  Text(
+                                    "CANCEL",
+                                    style: TextStyle(color: Colors.black),
+                                  )
+                                ],
+                              ),
+                              color: widgetcolor,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(10.0))),
+                          padding:
+                              EdgeInsets.only(top: 5, bottom: 5, right: 10),
+                        )
+                      ])),
+                    ),
+                  ),
                 ] // )
                 ),
           ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-            color: appbarcolor,
-            shape: CircularNotchedRectangle(),
-            notchMargin: 6,
-            child: Row(children: <Widget>[
-              Spacer(),
-              SizedBox(
-                width: 10,
-              ),
-              Container(
-                child: RaisedButton(
-                    onPressed: () async {
-                      if ((_id != "") && (_id != null) && (_id != "0")) {
-                        setState(() {
-                          enable = true;
-                        });
-                        saveItems();
-                      } else {
-                        final String customerurl =
-                            "http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=5&strPartyname=" +
-                                _custNameController.text;
+        ));
+    // bottomNavigationBar:
+    // BottomAppBar(
+    //     color: appbarcolor,
+    //     shape: CircularNotchedRectangle(),
+    //     notchMargin: 6,
+    //     child: Row(children: <Widget>[
+    //       Spacer(),
+    //       SizedBox(
+    //         width: 10,
+    //       ),
+    //       Container(
+    //         child: RaisedButton(
+    //             onPressed: () async {
+    //               if ((_id != "") && (_id != null) && (_id != "0")) {
+    //                 setState(() {
+    //                   enable = true;
+    //                 });
+    //                 saveItems();
+    //               } else {
+    //                 final String customerurl =
+    //                     "http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=5&strPartyname=" +
+    //                         _custNameController.text;
 
-                        var response = await http.get(
-                            Uri.encodeFull(customerurl),
-                            headers: {"Accept": "application/json"});
-                        var convertDataToJson = json.decode(response.body);
-                        setState(() {
-                          enable = true;
-                        });
-                        if (convertDataToJson[0]
-                            .toString()
-                            .contains("Already Exists: Already Exists")) {
-                          Alert(
-                              context: context,
-                              title: "Alert",
-                              type: AlertType.warning,
-                              desc: "Already Exists",
-                              buttons: [
-                                DialogButton(
-                                  child: Text(
-                                    "Close",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      ShowAddWidget = false;
-                                    });
-                                    //clearData(context);
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop();
+    //                 var response = await http.get(
+    //                     Uri.encodeFull(customerurl),
+    //                     headers: {"Accept": "application/json"});
+    //                 var convertDataToJson = json.decode(response.body);
+    //                 setState(() {
+    //                   enable = true;
+    //                 });
+    //                 if (convertDataToJson[0]
+    //                     .toString()
+    //                     .contains("Already Exists: Already Exists")) {
+    //                   Alert(
+    //                       context: context,
+    //                       title: "Alert",
+    //                       type: AlertType.warning,
+    //                       desc: "Already Exists",
+    //                       buttons: [
+    //                         DialogButton(
+    //                           child: Text(
+    //                             "Close",
+    //                             style: TextStyle(
+    //                                 color: Colors.white, fontSize: 20),
+    //                           ),
+    //                           onPressed: () {
+    //                             setState(() {
+    //                               ShowAddWidget = false;
+    //                             });
+    //                             //clearData(context);
+    //                             Navigator.of(context, rootNavigator: true)
+    //                                 .pop();
 
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) => HomePage(
-                                    //             custselectedtype, custpageno)));
-                                  },
-                                  width: 120,
-                                )
-                              ]).show();
-                        } else {
-                          // pr.show();
-                          saveItems();
+    //                             // Navigator.push(
+    //                             //     context,
+    //                             //     MaterialPageRoute(
+    //                             //         builder: (context) => HomePage(
+    //                             //             custselectedtype, custpageno)));
+    //                           },
+    //                           width: 120,
+    //                         )
+    //                       ]).show();
+    //                 } else {
+    //                   // pr.show();
+    //                   saveItems();
 
-                          // Function f;
-                          // f = await Navigator.pushNamed(context, 'Dashboard',
-                          //     arguments: {custselectedtype, custpageno});
-                          // f();
-                        }
-                      }
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset('Images/save.png', color: Colors.black),
-                        SizedBox(width: 10.0),
-                        Text(
-                          "SAVE",
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
-                    ),
-                    color: widgetcolor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10.0))),
-                padding: EdgeInsets.only(top: 5, bottom: 5),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Container(
-                child: RaisedButton(
-                    onPressed: () {
-                      setState(() {
-                        ShowAddWidget = false;
-                      });
+    //                   // Function f;
+    //                   // f = await Navigator.pushNamed(context, 'Dashboard',
+    //                   //     arguments: {custselectedtype, custpageno});
+    //                   // f();
+    //                 }
+    //               }
+    //             },
+    //             child: Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: <Widget>[
+    //                 Image.asset('Images/save.png', color: Colors.black),
+    //                 SizedBox(width: 10.0),
+    //                 Text(
+    //                   "SAVE",
+    //                   style: TextStyle(color: Colors.black),
+    //                 )
+    //               ],
+    //             ),
+    //             color: widgetcolor,
+    //             shape: RoundedRectangleBorder(
+    //                 borderRadius: new BorderRadius.circular(10.0))),
+    //         padding: EdgeInsets.only(top: 5, bottom: 5),
+    //       ),
+    //       SizedBox(
+    //         width: 10,
+    //       ),
+    //       Container(
+    //         child: RaisedButton(
+    //             onPressed: () {
+    //               setState(() {
+    //                 ShowAddWidget = false;
+    //               });
 
-                      clearData(context);
-                      // saveItems();
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset('Images/cancel.png', color: Colors.black),
-                        SizedBox(width: 10.0),
-                        Text(
-                          "CANCEL",
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
-                    ),
-                    color: widgetcolor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10.0))),
-                padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
-              )
-            ])));
+    //               clearData(context);
+    //               // saveItems();
+    //             },
+    //             child: Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: <Widget>[
+    //                 Image.asset('Images/cancel.png', color: Colors.black),
+    //                 SizedBox(width: 10.0),
+    //                 Text(
+    //                   "CANCEL",
+    //                   style: TextStyle(color: Colors.black),
+    //                 )
+    //               ],
+    //             ),
+    //             color: widgetcolor,
+    //             shape: RoundedRectangleBorder(
+    //                 borderRadius: new BorderRadius.circular(10.0))),
+    //         padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
+    //       )
+    //     ])));
   }
 
   void saveItems() async {
@@ -409,6 +542,8 @@ class HomePageState extends State<HomePage> {
     _custNameController.text = '';
     _custMobileController.text = '';
     _id = '0';
+    enable = false;
+    _nameFocus.requestFocus();
   }
 
   List<master.Master> data = new List<master.Master>();
@@ -608,7 +743,7 @@ class HomePageState extends State<HomePage> {
           //color: Colors.white,
           width: maxwidth, // * .40,
           height: maxheight,
-          padding: EdgeInsets.all(50),
+          padding: EdgeInsets.all(60),
 
           child: ListView(children: <Widget>[
             Card(
@@ -618,17 +753,18 @@ class HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Expanded(
-                      child: Text("Name",
+                      child: Text(headerName,
                           textScaleFactor: 1.7,
                           textAlign: TextAlign.left,
                           style: new TextStyle(
                             color: widgetcolor,
                           )),
                     ),
+                    Spacer(),
                     Expanded(
                       child: Text("Action",
                           textScaleFactor: 1.7,
-                          textAlign: TextAlign.left,
+                          textAlign: TextAlign.right,
                           style: new TextStyle(
                             color: widgetcolor,
                           )),
@@ -944,190 +1080,192 @@ class HomePageState extends State<HomePage> {
                     width: maxwidth,
                     height: 50,
                     child: Card(
-                      child:
-                          // Padding(
-                          //   padding: const EdgeInsets.all(8.0),
-                          //   child:
-                          Row(
+                      child: Row(
                         children: <Widget>[
-                          // Container(
-                          //     child: Row(
-                          //   children: [
-                          // SizedBox(width: 1),
                           Expanded(
-                            //width: maxwidth * .20,
+                            flex: 3,
                             child: Text(
                               '    ' +
                                   _reportItems[index]
                                       .columnname
                                       .toLowerCase()
                                       .toString(),
-                              textScaleFactor: 1.2,
+                              textScaleFactor: 1.3,
                               textAlign: TextAlign.left,
                             ),
                           ),
-                          //SizedBox(width: 90),
+                          Spacer(),
                           Expanded(
+                              flex: 1,
                               //width: maxwidth * .20,
                               child: Row(children: [
-                            new IconButton(
-                              icon: Image.asset('Images/edit.png',
-                                  color: widgetcolor),
-                              onPressed: () {
-                                setState(() {
-                                  ShowAddWidget = true;
-                                  String id =
-                                      _reportItems[index].columnMasterid;
-                                  _id = id;
+                                Spacer(),
+                                new IconButton(
+                                  alignment: Alignment.bottomRight,
+                                  icon: Image.asset('Images/edit.png',
+                                      color: widgetcolor),
+                                  onPressed: () {
+                                    setState(() {
+                                      ShowAddWidget = true;
+                                      String id =
+                                          _reportItems[index].columnMasterid;
+                                      _id = id;
 
-                                  custselectedtype = selectedtype;
-                                  custpageno = pageno;
-                                  getAddCustomerJson();
-                                  // getGroupMaster('');
-                                  //setState(() {
-                                  //   getCustomerJson();
-                                  if ((_id != "") &&
-                                      (_id != null) &&
-                                      (_id != "0"))
-                                    _custIdController.text = _id.toString();
+                                      custselectedtype = selectedtype;
+                                      custpageno = pageno;
+                                      getAddCustomerJson();
+                                      // getGroupMaster('');
+                                      //setState(() {
+                                      //   getCustomerJson();
+                                      if ((_id != "") &&
+                                          (_id != null) &&
+                                          (_id != "0"))
+                                        _custIdController.text = _id.toString();
 
-                                  /// });
-                                });
+                                      /// });
+                                    });
 
-                                // ad.custid;
-                                // if (id != '0' || id != null)
-                                //   Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(
-                                //           builder: (context) =>
-                                //               Addparty.AddCustomer(
-                                //                 key: null,
-                                //                 title: "Add Customer",
-                                //                 searchtext: searchtext,
-                                //               )));
-                                //
-                              },
-                              highlightColor: Colors.pink,
-                            ),
-                            SizedBox(width: 1),
-                            // Spacer(),
-                            new IconButton(
-                              icon: Image.asset('Images/delete.png',
-                                  color: widgetcolor),
-                              onPressed: () async {
-                                String id = _reportItems[index].columnMasterid;
+                                    // ad.custid;
+                                    // if (id != '0' || id != null)
+                                    //   Navigator.push(
+                                    //       context,
+                                    //       MaterialPageRoute(
+                                    //           builder: (context) =>
+                                    //               Addparty.AddCustomer(
+                                    //                 key: null,
+                                    //                 title: "Add Customer",
+                                    //                 searchtext: searchtext,
+                                    //               )));
+                                    //
+                                  },
+                                  highlightColor: Colors.pink,
+                                ),
+                                SizedBox(width: 3),
+                                // Spacer(),
+                                new IconButton(
+                                  alignment: Alignment.bottomRight,
+                                  icon: Image.asset('Images/delete.png',
+                                      color: widgetcolor),
+                                  onPressed: () async {
+                                    String id =
+                                        _reportItems[index].columnMasterid;
 
-                                _id = id;
+                                    _id = id;
 
-                                if (id != '0' || id != null) {
-                                  bool yesflag = false;
+                                    if (id != '0' || id != null) {
+                                      bool yesflag = false;
 
-                                  Alert(
-                                      context: context,
-                                      title: "Done!",
-                                      desc: "Do you want to Delete it?",
-                                      type: AlertType.success,
-                                      style: AlertStyle(isCloseButton: false),
-                                      buttons: [
-                                        DialogButton(
-                                          child: Text(
-                                            "Yes",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20),
-                                          ),
-                                          onPressed: () async {
-                                            yesflag = true;
+                                      Alert(
+                                          context: context,
+                                          title: "Done!",
+                                          desc: "Do you want to Delete it?",
+                                          type: AlertType.success,
+                                          style:
+                                              AlertStyle(isCloseButton: false),
+                                          buttons: [
+                                            DialogButton(
+                                              child: Text(
+                                                "Yes",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20),
+                                              ),
+                                              onPressed: () async {
+                                                yesflag = true;
 
-                                            if (yesflag) {
-                                              Stream<String> stream =
-                                                  await insertMaster(
-                                                      id, "", "", "1");
-                                              stream
-                                                  .asBroadcastStream()
-                                                  .listen((String message) {
-                                                if (message.contains(
-                                                        """[{"RESULT":1}]""") ||
-                                                    message.contains(
-                                                        """[{"RESULT":2}]""")) {
-                                                  Alert(
-                                                      context: context,
-                                                      title: "Done!",
-                                                      desc:
-                                                          "Data Deleted successfully",
-                                                      type: AlertType.success,
-                                                      style: AlertStyle(
-                                                          isCloseButton: false),
-                                                      buttons: [
-                                                        DialogButton(
-                                                          child: Text(
-                                                            "Close",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 20),
-                                                          ),
-                                                          onPressed: () {
-                                                            getCustomerJson();
-                                                            Navigator.of(
-                                                                    context,
-                                                                    rootNavigator:
-                                                                        true)
-                                                                .pop();
-                                                            // Navigator.push(
-                                                            //     context,
-                                                            //     MaterialPageRoute(
-                                                            //         builder:
-                                                            //             (context) =>
-                                                            //                 HomePage()));
-                                                          },
-                                                          width: 120,
-                                                        )
-                                                      ]).show();
-                                                } else {
-                                                  Alert(
+                                                if (yesflag) {
+                                                  Stream<String> stream =
+                                                      await insertMaster(id,
+                                                          tableName, "", "1");
+                                                  stream
+                                                      .asBroadcastStream()
+                                                      .listen((String message) {
+                                                    if (message.contains(
+                                                            """[{"RESULT":1}]""") ||
+                                                        message.contains(
+                                                            """[{"RESULT":2}]""")) {
+                                                      Alert(
                                                           context: context,
-                                                          type: AlertType.error,
-                                                          title: "Error",
+                                                          title: "Done!",
                                                           desc:
-                                                              "Error during delete. Please try again.",
+                                                              "Data Deleted successfully",
+                                                          type:
+                                                              AlertType.success,
                                                           style: AlertStyle(
                                                               isCloseButton:
-                                                                  false))
-                                                      .show();
+                                                                  false),
+                                                          buttons: [
+                                                            DialogButton(
+                                                              child: Text(
+                                                                "Close",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        20),
+                                                              ),
+                                                              onPressed: () {
+                                                                getCustomerJson();
+                                                                Navigator.of(
+                                                                        context,
+                                                                        rootNavigator:
+                                                                            true)
+                                                                    .pop();
+                                                                // Navigator.push(
+                                                                //     context,
+                                                                //     MaterialPageRoute(
+                                                                //         builder:
+                                                                //             (context) =>
+                                                                //                 HomePage()));
+                                                              },
+                                                              width: 120,
+                                                            )
+                                                          ]).show();
+                                                    } else {
+                                                      Alert(
+                                                              context: context,
+                                                              type: AlertType
+                                                                  .error,
+                                                              title: "Error",
+                                                              desc:
+                                                                  "Error during delete. Please try again.",
+                                                              style: AlertStyle(
+                                                                  isCloseButton:
+                                                                      false))
+                                                          .show();
+                                                    }
+                                                  });
                                                 }
-                                              });
-                                            }
-                                            //   getPagingDetails();
-                                            getCustomerJson();
-                                            Navigator.of(context,
-                                                    rootNavigator: true)
-                                                .pop();
-                                          },
-                                          width: 120,
-                                        ),
-                                        DialogButton(
-                                          child: Text(
-                                            "No",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20),
-                                          ),
-                                          onPressed: () {
-                                            yesflag = false;
-                                            Navigator.of(context,
-                                                    rootNavigator: true)
-                                                .pop();
-                                          },
-                                          width: 120,
-                                        )
-                                      ]).show();
-                                }
-                                //
-                              },
-                              highlightColor: Colors.pink,
-                            ),
-                          ]))
+                                                //   getPagingDetails();
+                                                getCustomerJson();
+                                                Navigator.of(context,
+                                                        rootNavigator: true)
+                                                    .pop();
+                                              },
+                                              width: 120,
+                                            ),
+                                            DialogButton(
+                                              child: Text(
+                                                "No",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20),
+                                              ),
+                                              onPressed: () {
+                                                yesflag = false;
+                                                Navigator.of(context,
+                                                        rootNavigator: true)
+                                                    .pop();
+                                              },
+                                              width: 120,
+                                            )
+                                          ]).show();
+                                    }
+                                    //
+                                  },
+                                  highlightColor: Colors.pink,
+                                ),
+                              ]))
                           //   ],
                           // )),
                         ],
@@ -1148,37 +1286,5 @@ class HomePageState extends State<HomePage> {
       // return null;
     }
     return widgets;
-  }
-
-  List<Widget> generateTables() {
-    List<Widget> widgets = <Widget>[];
-    widgets.add(ListView.builder(
-        itemCount: _reportItems.length,
-        itemBuilder: (BuildContext ctxt, int index) {
-          return Expanded(
-            child: Text(
-              _reportItems[index].columnname.toString(),
-              textScaleFactor: 1.6,
-              textAlign: TextAlign.right,
-            ),
-          );
-        }));
-
-    //widgets.add(SizedBox(height: 2.0));
-    return widgets;
-  }
-
-  Widget generateChildTable() {
-    return ListView.builder(
-        itemCount: _reportItems.length,
-        itemBuilder: (BuildContext ctxt, int index) {
-          return Expanded(
-            child: Text(
-              _reportItems[index].columnname.toString(),
-              textScaleFactor: 1.6,
-              textAlign: TextAlign.right,
-            ),
-          );
-        });
   }
 }

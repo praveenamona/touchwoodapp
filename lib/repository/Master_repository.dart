@@ -73,11 +73,15 @@ Future<Stream<String>> insertMaster(masterid, name, columndata, del) async {
     }
   }
   final String url = MyHome.BASE_URL +
-      '/touch?&pagenumber=1&pagesize=20&Mode=master&spname=GetAndSubmitMasterTable&intflag=1&strTableName=' +
+      '/touch?&pagenumber=1&pagesize=20&Mode=master&spname=GetAndSubmitMasterTable&intflag=' +
+      intflag +
+      '&strTableName=' +
       name +
       '' +
-      '&intOrganizationMasterID=1&strcolumnname=' +
+      '&intOrganizationMasterID=1&strcolumndata=' +
       columndata +
+      '&intMasterid=' +
+      masterid +
       '';
   print(url);
   final client = new http.Client();

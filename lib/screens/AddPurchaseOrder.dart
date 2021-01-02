@@ -34,7 +34,7 @@ import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:dropdown_search/dropdown_search.dart';
 
 void main() => runApp(new MaterialApp(
-      home: new HomePage("10", 1),
+      home: new HomePage(),
       theme: ThemeData(
         primaryColor: Colors.black,
         accentColor: Colors.black,
@@ -115,7 +115,7 @@ bool enable = false;
 class HomePage extends StatefulWidget {
   String selectedType;
   int pageNo;
-  HomePage(this.selectedType, this.pageNo);
+  HomePage({this.selectedType, this.pageNo});
 
   String get custid {
     selectedtype = selectedType;
