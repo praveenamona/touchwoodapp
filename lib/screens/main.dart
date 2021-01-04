@@ -71,20 +71,22 @@ class MyHome extends StatelessWidget {
           child: Container(
             //width: MediaQuery.of(context).size.width,5
             margin: EdgeInsets.only(top: 0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white,
-            ),
+            color: appbarcolor,
+            // decoration: BoxDecoration(
+            //   borderRadius: BorderRadius.circular(20),
+            // ),
             child: LayoutBuilder(
               builder: (ctx, constraints) {
                 var upheight = constraints.maxHeight / 20;
                 var maxwidth = constraints.maxWidth;
                 return Center(
                     child: Container(
-                        color: Colors.white,
+                        color: appbarcolor,
                         height: constraints.maxHeight,
                         width: maxwidth,
                         child: Container(
+                          width: 700,
+                          height: 700,
                           color: Colors.white,
                           //  height: 700,
                           //   width: 500,

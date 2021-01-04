@@ -593,6 +593,41 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                           height: 1,
                                           color: widgetcolor,
                                         ),
+                                        Container(
+                                          child: ListTile(
+                                            //    leading: Text("Master"),
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername:
+                                                    "Fabric Composition",
+                                                tablename:
+                                                    "fabriccompositionmaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Fabric Composition"),
+                                          ),
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          //constraints: BoxConstraints(),
+                                        ),
+                                        Divider(
+                                          height: 1,
+                                          color: widgetcolor,
+                                        ),
                                         ListTile(
                                           onTap: () {
                                             Master.HomePage ad =
@@ -961,7 +996,7 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                   // leading: Image.asset(
                                   //   'images/people.png',
                                   // ),
-                                  title: Text("Purchas Order"),
+                                  title: Text("Purchase Order"),
                                 ),
                               ],
                             ),
