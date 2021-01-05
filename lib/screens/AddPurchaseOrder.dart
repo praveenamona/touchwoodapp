@@ -65,7 +65,9 @@ String selecteduom;
 String selectedfabtype;
 String selectedfabknittype;
 String selectedcomposition;
-
+String selectedportofdischarge;
+String selectedshipmentmode;
+String selectedportofload;
 int custpageno;
 String compid;
 String currencyid;
@@ -83,6 +85,9 @@ String colorid;
 String diaid;
 String yarntypeid;
 String uomid;
+String portofdischargeid;
+String portofloadid;
+String shipmentmodeid;
 
 GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<customer.Customer>>();
 String _id = "";
@@ -102,6 +107,10 @@ List<uom.Uom> uomdetails = <uom.Uom>[];
 List<master.Master> compositiondetails = <master.Master>[];
 List<customer.Customer> notifypartydetails = <customer.Customer>[];
 List<customer.Customer> supplierdetails = <customer.Customer>[];
+List<master.Master> portofdischargedetails = <master.Master>[];
+List<master.Master> shipmentmodedetails = <master.Master>[];
+List<master.Master> portofloaddetails = <master.Master>[];
+
 List<String> companydata = [];
 List<String> supplierdata = [];
 List<String> currencydata = [];
@@ -118,6 +127,9 @@ List<String> colordata = [];
 List<String> uomdata = [];
 List<String> compositiondata = [];
 List<String> prodtypedata = [];
+List<String> portofloaddata = [];
+List<String> shipmentmodedata = [];
+List<String> portofdischargedata = [];
 final _custPONoController = TextEditingController();
 final _custIdController = TextEditingController();
 final _custMobileController = TextEditingController();
@@ -139,7 +151,9 @@ FocusNode custidFocusNode;
 double maxwidth;
 double maxheight;
 TextEditingController dateCtl = TextEditingController();
+TextEditingController shipmentdateCtl = TextEditingController();
 var seldate;
+var selshipmentdate;
 bool enable = false;
 
 class HomePage extends StatefulWidget {
@@ -170,6 +184,138 @@ class HomePageState extends State<HomePage> {
     print("POSITION of Red: $positionRed ");
   }
 
+  // Widget listtableView() {
+  //   // selrate = '';
+  //   // Selecteditem = '';
+  //   //pr.show();
+  //   if (_itemdetails.length > 0) {
+  //     return SingleChildScrollView(
+  //         scrollDirection: Axis.vertical,
+  //         child: SingleChildScrollView(
+  //             scrollDirection: Axis.horizontal,
+  //             child: DataTable(
+  //               columnSpacing: 10.0,
+  //               columns: [
+  //                 DataColumn(
+  //                   label: Container(
+  //                       width: MediaQuery.of(context).size.width * 0.25,
+  //                       child: Text("Group")),
+  //                   numeric: false,
+  //                 ),
+  //                 DataColumn(
+  //                   label: Container(
+  //                       width: MediaQuery.of(context).size.width * 0.15,
+  //                       child: Text("Item Code")),
+  //                   numeric: false,
+  //                 ),
+  //                 DataColumn(
+  //                   label: Container(
+  //                     width: MediaQuery.of(context).size.width * 0.25,
+  //                     child: Text("Item Name"),
+  //                   ),
+  //                   numeric: false,
+  //                 ),
+  //                 DataColumn(
+  //                   label: Container(
+  //                     width: MediaQuery.of(context).size.width * 0.10,
+  //                     child: Text("Rate"),
+  //                   ),
+  //                   numeric: true,
+  //                 ),
+  //                 DataColumn(
+  //                   label: Text("Action"),
+  //                 )
+  //               ],
+  //               rows: _itemdetails
+  //                       ?.map(
+  //                         (item) => DataRow(cells: [
+  //                           DataCell(Container(
+  //                             width: MediaQuery.of(context).size.width * 0.25,
+  //                             child: Text(item.groupname.toUpperCase()),
+  //                           )),
+  //                           DataCell(Container(
+  //                             width: MediaQuery.of(context).size.width * 0.15,
+  //                             child: Text(item.itemCode.toUpperCase()),
+  //                           )),
+  //                           DataCell(
+  //                             Container(
+  //                               width: MediaQuery.of(context).size.width * 0.25,
+  //                               child: Text(item.itemName.toString()),
+  //                             ),
+  //                           ),
+  //                           DataCell(
+  //                             Container(
+  //                               width: MediaQuery.of(context).size.width * 0.10,
+  //                               child: Text(item.rate.toString()),
+  //                             ),
+  //                           ),
+  //                           DataCell(Row(
+  //                             children: [
+  //                               Container(
+  //                                   width: MediaQuery.of(context).size.width *
+  //                                       0.25,
+  //                                   child: Row(children: [
+  //                                     IconButton(
+  //                                         icon: Image.asset('Images/edit.png',
+  //                                             color: Colors.orange),
+  //                                         highlightColor: Colors.pink,
+  //                                         onPressed: () {
+  //                                           if (this.mounted)
+  //                                             setState(() {
+  //                                               Selecteditem = item.itemName;
+  //                                               Selectedgroup = groupdetails
+  //                                                   .where((element) =>
+  //                                                       element
+  //                                                           .columnMasterid ==
+  //                                                       item.groupMasterID)
+  //                                                   .map((e) => e.columnname)
+  //                                                   .first
+  //                                                   .toString();
+
+  //                                               //Editeditem = item.itemName;
+  //                                               selrate = item.rate;
+  //                                               _pricerateController.text =
+  //                                                   item.rate;
+  //                                               _previousitem = item;
+  //                                               removeItem(item);
+  //                                             });
+
+  //                                           //  Itemid = item.itemMasterID;
+  //                                           //  removeItem(item);
+  //                                         }),
+  //                                     SizedBox(width: 2),
+  //                                     IconButton(
+  //                                         icon: Image.asset('Images/delete.png',
+  //                                             color: Colors.orange),
+  //                                         highlightColor: Colors.pink,
+  //                                         onPressed: () {
+  //                                           removeItem(item);
+  //                                         })
+  //                                   ]))
+  //                             ],
+  //                           )),
+  //                         ]),
+  //                       )
+  //                       ?.toList() ??
+  //                   [],
+  //             )));
+  //   } else {
+  //     // pr.dismiss();
+  //     return Text("Add details using the form below",
+  //         textAlign: TextAlign.center);
+  //   }
+
+  //   //pr.dismiss();
+  // }
+
+  // BoxDecoration getBoxDecoration() {
+  //   if (_itemdetails.length > 0) {
+  //     return BoxDecoration(
+  //         border: Border.all(width: 2.0, color: Colors.blueGrey),
+  //         color: Colors.teal[600]);
+  //   }
+  //   return null;
+  // }
   _modalBottomSheetMenu(
       double maxwidth, double maxheight, BuildContext context) {
     return Dialog(
@@ -461,535 +607,416 @@ class HomePageState extends State<HomePage> {
                         SizedBox(
                           height: 10,
                         ),
-                        Row(
-                          children: [
-                            if (companydata != null && companydata.isNotEmpty)
-                              Container(
-                                constraints: BoxConstraints(
-                                  minWidth: 200,
-                                  maxWidth: 380,
-                                ),
-                                //padding: EdgeInsets.,
-                                width: maxwidth * .7, //* 0.50,
-                                child: DropdownSearch<String>(
-                                  dropDownButton: Image.asset(
-                                      'Images/arrow_drop_down.png',
-                                      color: Colors.white),
-                                  validator: (v) =>
-                                      v == null ? "required field" : null,
-                                  hint: "Select a Company",
-                                  mode: Mode.MENU,
-                                  enabled:
-                                      (_id != null && _id != '' && _id != '0')
-                                          ? false
-                                          : true,
-                                  showSelectedItem: true,
-                                  showSearchBox: true,
-                                  items: companydata,
-                                  label: "Type *",
-                                  showClearButton: false,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      selectedcompany = val;
 
-                                      compid = companydetails
-                                          .where((element) =>
-                                              element.ptyname == val)
-                                          .map((e) => e.partyid)
-                                          .first
-                                          .toString();
-                                    });
-                                  },
-                                  popupItemDisabled: (String s) =>
-                                      s.startsWith('I'),
-                                  selectedItem: selectedcompany,
-                                ),
-                              ),
-                            // ],
-                            // ),
-                            // ),
-                            //)
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Container(
-                              constraints: BoxConstraints(
-                                //minHeight: 20,
-                                minWidth: 100,
-                                maxWidth: 200,
-                              ),
-                              width: maxwidth * .7,
-                              child: TextField(
-                                decoration: const InputDecoration(
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: widgetcolor),
-                                    ),
-                                    border: InputBorder.none,
-                                    //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                    labelText: "PO No",
-                                    labelStyle: TextStyle(fontSize: 20.0)),
-                                keyboardType: TextInputType.text,
-                                style: textStyle,
-                                controller: _custPONoController,
-                                focusNode: custidFocusNode,
+                        Container(
+                          height: maxheight * .30,
+                          width: maxwidth,
+                          margin: EdgeInsets.only(top: 0),
 
-                                readOnly: enable,
-                                //enableInteractiveSelection: enable,
-                              ),
-                            ),
-                            Spacer(),
-                            Container(
-                              constraints: BoxConstraints(
-                                //minHeight: 20,
-                                minWidth: 100,
-                                maxWidth: 200,
-                              ),
-                              key: _keyRed,
-                              width: maxwidth * .7,
-                              child: TextField(
-                                decoration: const InputDecoration(
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: widgetcolor),
-                                    ),
-                                    border: InputBorder.none,
-                                    //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                    labelText: "Consignee Address",
-                                    labelStyle: TextStyle(fontSize: 20.0)),
-                                keyboardType: TextInputType.text,
-                                style: textStyle,
-                                controller: _custconsigneeAddressController,
-                                // focusNode: custidFocusNode,
+                          padding: EdgeInsets.all(
+                              2), // decoration: BoxDecoration(border: ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (companydata != null &&
+                                            companydata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 200,
+                                              maxWidth: 380,
+                                            ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .4, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Company",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: companydata,
+                                              label: "Type *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedcompany = val;
 
-                                readOnly: enable,
-                                //enableInteractiveSelection: enable,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Container(
-                              constraints: BoxConstraints(
-                                //minHeight: 20,
-                                minWidth: 100,
-                                maxWidth: 200,
-                              ),
-                              width: maxwidth * .3,
-                              child: TextFormField(
-                                //enabled: false,
-                                controller: dateCtl,
-                                decoration: InputDecoration(
-                                  labelText: "Date",
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.orange),
+                                                  compid = companydetails
+                                                      .where((element) =>
+                                                          element.ptyname ==
+                                                          val)
+                                                      .map((e) => e.partyid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedcompany,
+                                            ),
+                                          ),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            //minHeight: 20,
+                                            minWidth: 100,
+                                            maxWidth: 250,
+                                          ),
+                                          width: maxwidth * .3,
+                                          child: TextField(
+                                            decoration: const InputDecoration(
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: widgetcolor),
+                                                ),
+                                                border: InputBorder.none,
+                                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                labelText: "PO No",
+                                                labelStyle:
+                                                    TextStyle(fontSize: 20.0)),
+                                            keyboardType: TextInputType.text,
+                                            style: textStyle,
+                                            controller: _custPONoController,
+                                            focusNode: custidFocusNode,
+
+                                            readOnly: enable,
+                                            //enableInteractiveSelection: enable,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            //minHeight: 20,
+                                            minWidth: 100,
+                                            maxWidth: 200,
+                                          ),
+                                          width: maxwidth * .3,
+                                          child: TextFormField(
+                                            //enabled: false,
+                                            controller: dateCtl,
+                                            decoration: InputDecoration(
+                                              labelText: "Date",
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.orange),
+                                              ),
+                                              border: InputBorder.none,
+                                              hintText: "Ex. Insert your date",
+                                            ),
+                                            onTap: () async {
+                                              DateTime date = DateTime(1900);
+                                              FocusScope.of(context)
+                                                  .requestFocus(
+                                                      new FocusNode());
+
+                                              date = await showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(1900),
+                                                  lastDate: DateTime(2100));
+
+                                              if (this.mounted)
+                                                setState(() {
+                                                  DateTime today = date;
+
+                                                  if (today != null) {
+                                                    seldate =
+                                                        "${today.year.toString()}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+
+                                                    dateCtl.text =
+                                                        "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year.toString()}";
+                                                  }
+                                                  //  seldate; //date.toIso8601String();
+                                                });
+                                            },
+                                          ),
+                                        ),
+                                      ]),
+                                  // ),
+                                  flex: 2),
+                              SizedBox(width: 20),
+                              Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          //minHeight: 20,
+                                          minWidth: 100,
+                                          maxWidth: 400,
+                                        ),
+                                        key: _keyRed,
+                                        width: maxwidth * .5,
+                                        child: TextField(
+                                          decoration: const InputDecoration(
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: widgetcolor),
+                                              ),
+                                              border: InputBorder.none,
+                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                              labelText: "Consignee Address",
+                                              labelStyle:
+                                                  TextStyle(fontSize: 20.0)),
+                                          keyboardType: TextInputType.text,
+                                          style: textStyle,
+                                          controller:
+                                              _custconsigneeAddressController,
+                                          // focusNode: custidFocusNode,
+
+                                          readOnly: enable,
+                                          //enableInteractiveSelection: enable,
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      if (notifypartydata != null &&
+                                          notifypartydata.isNotEmpty)
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 100,
+                                            maxWidth: 300,
+                                          ),
+                                          //padding: EdgeInsets.,
+                                          width: maxwidth * .3, //* 0.50,
+                                          child: DropdownSearch<String>(
+                                            dropDownButton: Image.asset(
+                                                'Images/arrow_drop_down.png',
+                                                color: Colors.white),
+                                            validator: (v) => v == null
+                                                ? "required field"
+                                                : null,
+                                            hint: "Select a Notify Party",
+                                            mode: Mode.MENU,
+                                            enabled: (_id != null &&
+                                                    _id != '' &&
+                                                    _id != '0')
+                                                ? false
+                                                : true,
+                                            showSelectedItem: true,
+                                            showSearchBox: true,
+                                            items: notifypartydata,
+                                            label: "Notify Party *",
+                                            showClearButton: false,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                selectednotifyparty = val;
+
+                                                notifypartyid =
+                                                    notifypartydetails
+                                                        .where((element) =>
+                                                            element
+                                                                .customerName ==
+                                                            val)
+                                                        .map((e) => e.custId)
+                                                        .first
+                                                        .toString();
+                                              });
+                                            },
+                                            popupItemDisabled: (String s) =>
+                                                s.startsWith('I'),
+                                            selectedItem: selectednotifyparty,
+                                          ),
+                                        ),
+                                      SizedBox(height: 10),
+                                      if (supplierdata != null &&
+                                          supplierdata.isNotEmpty)
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 100,
+                                            maxWidth: 300,
+                                          ),
+                                          //padding: EdgeInsets.,
+                                          width: maxwidth * .3, //* 0.50,
+                                          child: DropdownSearch<String>(
+                                            dropDownButton: Image.asset(
+                                                'Images/arrow_drop_down.png',
+                                                color: Colors.white),
+                                            validator: (v) => v == null
+                                                ? "required field"
+                                                : null,
+                                            hint: "Select a Supplier",
+                                            mode: Mode.MENU,
+                                            enabled: (_id != null &&
+                                                    _id != '' &&
+                                                    _id != '0')
+                                                ? false
+                                                : true,
+                                            showSelectedItem: true,
+                                            showSearchBox: true,
+                                            items: supplierdata,
+                                            label: "Supplier *",
+                                            showClearButton: false,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                selectedsupplier = val;
+
+                                                supplierid = supplierdetails
+                                                    .where((element) =>
+                                                        element.customerName ==
+                                                        val)
+                                                    .map((e) => e.custId)
+                                                    .first
+                                                    .toString();
+                                              });
+                                            },
+                                            popupItemDisabled: (String s) =>
+                                                s.startsWith('I'),
+                                            selectedItem: selectedsupplier,
+                                          ),
+                                        ),
+                                      // ],
+                                    ],
                                   ),
-                                  border: InputBorder.none,
-                                  hintText: "Ex. Insert your date",
-                                ),
-                                onTap: () async {
-                                  DateTime date = DateTime(1900);
-                                  FocusScope.of(context)
-                                      .requestFocus(new FocusNode());
+                                  flex: 2),
+                              Expanded(
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (currencydata != null &&
+                                            currencydata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 300,
+                                            ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .3, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Currency",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: currencydata,
+                                              label: "Currency *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedcurrency = val;
 
-                                  date = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
-                                      lastDate: DateTime(2100));
+                                                  currencyid = currencydetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedcurrency,
+                                            ),
+                                          ),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 100,
+                                            maxWidth: 200,
+                                          ),
+                                          //padding: EdgeInsets.,
+                                          width: maxwidth * .7, //* 0.50,
+                                          child: DropdownSearch<String>(
+                                            dropDownButton: Image.asset(
+                                                'Images/arrow_drop_down.png',
+                                                color: Colors.white),
+                                            validator: (v) => v == null
+                                                ? "required field"
+                                                : null,
+                                            hint: "Select a Type",
+                                            mode: Mode.MENU,
+                                            enabled: (_id != null &&
+                                                    _id != '' &&
+                                                    _id != '0')
+                                                ? false
+                                                : true,
+                                            showSelectedItem: true,
+                                            showSearchBox: true,
+                                            items: prodtypedata,
+                                            label: "Type *",
+                                            showClearButton: false,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                selectedprodtype = val;
 
-                                  if (this.mounted)
-                                    setState(() {
-                                      DateTime today = date;
+                                                prodtypeid = prodtypedetails
+                                                    .where((element) =>
+                                                        element.columnname ==
+                                                        val)
+                                                    .map(
+                                                        (e) => e.columnMasterid)
+                                                    .first
+                                                    .toString();
 
-                                      if (today != null) {
-                                        seldate =
-                                            "${today.year.toString()}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+                                                if (selectedprodtype
+                                                        .toString()
+                                                        .toLowerCase() ==
+                                                    'fabric') {
+                                                  getfabricdetails('');
+                                                  getfabknittypedetails('');
+                                                  getcolordetails('');
+                                                  getdiadetails('');
+                                                  getuomdetails('');
+                                                  getcompositiondetails('');
+                                                  getfabrictypedetails('');
+                                                }
 
-                                        dateCtl.text =
-                                            "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year.toString()}";
-                                      }
-                                      //  seldate; //date.toIso8601String();
-                                    });
-                                },
-                              ),
-                            ),
-                            Spacer(),
-
-                            if (notifypartydata != null &&
-                                notifypartydata.isNotEmpty)
-                              Container(
-                                constraints: BoxConstraints(
-                                  minWidth: 100,
-                                  maxWidth: 200,
-                                ),
-                                //padding: EdgeInsets.,
-                                width: maxwidth * .4, //* 0.50,
-                                child: DropdownSearch<String>(
-                                  dropDownButton: Image.asset(
-                                      'Images/arrow_drop_down.png',
-                                      color: Colors.white),
-                                  validator: (v) =>
-                                      v == null ? "required field" : null,
-                                  hint: "Select a Notify Party",
-                                  mode: Mode.MENU,
-                                  enabled:
-                                      (_id != null && _id != '' && _id != '0')
-                                          ? false
-                                          : true,
-                                  showSelectedItem: true,
-                                  showSearchBox: true,
-                                  items: notifypartydata,
-                                  label: "Notify Party *",
-                                  showClearButton: false,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      selectednotifyparty = val;
-
-                                      notifypartyid = notifypartydetails
-                                          .where((element) =>
-                                              element.customerName == val)
-                                          .map((e) => e.custId)
-                                          .first
-                                          .toString();
-                                    });
-                                  },
-                                  popupItemDisabled: (String s) =>
-                                      s.startsWith('I'),
-                                  selectedItem: selectednotifyparty,
-                                ),
-                              ),
-
-                            // ),   if (currencydata != null && currencydata.isNotEmpty)
-                          ],
+                                                if (selectedprodtype
+                                                        .toString()
+                                                        .toLowerCase() ==
+                                                    'yarn') {
+                                                  getyarncountdetails('');
+                                                  getyarntypedetails('');
+                                                  getyarnmilldetails('');
+                                                  getcolordetails('');
+                                                }
+                                              });
+                                            },
+                                            popupItemDisabled: (String s) =>
+                                                s.startsWith('I'),
+                                            selectedItem: selectedprodtype,
+                                          ),
+                                        ),
+                                      ]),
+                                  flex: 1),
+                            ],
+                          ),
                         ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            if (supplierdata != null && supplierdata.isNotEmpty)
-                              Container(
-                                constraints: BoxConstraints(
-                                  minWidth: 100,
-                                  maxWidth: 200,
-                                ),
-                                //padding: EdgeInsets.,
-                                width: maxwidth * .7, //* 0.50,
-                                child: DropdownSearch<String>(
-                                  dropDownButton: Image.asset(
-                                      'Images/arrow_drop_down.png',
-                                      color: Colors.white),
-                                  validator: (v) =>
-                                      v == null ? "required field" : null,
-                                  hint: "Select a Supplier",
-                                  mode: Mode.MENU,
-                                  enabled:
-                                      (_id != null && _id != '' && _id != '0')
-                                          ? false
-                                          : true,
-                                  showSelectedItem: true,
-                                  showSearchBox: true,
-                                  items: supplierdata,
-                                  label: "Supplier *",
-                                  showClearButton: false,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      selectedsupplier = val;
 
-                                      supplierid = supplierdetails
-                                          .where((element) =>
-                                              element.customerName == val)
-                                          .map((e) => e.custId)
-                                          .first
-                                          .toString();
-                                    });
-                                  },
-                                  popupItemDisabled: (String s) =>
-                                      s.startsWith('I'),
-                                  selectedItem: selectedsupplier,
-                                ),
-                              ),
-                            // ],
-                            Spacer(),
-                            if (currencydata != null && currencydata.isNotEmpty)
-                              Container(
-                                constraints: BoxConstraints(
-                                  minWidth: 100,
-                                  maxWidth: 200,
-                                ),
-                                //padding: EdgeInsets.,
-                                width: maxwidth * .7, //* 0.50,
-                                child: DropdownSearch<String>(
-                                  dropDownButton: Image.asset(
-                                      'Images/arrow_drop_down.png',
-                                      color: Colors.white),
-                                  validator: (v) =>
-                                      v == null ? "required field" : null,
-                                  hint: "Select a Currency",
-                                  mode: Mode.MENU,
-                                  enabled:
-                                      (_id != null && _id != '' && _id != '0')
-                                          ? false
-                                          : true,
-                                  showSelectedItem: true,
-                                  showSearchBox: true,
-                                  items: currencydata,
-                                  label: "Currency *",
-                                  showClearButton: false,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      selectedcurrency = val;
-
-                                      currencyid = currencydetails
-                                          .where((element) =>
-                                              element.columnname == val)
-                                          .map((e) => e.columnMasterid)
-                                          .first
-                                          .toString();
-                                    });
-                                  },
-                                  popupItemDisabled: (String s) =>
-                                      s.startsWith('I'),
-                                  selectedItem: selectedcurrency,
-                                ),
-                              ),
-                            // ],// ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            //if (supplierdata != null && supplierdata.isNotEmpty)
-                            Container(
-                              constraints: BoxConstraints(
-                                minWidth: 100,
-                                maxWidth: 200,
-                              ),
-                              //padding: EdgeInsets.,
-                              width: maxwidth * .7, //* 0.50,
-                              child: DropdownSearch<String>(
-                                dropDownButton: Image.asset(
-                                    'Images/arrow_drop_down.png',
-                                    color: Colors.white),
-                                validator: (v) =>
-                                    v == null ? "required field" : null,
-                                hint: "Select a Type",
-                                mode: Mode.MENU,
-                                enabled:
-                                    (_id != null && _id != '' && _id != '0')
-                                        ? false
-                                        : true,
-                                showSelectedItem: true,
-                                showSearchBox: true,
-                                items: prodtypedata,
-                                label: "Type *",
-                                showClearButton: false,
-                                onChanged: (val) {
-                                  setState(() {
-                                    selectedprodtype = val;
-
-                                    prodtypeid = prodtypedetails
-                                        .where((element) =>
-                                            element.columnname == val)
-                                        .map((e) => e.columnMasterid)
-                                        .first
-                                        .toString();
-
-                                    if (selectedprodtype
-                                            .toString()
-                                            .toLowerCase() ==
-                                        'fabric') {
-                                      getfabricdetails('');
-                                      getfabknittypedetails('');
-                                      getcolordetails('');
-                                      getdiadetails('');
-                                      getuomdetails('');
-                                      getcompositiondetails('');
-                                      getfabrictypedetails('');
-                                    }
-
-                                    if (selectedprodtype
-                                            .toString()
-                                            .toLowerCase() ==
-                                        'yarn') {
-                                      getyarncountdetails('');
-                                      getyarntypedetails('');
-                                      getyarnmilldetails('');
-                                      getcolordetails('');
-                                    }
-
-                                    // return Dialog(
-                                    //   shape: RoundedRectangleBorder(
-                                    //     borderRadius:
-                                    //         BorderRadius.circular(5.0),
-                                    //   ),
-                                    //   elevation: 0,
-                                    //   backgroundColor: Colors.transparent,
-                                    //   child: Row(children: [
-                                    //     if (fabricdata != null &&
-                                    //         fabricdata.isNotEmpty)
-                                    //       Container(
-                                    //         constraints: BoxConstraints(
-                                    //           minWidth: 100,
-                                    //           maxWidth: 150,
-                                    //         ),
-                                    //         //padding: EdgeInsets.,
-                                    //         width: maxwidth * .7, //* 0.50,
-                                    //         child: DropdownSearch<String>(
-                                    //           dropDownButton: Image.asset(
-                                    //               'Images/arrow_drop_down.png',
-                                    //               color: Colors.white),
-                                    //           validator: (v) => v == null
-                                    //               ? "required field"
-                                    //               : null,
-                                    //           hint: "Select a Fabric",
-                                    //           mode: Mode.MENU,
-                                    //           enabled: (_id != null &&
-                                    //                   _id != '' &&
-                                    //                   _id != '0')
-                                    //               ? false
-                                    //               : true,
-                                    //           showSelectedItem: true,
-                                    //           showSearchBox: true,
-                                    //           items: fabricdata,
-                                    //           label: "Fabric *",
-                                    //           showClearButton: false,
-                                    //           onChanged: (val) {
-                                    //             setState(() {
-                                    //               selectedfabric = val;
-
-                                    //               fabricid = fabricdetails
-                                    //                   .where((element) =>
-                                    //                       element.columnname ==
-                                    //                       val)
-                                    //                   .map((e) =>
-                                    //                       e.columnMasterid)
-                                    //                   .first
-                                    //                   .toString();
-                                    //             });
-                                    //           },
-                                    //           popupItemDisabled: (String s) =>
-                                    //               s.startsWith('I'),
-                                    //           selectedItem: selectedfabric,
-                                    //         ),
-                                    //       ),
-                                    //     SizedBox(width: 10),
-                                    //     if (fabrictypedata != null &&
-                                    //         fabrictypedata.isNotEmpty)
-                                    //       Container(
-                                    //         constraints: BoxConstraints(
-                                    //           minWidth: 100,
-                                    //           maxWidth: 150,
-                                    //         ),
-                                    //         //padding: EdgeInsets.,
-                                    //         width: maxwidth * .7, //* 0.50,
-                                    //         child: DropdownSearch<String>(
-                                    //           dropDownButton: Image.asset(
-                                    //               'Images/arrow_drop_down.png',
-                                    //               color: Colors.white),
-                                    //           validator: (v) => v == null
-                                    //               ? "required field"
-                                    //               : null,
-                                    //           hint: "Select a Fabric type",
-                                    //           mode: Mode.MENU,
-                                    //           enabled: (_id != null &&
-                                    //                   _id != '' &&
-                                    //                   _id != '0')
-                                    //               ? false
-                                    //               : true,
-                                    //           showSelectedItem: true,
-                                    //           showSearchBox: true,
-                                    //           items: fabrictypedata,
-                                    //           label: "Fabric Type*",
-                                    //           showClearButton: false,
-                                    //           onChanged: (val) {
-                                    //             setState(() {
-                                    //               selectedfabtype = val;
-
-                                    //               fabtypeid =
-                                    //                   fabrictypetypedetails
-                                    //                       .where((element) =>
-                                    //                           element
-                                    //                               .columnname ==
-                                    //                           val)
-                                    //                       .map((e) =>
-                                    //                           e.columnMasterid)
-                                    //                       .first
-                                    //                       .toString();
-                                    //             });
-                                    //           },
-                                    //           popupItemDisabled: (String s) =>
-                                    //               s.startsWith('I'),
-                                    //           selectedItem: selectedfabtype,
-                                    //         ),
-                                    //       ),
-                                    //     SizedBox(width: 10),
-                                    //     if (fabricknitdata != null &&
-                                    //         fabricknitdata.isNotEmpty)
-                                    //       Container(
-                                    //         constraints: BoxConstraints(
-                                    //           minWidth: 100,
-                                    //           maxWidth: 150,
-                                    //         ),
-                                    //         //padding: EdgeInsets.,
-                                    //         width: maxwidth * .7, //* 0.50,
-                                    //         child: DropdownSearch<String>(
-                                    //           dropDownButton: Image.asset(
-                                    //               'Images/arrow_drop_down.png',
-                                    //               color: Colors.white),
-                                    //           validator: (v) => v == null
-                                    //               ? "required field"
-                                    //               : null,
-                                    //           hint: "Select a Fabric Knit type",
-                                    //           mode: Mode.MENU,
-                                    //           enabled: (_id != null &&
-                                    //                   _id != '' &&
-                                    //                   _id != '0')
-                                    //               ? false
-                                    //               : true,
-                                    //           showSelectedItem: true,
-                                    //           showSearchBox: true,
-                                    //           items: fabricknitdata,
-                                    //           label: "Fabric Knit Type *",
-                                    //           showClearButton: false,
-                                    //           onChanged: (val) {
-                                    //             setState(() {
-                                    //               selectedfabknittype = val;
-
-                                    //               fabknittypeid =
-                                    //                   fabricknittypedetails
-                                    //                       .where((element) =>
-                                    //                           element
-                                    //                               .columnname ==
-                                    //                           val)
-                                    //                       .map((e) =>
-                                    //                           e.columnMasterid)
-                                    //                       .first
-                                    //                       .toString();
-                                    //             });
-                                    //           },
-                                    //           popupItemDisabled: (String s) =>
-                                    //               s.startsWith('I'),
-                                    //           selectedItem: selectedfabknittype,
-                                    //         ),
-                                    //       ),
-                                    //   ]),
-                                    // );
-
-                                    //addfabricwid();
-                                  });
-                                },
-                                popupItemDisabled: (String s) =>
-                                    s.startsWith('I'),
-                                selectedItem: selectedprodtype,
-                              ),
-                            ),
-                          ],
-                        ),
                         SizedBox(height: 10),
                         Text('Details'),
                         SizedBox(height: 10),
@@ -1010,7 +1037,9 @@ class HomePageState extends State<HomePage> {
                                 child: ListView(
                                     scrollDirection: Axis.horizontal,
                                     children: [
-                                      if (selectedprodtype.toLowerCase() ==
+                                      if (selectedprodtype
+                                              .toString()
+                                              .toLowerCase() ==
                                           'fabric')
                                         Row(children: [
                                           SizedBox(width: 10),
@@ -1577,7 +1606,9 @@ class HomePageState extends State<HomePage> {
                                   // SizedBox(height: 10),
                                   Row(children: [
                                     SizedBox(width: 10),
-                                    if (selectedprodtype.toLowerCase() ==
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
                                         'fabric')
                                       Container(
                                         constraints: BoxConstraints(
@@ -1607,7 +1638,9 @@ class HomePageState extends State<HomePage> {
                                           //enableInteractiveSelection: enable,
                                         ),
                                       ),
-                                    if (selectedprodtype.toLowerCase() ==
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
                                         'fabric')
                                       SizedBox(width: 20),
                                     Container(
@@ -1768,233 +1801,452 @@ class HomePageState extends State<HomePage> {
                         SizedBox(
                           height: 20,
                         ),
+                        Row(children: [
+                          Spacer(),
+                          SizedBox(
+                              width: 30,
+                              height: 30,
+                              child: FloatingActionButton(
+                                backgroundColor: widgetcolor,
+                                heroTag: "btn1",
+
+                                onPressed: () {
+                                  // ItemMaster _data;
+                                  // _data = Getitemdetails(); //= <ItemMaster>[];
+
+                                  // if (this.mounted)
+                                  //   setState(() {
+                                  //     if (_itemdetails
+                                  //         .where((e) =>
+                                  //             e.itemMasterID ==
+                                  //             _data.itemMasterID)
+                                  //         .isEmpty) {
+                                  //       _itemdetails.add(_data);
+
+                                  //       Selecteditem = '';
+                                  //       Selectedgroup = '';
+                                  //       _pricerateController.text = '';
+                                  //     }
+                                  //   });
+                                },
+                                //clearData(context);
+                                //idFocusNode.dispose();
+                                // },
+                                tooltip: 'Add new Item ',
+                                child: Image.asset('images/add.png',
+                                    color: Colors.black),
+                              )),
+                          SizedBox(width: 10),
+                          SizedBox(
+                              width: 30,
+                              height: 30,
+                              child: FloatingActionButton(
+                                heroTag: "btn2",
+                                backgroundColor: widgetcolor,
+                                onPressed: () {
+//                                   ItemMaster _data;
+//                                   _data = Getitemdetails();
+//                                   if (selrate != '' && selrate != null) {
+//                                     if (this.mounted)
+//                                       setState(() {
+//                                         if (_previousitem != null)
+//                                           _itemdetails.add(_previousitem);
+//                                         Selecteditem = '';
+//                                         Selectedgroup = '';
+//                                         _pricerateController.text = '';
+//                                         _previousitem = null;
+//                                       });
+// //});
+//                                   }
+                                  //clearData(context);
+                                  //idFocusNode.dispose();
+                                },
+                                tooltip: 'Cancel Item ',
+                                child: Image.asset('Images/cancel.png',
+                                    color: Colors.black),
+                              )),
+                        ]),
 
                         Container(
-                          child: Row(children: [
-                            Container(
-                              constraints: BoxConstraints(
-                                //minHeight: 20,
-                                minWidth: 100,
-                                maxWidth: 100,
-                              ),
-                              width: maxwidth * .7,
-                              child: TextField(
-                                decoration: const InputDecoration(
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: widgetcolor),
-                                    ),
-                                    border: InputBorder.none,
-                                    //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                    labelText: "Total No.of Containers",
-                                    labelStyle: TextStyle(fontSize: 20.0)),
-                                keyboardType: TextInputType.text,
-                                style: textStyle,
-                                controller: _custgsmController,
-                                //   focusNode: custidFocusNode,
-
-                                readOnly: enable,
-                                //enableInteractiveSelection: enable,
-                              ),
-                            ),
-                          ]),
+                          height: maxheight * .30,
                           width: maxwidth,
-                        ),
-                        Row(children: [
-                          Container(
-                            constraints: BoxConstraints(
-                              //minHeight: 20,
-                              minWidth: 100,
-                              maxWidth: 100,
-                            ),
-                            width: maxwidth * .7,
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: widgetcolor),
-                                  ),
-                                  border: InputBorder.none,
-                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                  labelText: "Payment Terms/LC",
-                                  labelStyle: TextStyle(fontSize: 20.0)),
-                              keyboardType: TextInputType.text,
-                              style: textStyle,
-                              controller: _custgsmController,
-                              //   focusNode: custidFocusNode,
+                          margin: EdgeInsets.only(top: 0),
 
-                              readOnly: enable,
-                              //enableInteractiveSelection: enable,
-                            ),
-                          ),
-                          SizedBox(width: 20),
-                          Container(
-                            constraints: BoxConstraints(
-                              //minHeight: 20,
-                              minWidth: 100,
-                              maxWidth: 100,
-                            ),
-                            width: maxwidth * .7,
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: widgetcolor),
-                                  ),
-                                  border: InputBorder.none,
-                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                  labelText: "Port of Discharge",
-                                  labelStyle: TextStyle(fontSize: 20.0)),
-                              keyboardType: TextInputType.text,
-                              style: textStyle,
-                              controller: _custgsmController,
-                              //   focusNode: custidFocusNode,
+                          padding: EdgeInsets.all(
+                              2), // decoration: BoxDecoration(border: ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            //minHeight: 20,
+                                            minWidth: 100,
+                                            maxWidth: 200,
+                                          ),
+                                          width: maxwidth * .3,
+                                          child: TextField(
+                                            decoration: const InputDecoration(
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: widgetcolor),
+                                                ),
+                                                border: InputBorder.none,
+                                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                labelText:
+                                                    "Total No.of Containers",
+                                                labelStyle:
+                                                    TextStyle(fontSize: 20.0)),
+                                            keyboardType: TextInputType.text,
+                                            style: textStyle,
+                                            controller: _custgsmController,
+                                            //   focusNode: custidFocusNode,
+                                            readOnly: enable,
+                                            //enableInteractiveSelection: enable,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        if (portofloaddata != null &&
+                                            portofloaddata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 200,
+                                            ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Port of Load",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: portofloaddata,
+                                              label: "Port of Loading *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedportofload = val;
 
-                              readOnly: enable,
-                              //enableInteractiveSelection: enable,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Container(
-                            constraints: BoxConstraints(
-                              //minHeight: 20,
-                              minWidth: 100,
-                              maxWidth: 100,
-                            ),
-                            width: maxwidth * .7,
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: widgetcolor),
-                                  ),
-                                  border: InputBorder.none,
-                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                  labelText: "Shipment Mode",
-                                  labelStyle: TextStyle(fontSize: 20.0)),
-                              keyboardType: TextInputType.text,
-                              style: textStyle,
-                              controller: _custgsmController,
-                              //   focusNode: custidFocusNode,
+                                                  portofloadid =
+                                                      portofloaddetails
+                                                          .where((element) =>
+                                                              element
+                                                                  .columnname ==
+                                                              val)
+                                                          .map((e) =>
+                                                              e.columnMasterid)
+                                                          .first
+                                                          .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedportofload,
+                                            ),
+                                          ),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            //minHeight: 20,
+                                            minWidth: 100,
+                                            maxWidth: 300,
+                                          ),
+                                          width: maxwidth * .3,
+                                          child: TextField(
+                                            decoration: const InputDecoration(
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: widgetcolor),
+                                                ),
+                                                border: InputBorder.none,
+                                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                labelText: "Packing Detail",
+                                                labelStyle:
+                                                    TextStyle(fontSize: 20.0)),
+                                            keyboardType: TextInputType.text,
+                                            style: textStyle,
+                                            controller: _custgsmController,
+                                            //   focusNode: custidFocusNode,
 
-                              readOnly: enable,
-                              //enableInteractiveSelection: enable,
-                            ),
-                          ),
-                        ]),
+                                            readOnly: enable,
+                                            //enableInteractiveSelection: enable,
+                                          ),
+                                        ),
+                                      ]),
+                                  // ),
+                                  flex: 1),
+                              SizedBox(width: 20),
+                              Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          //minHeight: 20,
+                                          minWidth: 100,
+                                          maxWidth: 600,
+                                        ),
+                                        width: maxwidth * .8,
+                                        child: TextField(
+                                          decoration: const InputDecoration(
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: widgetcolor),
+                                              ),
+                                              border: InputBorder.none,
+                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                              labelText: "Payment Terms/LC",
+                                              labelStyle:
+                                                  TextStyle(fontSize: 20.0)),
+                                          keyboardType: TextInputType.text,
+                                          style: textStyle,
+                                          controller: _custgsmController,
+                                          //   focusNode: custidFocusNode,
 
-                        Row(children: [
-                          Container(
-                            constraints: BoxConstraints(
-                              //minHeight: 20,
-                              minWidth: 100,
-                              maxWidth: 100,
-                            ),
-                            width: maxwidth * .7,
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: widgetcolor),
-                                  ),
-                                  border: InputBorder.none,
-                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                  labelText: "Port of Loading",
-                                  labelStyle: TextStyle(fontSize: 20.0)),
-                              keyboardType: TextInputType.text,
-                              style: textStyle,
-                              controller: _custgsmController,
-                              //   focusNode: custidFocusNode,
-
-                              readOnly: enable,
-                              //enableInteractiveSelection: enable,
-                            ),
-                          ),
-                          SizedBox(width: 20),
-                          Container(
-                            constraints: BoxConstraints(
-                              //minHeight: 20,
-                              minWidth: 100,
-                              maxWidth: 100,
-                            ),
-                            width: maxwidth * .7,
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: widgetcolor),
-                                  ),
-                                  border: InputBorder.none,
-                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                  labelText: "ShipmentDate",
-                                  labelStyle: TextStyle(fontSize: 20.0)),
-                              keyboardType: TextInputType.text,
-                              style: textStyle,
-                              controller: _custgsmController,
-                              //   focusNode: custidFocusNode,
-
-                              readOnly: enable,
-                              //enableInteractiveSelection: enable,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Container(
-                            constraints: BoxConstraints(
-                              //minHeight: 20,
-                              minWidth: 100,
-                              maxWidth: 100,
-                            ),
-                            width: maxwidth * .7,
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: widgetcolor),
-                                  ),
-                                  border: InputBorder.none,
-                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                  labelText: "Packing Detail",
-                                  labelStyle: TextStyle(fontSize: 20.0)),
-                              keyboardType: TextInputType.text,
-                              style: textStyle,
-                              controller: _custgsmController,
-                              //   focusNode: custidFocusNode,
-
-                              readOnly: enable,
-                              //enableInteractiveSelection: enable,
-                            ),
-                          ),
-                        ]),
-                        Row(
-                          children: [
-                            Row(children: [
-                              Container(
-                                constraints: BoxConstraints(
-                                  //minHeight: 20,
-                                  minWidth: 100,
-                                  maxWidth: 700,
-                                ),
-                                width: maxwidth * .7,
-                                child: TextField(
-                                  decoration: const InputDecoration(
-                                      focusedBorder: UnderlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: widgetcolor),
+                                          readOnly: enable,
+                                          //enableInteractiveSelection: enable,
+                                        ),
                                       ),
-                                      border: InputBorder.none,
-                                      //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                      labelText: "Remarks",
-                                      labelStyle: TextStyle(fontSize: 20.0)),
-                                  keyboardType: TextInputType.text,
-                                  style: textStyle,
-                                  controller: _custgsmController,
-                                  //   focusNode: custidFocusNode,
+                                      SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          if (portofdischargedata != null &&
+                                              portofdischargedata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 100,
+                                                maxWidth: 150,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              //width: maxwidth * .3, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint:
+                                                    "Select a Port of Discharge",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: portofdischargedata,
+                                                label: "Port of Discharge *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedportofdischarge =
+                                                        val;
 
-                                  readOnly: enable,
-                                  //enableInteractiveSelection: enable,
+                                                    portofdischargeid =
+                                                        portofdischargedetails
+                                                            .where((element) =>
+                                                                element
+                                                                    .columnname ==
+                                                                val)
+                                                            .map((e) => e
+                                                                .columnMasterid)
+                                                            .first
+                                                            .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem:
+                                                    selectedportofdischarge,
+                                              ),
+                                            ),
+                                          Spacer(),
+                                          if (shipmentmodedata != null &&
+                                              shipmentmodedata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 100,
+                                                maxWidth: 100,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .3, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Shipment Mode",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: shipmentmodedata,
+                                                label: "Shipment Mode *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedshipmentmode = val;
+
+                                                    shipmentmodeid =
+                                                        shipmentmodedetails
+                                                            .where((element) =>
+                                                                element
+                                                                    .columnname ==
+                                                                val)
+                                                            .map((e) => e
+                                                                .columnMasterid)
+                                                            .first
+                                                            .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem:
+                                                    selectedshipmentmode,
+                                              ),
+                                            ),
+                                          Spacer(),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 100,
+                                              maxWidth: 100,
+                                            ),
+                                            width: maxwidth * .3,
+                                            child: TextFormField(
+                                              //enabled: false,
+                                              controller: shipmentdateCtl,
+                                              decoration: InputDecoration(
+                                                labelText: "Shipment Date",
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.orange),
+                                                ),
+                                                border: InputBorder.none,
+                                                hintText:
+                                                    "Ex. Insert your Shipment date",
+                                              ),
+                                              onTap: () async {
+                                                DateTime date = DateTime(1900);
+                                                FocusScope.of(context)
+                                                    .requestFocus(
+                                                        new FocusNode());
+
+                                                date = await showDatePicker(
+                                                    context: context,
+                                                    initialDate: DateTime.now(),
+                                                    firstDate: DateTime(1900),
+                                                    lastDate: DateTime(2100));
+
+                                                if (this.mounted)
+                                                  setState(() {
+                                                    DateTime today = date;
+
+                                                    if (today != null) {
+                                                      selshipmentdate =
+                                                          "${today.year.toString()}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+
+                                                      shipmentdateCtl.text =
+                                                          "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year.toString()}";
+                                                    }
+                                                    //  seldate; //date.toIso8601String();
+                                                  });
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 10),
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          //minHeight: 20,
+                                          minWidth: 100,
+                                          maxWidth: 700,
+                                        ),
+                                        width: maxwidth * .6,
+                                        child: TextField(
+                                          decoration: const InputDecoration(
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: widgetcolor),
+                                              ),
+                                              border: InputBorder.none,
+                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                              labelText: "Remarks",
+                                              labelStyle:
+                                                  TextStyle(fontSize: 20.0)),
+                                          keyboardType: TextInputType.text,
+                                          style: textStyle,
+                                          controller: _custgsmController,
+                                          //   focusNode: custidFocusNode,
+
+                                          readOnly: enable,
+                                          //enableInteractiveSelection: enable,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  flex: 3),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          constraints: BoxConstraints(
+                            //minHeight: 20,
+                            minWidth: 100,
+                            maxWidth: 900,
+                          ),
+                          width: maxwidth * .9,
+                          child: TextField(
+                            decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: widgetcolor),
                                 ),
-                              ),
-                            ])
-                          ],
-                        )
+                                border: InputBorder.none,
+                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                labelText: "Terms & Conditions",
+                                labelStyle: TextStyle(fontSize: 20.0)),
+                            keyboardType: TextInputType.text,
+                            style: textStyle,
+                            controller: _custgsmController,
+                            //   focusNode: custidFocusNode,
+
+                            readOnly: enable,
+                            //enableInteractiveSelection: enable,
+                          ),
+                        ),
 
                         // //  addfabricwid()
                       ]),
@@ -2500,13 +2752,142 @@ class HomePageState extends State<HomePage> {
         selecteddia = diadata.first;
 
       diaid = diadetails
-          .where((element) => element.columnname == selectedcurrency)
+          .where((element) => element.columnname == selecteddia)
           .map((e) => e.columnMasterid)
           .first
           .toString();
     });
 
     return diadetails;
+  }
+
+  Future<List<master.Master>> getportofdischargedetails(String filter) async {
+    setState(() {
+      portofdischargedetails = [];
+      portofdischargedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=portofdischargemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      portofdischargedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        portofdischargedetails = portofdischargedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      portofdischargedata =
+          portofdischargedetails.map((e) => e.columnname).toList();
+      if (portofdischargeid == '' ||
+          portofdischargeid == null ||
+          portofdischargeid == '0') selecteddia = diadata.first;
+
+      portofdischargeid = portofdischargedetails
+          .where((element) => element.columnname == selectedportofdischarge)
+          .map((e) => e.columnMasterid)
+          .first
+          .toString();
+    });
+
+    return portofdischargedetails;
+  }
+
+  Future<List<master.Master>> getportofloaddetails(String filter) async {
+    setState(() {
+      portofloaddetails = [];
+      portofloaddata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=portofloadingmaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      portofloaddetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        portofloaddetails = portofloaddetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      portofloaddata = portofloaddetails.map((e) => e.columnname).toList();
+      if (portofloadid == '' || portofloadid == null || portofloadid == '0')
+        selectedportofload = portofloaddata.first;
+
+      portofloadid = portofloaddetails
+          .where((element) => element.columnname == selectedportofload)
+          .map((e) => e.columnMasterid)
+          .first
+          .toString();
+    });
+
+    return portofloaddetails;
+  }
+
+  Future<List<master.Master>> getshipmentmodedetails(String filter) async {
+    setState(() {
+      shipmentmodedetails = [];
+      shipmentmodedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=shipmentmodemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      shipmentmodedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        shipmentmodedetails = shipmentmodedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      shipmentmodedata = shipmentmodedetails.map((e) => e.columnname).toList();
+      if (shipmentmodeid == '' ||
+          shipmentmodeid == null ||
+          shipmentmodeid == '0') selectedshipmentmode = shipmentmodedata.first;
+
+      shipmentmodeid = shipmentmodedetails
+          .where((element) => element.columnname == selectedshipmentmode)
+          .map((e) => e.columnMasterid)
+          .first
+          .toString();
+    });
+
+    return shipmentmodedetails;
   }
 
   Future<List<master.Master>> getcolordetails(String filter) async {
@@ -2906,6 +3287,10 @@ class HomePageState extends State<HomePage> {
     getsupplierdetails('');
     getcurrencydetails('');
     getnotifypartydetails('');
+    getportofdischargedetails('');
+    getportofloaddetails('');
+    getshipmentmodedetails('');
+
     getproddetails('');
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
     //_getPositions();
@@ -3236,41 +3621,43 @@ class HomePageState extends State<HomePage> {
                     body: bodywid(maxwidth, maxheight),
                   )
                 : addcustomerwid(maxwidth, maxheight, context),
-            desktop: (BuildContext context) => Container(
-                width: maxwidth, //- 210,
-                // padding: EdgeInsets.only(left: 210),
-                height: maxheight,
-                child: Row(children: [
-                  Expanded(
-                      flex: 3,
-                      child: Scaffold(
-                        floatingActionButtonLocation:
-                            FloatingActionButtonLocation.miniEndDocked,
-                        floatingActionButton: Addbutton(),
-                        drawer: drawer.CollapsingNavigationDrawer(),
-                        drawerScrimColor: Colors.transparent,
-                        appBar: appbarwid(),
-                        bottomNavigationBar: bottomapp(maxwidth, maxheight),
-                        body: bodywid(maxwidth, maxheight),
-                      )),
-                  // SizedBox(
-                  //     width: 5,
-                  //     child: Container(
-                  //       color: appbarcolor,
-                  //     )),
-                  Expanded(
-                    flex: 4,
-                    child: LayoutBuilder(
-                        builder: (context, BoxConstraints constraints) {
-                      var maxwidth = constraints.maxWidth;
-                      var minwidth = constraints.minWidth;
-                      var maxheight = constraints.maxHeight;
-                      var minheight = constraints.minHeight;
+            desktop: (BuildContext context) => ShowAddWidget == false
+                ? Container(
+                    width: maxwidth, //- 210,
+                    // padding: EdgeInsets.only(left: 210),
+                    height: maxheight,
+                    child: Row(children: [
+                      Expanded(
+                          flex: 3,
+                          child: Scaffold(
+                            floatingActionButtonLocation:
+                                FloatingActionButtonLocation.miniEndDocked,
+                            floatingActionButton: Addbutton(),
+                            drawer: drawer.CollapsingNavigationDrawer(),
+                            drawerScrimColor: Colors.transparent,
+                            appBar: appbarwid(),
+                            bottomNavigationBar: bottomapp(maxwidth, maxheight),
+                            body: bodywid(maxwidth, maxheight),
+                          )),
+                      // SizedBox(
+                      //     width: 5,
+                      //     child: Container(
+                      //       color: appbarcolor,
+                      //     )),
+                      Expanded(
+                        flex: 4,
+                        child: LayoutBuilder(
+                            builder: (context, BoxConstraints constraints) {
+                          var maxwidth = constraints.maxWidth;
+                          var minwidth = constraints.minWidth;
+                          var maxheight = constraints.maxHeight;
+                          var minheight = constraints.minHeight;
 
-                      return addcustomerwid(maxwidth, maxheight, context);
-                    }),
-                  )
-                ])),
+                          return addcustomerwid(maxwidth, maxheight, context);
+                        }),
+                      )
+                    ]))
+                : addcustomerwid(maxwidth, maxheight, context),
             watch: (BuildContext context) => Container(color: Colors.purple),
           );
         })); //);
