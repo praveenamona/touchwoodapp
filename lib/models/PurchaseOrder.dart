@@ -1,29 +1,82 @@
+class PurchaseOrderHeader {
+  PurchaseOrderHeader(this.purchaseorderdetail);
+
+  String headerid;
+  String pono;
+  String podate;
+
+  List<PurchaseOrder> purchaseorderdetail;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'intHeaderID': headerid,
+        'strPoNo': pono,
+        'dtPoDate': podate,
+        'yarn': purchaseorderdetail,
+      };
+}
+
 class PurchaseOrder {
-  final String headerid;
-  final String yarnmillid;
-  //final String
-  final String yarntypeid;
-  final String yarncountid;
-  final String producttypeid;
-  final String colorid;
-  final String uomid;
-  final String diaid;
-  final String knittypeid;
-  final String fabrictypeid;
-  final String fabricid;
-  final String lineid;
+  String headerid;
+  String yarnmillid;
+  //   String
+  String yarntypeid;
+  String yarntype;
+  String yarnmill;
+  String yarncount;
+  String yarncountid;
+  String producttypeid;
+  String producttype;
+  String color;
+  String uom;
+  String dia;
+  String knittype;
+  String fabrictype;
+  String fabric;
+  String colorid;
+  String composition;
+  String compositionid;
+  String uomid;
+  String diaid;
+  String knittypeid;
+  String fabrictypeid;
+  String fabricid;
+  String lineid;
+  String noofbox;
+  String gsm;
+  String weight;
+  String kgsperbox;
+  String rate;
+  String amount;
 
   PurchaseOrder.fromJSON(Map<String, dynamic> jsonMap)
-      : headerid = jsonMap['dia'].toString(),
-        yarnmillid = jsonMap['diaid'].toString(),
-        yarntypeid = jsonMap['fabricname'].toString(),
-        yarncountid = jsonMap['fabriccolor'].toString(),
-        producttypeid = jsonMap['fabricmasterid'].toString(),
-        colorid = jsonMap['fabcolorid'].toString(),
-        uomid = jsonMap['gsm'].toString(),
-        diaid = jsonMap['color'].toString(),
-        knittypeid = jsonMap['colorid'].toString(),
-        fabrictypeid = jsonMap['fabcolorid'].toString(),
-        fabricid = jsonMap['fabcolorid'].toString(),
-        lineid = jsonMap['fabcolorid'].toString();
+      : headerid = jsonMap['headerid'].toString(),
+        yarnmillid = jsonMap['yarnmillid'].toString(),
+        noofbox = jsonMap['noofbox'].toString(),
+        gsm = jsonMap['gsm'].toString(),
+        weight = jsonMap['weight'].toString(),
+        kgsperbox = jsonMap['kgsperbox'].toString(),
+        rate = jsonMap['rate'].toString(),
+        amount = jsonMap['amount'].toString(),
+        yarnmill = jsonMap['yarnmill'].toString(),
+        yarntypeid = jsonMap['yarntypeid'].toString(),
+        yarntype = jsonMap['yarntype'].toString(),
+        yarncountid = jsonMap['yarncountid'].toString(),
+        yarncount = jsonMap['yarncount'].toString(),
+        producttypeid = jsonMap['producttypeid'].toString(),
+        producttype = jsonMap['producttype'].toString(),
+        colorid = jsonMap['colorid'].toString(),
+        color = jsonMap['color'].toString(),
+        uomid = jsonMap['uomid'].toString(),
+        uom = jsonMap['uom'].toString(),
+        compositionid = jsonMap['compositionid'].toString(),
+        composition = jsonMap['composition'].toString(),
+        diaid = jsonMap['diaid'].toString(),
+        dia = jsonMap['dia'].toString(),
+        knittypeid = jsonMap['knittypeid'].toString(),
+        knittype = jsonMap['knittype'].toString(),
+        fabrictypeid = jsonMap['fabrictypeid'].toString(),
+        fabrictype = jsonMap['fabrictype'].toString(),
+        fabricid = jsonMap['fabricid'].toString(),
+        fabric = jsonMap['fabric'].toString(),
+        lineid = jsonMap['lineid'].toString();
 }

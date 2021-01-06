@@ -13,7 +13,7 @@ import 'package:touchwoodapp/widgets/collapsing_navigation_drawer_widget.dart'
 import 'package:touchwoodapp/repository/cutomer_repository.dart';
 //import 'package:touchwoodapp/screens/AddCustomer.dart' as Addparty;
 import 'dart:convert';
-
+import 'package:touchwoodapp/models/PurchaseOrder.dart' as purchaseorderdetl;
 import 'dart:core';
 
 import 'package:progress_dialog/progress_dialog.dart';
@@ -101,6 +101,9 @@ List<master.Master> prodtypedetails = <master.Master>[];
 List<master.Master> fabricdetails = <master.Master>[];
 List<master.Master> fabrictypetypedetails = <master.Master>[];
 List<master.Master> fabricknittypedetails = <master.Master>[];
+List<purchaseorderdetl.PurchaseOrder> details =
+    <purchaseorderdetl.PurchaseOrder>[];
+List<purchaseorderdetl.PurchaseOrder> _itemdetails = [];
 List<master.Master> colordetails = <master.Master>[];
 List<master.Master> diadetails = <master.Master>[];
 List<uom.Uom> uomdetails = <uom.Uom>[];
@@ -146,6 +149,13 @@ final _custkgsperboxController = TextEditingController();
 final _custweightController = TextEditingController();
 final _custrateController = TextEditingController();
 final _custamountController = TextEditingController();
+final _custconsigneeAddressController = TextEditingController();
+final _custtermsandconditionsController = TextEditingController();
+final _custnoofcontainerController = TextEditingController();
+final _custpackingdetailController = TextEditingController();
+final _custpaymenttermsController = TextEditingController();
+final _custremarksController = TextEditingController();
+
 ProgressDialog pr;
 FocusNode custidFocusNode;
 double maxwidth;
@@ -172,6 +182,9 @@ class HomePage extends StatefulWidget {
 
 GlobalKey _keyRed = GlobalKey();
 double xaxis;
+String selamount;
+List<purchaseorderdetl.PurchaseOrder> Itemdetails =
+    <purchaseorderdetl.PurchaseOrder>[];
 
 class HomePageState extends State<HomePage> {
   _getPositions() {
@@ -561,10 +574,563 @@ class HomePageState extends State<HomePage> {
     //  );
   }
 
+  BoxDecoration getBoxDecoration() {
+    if (_itemdetails.length > 0) {
+      return BoxDecoration(
+          border: Border.all(width: 2.0, color: Colors.blueGrey),
+          color: appbarcolor);
+    }
+    return null;
+  }
+
+  void removeItem(item) {
+    if (this.mounted)
+      setState(() {
+        _itemdetails.remove(item);
+      });
+  }
+
+  Widget listtableView1(double maxwidth, double maxheight) {
+    return new Container(
+      color: bodycolor,
+      child: Container(
+        //color: Colors.white,
+        width: maxwidth, // * .40,
+        height: maxheight * .15,
+        padding: EdgeInsets.all(5),
+
+        child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ListView(children: <Widget>[
+                Card(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Expanded(
+                          child: Text("headerName",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.left,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                        Spacer(),
+                        Expanded(
+                          child: Text("Action",
+                              textScaleFactor: 1.7,
+                              textAlign: TextAlign.right,
+                              style: new TextStyle(
+                                color: widgetcolor,
+                              )),
+                        ),
+                      ]),
+                )),
+                //  ),
+                Container(
+                    width: maxwidth,
+                    //height: maxheight,
+                    //padding: EdgeInsets.all(5)
+                    child: SizedBox(
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemCount: _itemdetails.length,
+                          itemBuilder: (BuildContext ctxt, int index) {
+                            return Container(
+                              width: maxwidth,
+                              height: 50,
+                              child: Card(
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .fabric
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .fabrictype
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .knittype
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .color
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .dia
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .uom
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .kgsperbox
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .weight
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .rate
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        '    ' +
+                                            _itemdetails[index]
+                                                .amount
+                                                .toLowerCase()
+                                                .toString(),
+                                        textScaleFactor: 1.3,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Expanded(
+                                        flex: 1,
+                                        //width: maxwidth * .20,
+                                        child: Row(children: [
+                                          Spacer(),
+                                          new IconButton(
+                                            alignment: Alignment.bottomRight,
+                                            icon: Image.asset('Images/edit.png',
+                                                color: widgetcolor),
+                                            onPressed: () {
+                                              if (this.mounted)
+                                                setState(() {
+                                                  removeItem(_itemdetails);
+                                                });
+                                            },
+                                            highlightColor: Colors.pink,
+                                          ),
+                                          SizedBox(width: 3),
+                                          // Spacer(),
+                                          new IconButton(
+                                            alignment: Alignment.bottomRight,
+                                            icon: Image.asset(
+                                                'Images/delete.png',
+                                                color: widgetcolor),
+                                            onPressed: () async {
+                                              removeItem(_itemdetails);
+                                            },
+                                            highlightColor: Colors.pink,
+                                          ),
+                                        ]))
+                                    //   ],
+                                    // )),
+                                  ],
+                                ), //,
+                                //),
+                              ),
+                            );
+                          }),
+                    )),
+              ]),
+            )),
+      ),
+    );
+  }
+
+  Widget listtableView(double maxwidth, double maxheight) {
+    // selrate = '';
+    // Selecteditem = '';
+    //pr.show();
+    if (_itemdetails.length > 0) {
+      return SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columnSpacing: 10.0,
+                columns: [
+                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                    DataColumn(
+                      label: Container(
+                          width: maxwidth * 0.25, child: Text("Fabric")),
+                      numeric: false,
+                    ),
+                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                    DataColumn(
+                      label: Container(
+                          width: maxwidth * 0.15, child: Text("Fabric Type")),
+                      numeric: false,
+                    ),
+                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                    DataColumn(
+                      label: Container(
+                        width: maxwidth * 0.25,
+                        child: Text("knit Type"),
+                      ),
+                      numeric: false,
+                    ),
+                  if (selectedprodtype.toString().toLowerCase() == 'yarn')
+                    DataColumn(
+                      label: Container(
+                          width: maxwidth * 0.25, child: Text("Yarn Mill")),
+                      numeric: false,
+                    ),
+                  if (selectedprodtype.toString().toLowerCase() == 'yarn')
+                    DataColumn(
+                      label: Container(
+                          width: maxwidth * 0.15, child: Text("Yarn Count")),
+                      numeric: false,
+                    ),
+                  if (selectedprodtype.toString().toLowerCase() == 'yarn')
+                    DataColumn(
+                      label: Container(
+                        width: maxwidth * 0.25,
+                        child: Text("Yarn Type"),
+                      ),
+                      numeric: false,
+                    ),
+                  DataColumn(
+                    label: Container(
+                      width: maxwidth * 0.10,
+                      child: Text("Color"),
+                    ),
+                    numeric: true,
+                  ),
+                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                    DataColumn(
+                      label: Container(
+                        width: maxwidth * 0.10,
+                        child: Text("Dia"),
+                      ),
+                      numeric: true,
+                    ),
+                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                    DataColumn(
+                      label: Container(
+                        width: maxwidth * 0.10,
+                        child: Text("Uom"),
+                      ),
+                      numeric: true,
+                    ),
+                  DataColumn(
+                    label: Container(
+                      width: maxwidth * 0.10,
+                      child: Text("Kgs/Box"),
+                    ),
+                    numeric: true,
+                  ),
+                  DataColumn(
+                    label: Container(
+                      width: maxwidth * 0.10,
+                      child: Text("Weight"),
+                    ),
+                    numeric: true,
+                  ),
+                  DataColumn(
+                    label: Container(
+                      width: maxwidth * 0.10,
+                      child: Text("Rate"),
+                    ),
+                    numeric: true,
+                  ),
+                  DataColumn(
+                    label: Container(
+                      width: maxwidth * 0.10,
+                      child: Text("Amount"),
+                    ),
+                    numeric: true,
+                  ),
+                  DataColumn(
+                    label: Container(
+                      width: maxwidth * 0.25,
+                      child: Text("Action"),
+                    ),
+                  )
+                ],
+                rows: _itemdetails
+                        ?.map(
+                          (item) => DataRow(cells: [
+                            if (selectedprodtype.toString().toLowerCase() ==
+                                'fabric')
+                              DataCell(Container(
+                                width: maxwidth * 0.25,
+                                child:
+                                    Text(item.fabric.toString().toUpperCase()),
+                              )),
+                            if (selectedprodtype.toString().toLowerCase() ==
+                                'fabric')
+                              DataCell(Container(
+                                width: maxwidth * 0.15,
+                                child: Text(
+                                    item.fabrictype.toString().toUpperCase()),
+                              )),
+                            if (selectedprodtype.toString().toLowerCase() ==
+                                'fabric')
+                              DataCell(
+                                Container(
+                                  width: maxwidth * 0.25,
+                                  child: Text(item.knittype.toString()),
+                                ),
+                              ),
+                            if (selectedprodtype.toString().toLowerCase() ==
+                                'yarn')
+                              DataCell(
+                                Container(
+                                  width: maxwidth * 0.25,
+                                  child: Text(item.yarnmill.toString()),
+                                ),
+                              ),
+                            if (selectedprodtype.toString().toLowerCase() ==
+                                'yarn')
+                              DataCell(
+                                Container(
+                                  width: maxwidth * 0.25,
+                                  child: Text(item.yarncount.toString()),
+                                ),
+                              ),
+                            if (selectedprodtype.toString().toLowerCase() ==
+                                'yarn')
+                              DataCell(
+                                Container(
+                                  width: maxwidth * 0.25,
+                                  child: Text(item.yarntype.toString()),
+                                ),
+                              ),
+                            DataCell(
+                              Container(
+                                width: maxwidth * 0.10,
+                                child: Text(item.color.toString()),
+                              ),
+                            ),
+                            if (selectedprodtype.toString().toLowerCase() ==
+                                'fabric')
+                              DataCell(Container(
+                                width: maxwidth * 0.10,
+                                child: Text(item.dia.toString().toUpperCase()),
+                              )),
+                            if (selectedprodtype.toString().toLowerCase() ==
+                                'fabric')
+                              DataCell(Container(
+                                width: maxwidth * 0.10,
+                                child: Text(item.uom.toString().toUpperCase()),
+                              )),
+                            DataCell(
+                              Container(
+                                width: maxwidth * 0.10,
+                                child: Text(item.kgsperbox.toString()),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                width: maxwidth * 0.10,
+                                child: Text(item.weight.toString()),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                width: maxwidth * 0.10,
+                                child: Text(item.rate.toString()),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                width: maxwidth * 0.10,
+                                child: Text(item.amount.toString()),
+                              ),
+                            ),
+                            DataCell(Row(
+                              children: [
+                                Container(
+                                    width: maxwidth * 0.25,
+                                    child: Row(children: [
+                                      IconButton(
+                                          icon: Image.asset('Images/edit.png',
+                                              color: widgetcolor),
+                                          highlightColor: Colors.pink,
+                                          onPressed: () {
+                                            if (this.mounted)
+                                              setState(() {
+                                                removeItem(item);
+                                              });
+
+                                            //  Itemid = item.itemMasterID;
+                                            //  removeItem(item);
+                                          }),
+                                      SizedBox(width: 2),
+                                      IconButton(
+                                          icon: Image.asset('Images/delete.png',
+                                              color: widgetcolor),
+                                          highlightColor: Colors.pink,
+                                          onPressed: () {
+                                            removeItem(item);
+                                          })
+                                    ]))
+                              ],
+                            )),
+                          ]),
+                        )
+                        ?.toList() ??
+                    [],
+              )));
+    } else {
+      // pr.dismiss();
+      return Text("Add details using the form below",
+          textAlign: TextAlign.center);
+    }
+
+    //pr.dismiss();
+  }
+
   Widget addcustomerwid(
       double maxwidth, double maxheight, BuildContext context) {
-    var _custconsigneeAddressController;
-
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -607,77 +1173,167 @@ class HomePageState extends State<HomePage> {
                         SizedBox(
                           height: 10,
                         ),
+                        Card(
+                          child: Container(
+                            height: maxheight * .30,
+                            width: maxwidth,
+                            margin: EdgeInsets.only(top: 0),
 
-                        Container(
-                          height: maxheight * .30,
-                          width: maxwidth,
-                          margin: EdgeInsets.only(top: 0),
+                            padding: EdgeInsets.all(
+                                2), // decoration: BoxDecoration(border: ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (companydata != null &&
+                                              companydata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 200,
+                                                maxWidth: 380,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .4, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Company",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: companydata,
+                                                label: "Type *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedcompany = val;
 
-                          padding: EdgeInsets.all(
-                              2), // decoration: BoxDecoration(border: ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                  child: Column(
+                                                    compid = companydetails
+                                                        .where((element) =>
+                                                            element.ptyname ==
+                                                            val)
+                                                        .map((e) => e.partyid)
+                                                        .first
+                                                        .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem: selectedcompany,
+                                              ),
+                                            ),
+                                          SizedBox(height: 10),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 100,
+                                              maxWidth: 250,
+                                            ),
+                                            width: maxwidth * .3,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                  labelText: "PO No",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType.text,
+                                              style: textStyle,
+                                              controller: _custPONoController,
+                                              focusNode: custidFocusNode,
+
+                                              readOnly: enable,
+                                              //enableInteractiveSelection: enable,
+                                            ),
+                                          ),
+                                          SizedBox(height: 10),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 100,
+                                              maxWidth: 200,
+                                            ),
+                                            width: maxwidth * .3,
+                                            child: TextFormField(
+                                              //enabled: false,
+                                              controller: dateCtl,
+                                              decoration: InputDecoration(
+                                                labelText: "Date",
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: widgetcolor),
+                                                ),
+                                                border: InputBorder.none,
+                                                hintText:
+                                                    "Ex. Insert your date",
+                                              ),
+                                              onTap: () async {
+                                                DateTime date = DateTime(1900);
+                                                FocusScope.of(context)
+                                                    .requestFocus(
+                                                        new FocusNode());
+
+                                                date = await showDatePicker(
+                                                    context: context,
+                                                    initialDate: DateTime.now(),
+                                                    firstDate: DateTime(1900),
+                                                    lastDate: DateTime(2100));
+
+                                                if (this.mounted)
+                                                  setState(() {
+                                                    DateTime today = date;
+
+                                                    if (today != null) {
+                                                      seldate =
+                                                          "${today.year.toString()}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+
+                                                      dateCtl.text =
+                                                          "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year.toString()}";
+                                                    }
+                                                    //  seldate; //date.toIso8601String();
+                                                  });
+                                              },
+                                            ),
+                                          ),
+                                        ]),
+                                    // ),
+                                    flex: 2),
+                                SizedBox(width: 20),
+                                Expanded(
+                                    child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        if (companydata != null &&
-                                            companydata.isNotEmpty)
-                                          Container(
-                                            constraints: BoxConstraints(
-                                              minWidth: 200,
-                                              maxWidth: 380,
-                                            ),
-                                            //padding: EdgeInsets.,
-                                            width: maxwidth * .4, //* 0.50,
-                                            child: DropdownSearch<String>(
-                                              dropDownButton: Image.asset(
-                                                  'Images/arrow_drop_down.png',
-                                                  color: Colors.white),
-                                              validator: (v) => v == null
-                                                  ? "required field"
-                                                  : null,
-                                              hint: "Select a Company",
-                                              mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
-                                              showSelectedItem: true,
-                                              showSearchBox: true,
-                                              items: companydata,
-                                              label: "Type *",
-                                              showClearButton: false,
-                                              onChanged: (val) {
-                                                setState(() {
-                                                  selectedcompany = val;
-
-                                                  compid = companydetails
-                                                      .where((element) =>
-                                                          element.ptyname ==
-                                                          val)
-                                                      .map((e) => e.partyid)
-                                                      .first
-                                                      .toString();
-                                                });
-                                              },
-                                              popupItemDisabled: (String s) =>
-                                                  s.startsWith('I'),
-                                              selectedItem: selectedcompany,
-                                            ),
-                                          ),
-                                        SizedBox(height: 10),
                                         Container(
                                           constraints: BoxConstraints(
                                             //minHeight: 20,
                                             minWidth: 100,
-                                            maxWidth: 250,
+                                            maxWidth: 400,
                                           ),
-                                          width: maxwidth * .3,
+                                          key: _keyRed,
+                                          width: maxwidth * .5,
                                           child: TextField(
                                             decoration: const InputDecoration(
                                                 focusedBorder:
@@ -687,216 +1343,22 @@ class HomePageState extends State<HomePage> {
                                                 ),
                                                 border: InputBorder.none,
                                                 //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                labelText: "PO No",
+                                                labelText: "Consignee Address",
                                                 labelStyle:
                                                     TextStyle(fontSize: 20.0)),
                                             keyboardType: TextInputType.text,
                                             style: textStyle,
-                                            controller: _custPONoController,
-                                            focusNode: custidFocusNode,
+                                            controller:
+                                                _custconsigneeAddressController,
+                                            // focusNode: custidFocusNode,
 
                                             readOnly: enable,
                                             //enableInteractiveSelection: enable,
                                           ),
                                         ),
                                         SizedBox(height: 10),
-                                        Container(
-                                          constraints: BoxConstraints(
-                                            //minHeight: 20,
-                                            minWidth: 100,
-                                            maxWidth: 200,
-                                          ),
-                                          width: maxwidth * .3,
-                                          child: TextFormField(
-                                            //enabled: false,
-                                            controller: dateCtl,
-                                            decoration: InputDecoration(
-                                              labelText: "Date",
-                                              focusedBorder:
-                                                  UnderlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.orange),
-                                              ),
-                                              border: InputBorder.none,
-                                              hintText: "Ex. Insert your date",
-                                            ),
-                                            onTap: () async {
-                                              DateTime date = DateTime(1900);
-                                              FocusScope.of(context)
-                                                  .requestFocus(
-                                                      new FocusNode());
-
-                                              date = await showDatePicker(
-                                                  context: context,
-                                                  initialDate: DateTime.now(),
-                                                  firstDate: DateTime(1900),
-                                                  lastDate: DateTime(2100));
-
-                                              if (this.mounted)
-                                                setState(() {
-                                                  DateTime today = date;
-
-                                                  if (today != null) {
-                                                    seldate =
-                                                        "${today.year.toString()}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
-
-                                                    dateCtl.text =
-                                                        "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year.toString()}";
-                                                  }
-                                                  //  seldate; //date.toIso8601String();
-                                                });
-                                            },
-                                          ),
-                                        ),
-                                      ]),
-                                  // ),
-                                  flex: 2),
-                              SizedBox(width: 20),
-                              Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        constraints: BoxConstraints(
-                                          //minHeight: 20,
-                                          minWidth: 100,
-                                          maxWidth: 400,
-                                        ),
-                                        key: _keyRed,
-                                        width: maxwidth * .5,
-                                        child: TextField(
-                                          decoration: const InputDecoration(
-                                              focusedBorder:
-                                                  UnderlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: widgetcolor),
-                                              ),
-                                              border: InputBorder.none,
-                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                              labelText: "Consignee Address",
-                                              labelStyle:
-                                                  TextStyle(fontSize: 20.0)),
-                                          keyboardType: TextInputType.text,
-                                          style: textStyle,
-                                          controller:
-                                              _custconsigneeAddressController,
-                                          // focusNode: custidFocusNode,
-
-                                          readOnly: enable,
-                                          //enableInteractiveSelection: enable,
-                                        ),
-                                      ),
-                                      SizedBox(height: 10),
-                                      if (notifypartydata != null &&
-                                          notifypartydata.isNotEmpty)
-                                        Container(
-                                          constraints: BoxConstraints(
-                                            minWidth: 100,
-                                            maxWidth: 300,
-                                          ),
-                                          //padding: EdgeInsets.,
-                                          width: maxwidth * .3, //* 0.50,
-                                          child: DropdownSearch<String>(
-                                            dropDownButton: Image.asset(
-                                                'Images/arrow_drop_down.png',
-                                                color: Colors.white),
-                                            validator: (v) => v == null
-                                                ? "required field"
-                                                : null,
-                                            hint: "Select a Notify Party",
-                                            mode: Mode.MENU,
-                                            enabled: (_id != null &&
-                                                    _id != '' &&
-                                                    _id != '0')
-                                                ? false
-                                                : true,
-                                            showSelectedItem: true,
-                                            showSearchBox: true,
-                                            items: notifypartydata,
-                                            label: "Notify Party *",
-                                            showClearButton: false,
-                                            onChanged: (val) {
-                                              setState(() {
-                                                selectednotifyparty = val;
-
-                                                notifypartyid =
-                                                    notifypartydetails
-                                                        .where((element) =>
-                                                            element
-                                                                .customerName ==
-                                                            val)
-                                                        .map((e) => e.custId)
-                                                        .first
-                                                        .toString();
-                                              });
-                                            },
-                                            popupItemDisabled: (String s) =>
-                                                s.startsWith('I'),
-                                            selectedItem: selectednotifyparty,
-                                          ),
-                                        ),
-                                      SizedBox(height: 10),
-                                      if (supplierdata != null &&
-                                          supplierdata.isNotEmpty)
-                                        Container(
-                                          constraints: BoxConstraints(
-                                            minWidth: 100,
-                                            maxWidth: 300,
-                                          ),
-                                          //padding: EdgeInsets.,
-                                          width: maxwidth * .3, //* 0.50,
-                                          child: DropdownSearch<String>(
-                                            dropDownButton: Image.asset(
-                                                'Images/arrow_drop_down.png',
-                                                color: Colors.white),
-                                            validator: (v) => v == null
-                                                ? "required field"
-                                                : null,
-                                            hint: "Select a Supplier",
-                                            mode: Mode.MENU,
-                                            enabled: (_id != null &&
-                                                    _id != '' &&
-                                                    _id != '0')
-                                                ? false
-                                                : true,
-                                            showSelectedItem: true,
-                                            showSearchBox: true,
-                                            items: supplierdata,
-                                            label: "Supplier *",
-                                            showClearButton: false,
-                                            onChanged: (val) {
-                                              setState(() {
-                                                selectedsupplier = val;
-
-                                                supplierid = supplierdetails
-                                                    .where((element) =>
-                                                        element.customerName ==
-                                                        val)
-                                                    .map((e) => e.custId)
-                                                    .first
-                                                    .toString();
-                                              });
-                                            },
-                                            popupItemDisabled: (String s) =>
-                                                s.startsWith('I'),
-                                            selectedItem: selectedsupplier,
-                                          ),
-                                        ),
-                                      // ],
-                                    ],
-                                  ),
-                                  flex: 2),
-                              Expanded(
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (currencydata != null &&
-                                            currencydata.isNotEmpty)
+                                        if (notifypartydata != null &&
+                                            notifypartydata.isNotEmpty)
                                           Container(
                                             constraints: BoxConstraints(
                                               minWidth: 100,
@@ -911,7 +1373,7 @@ class HomePageState extends State<HomePage> {
                                               validator: (v) => v == null
                                                   ? "required field"
                                                   : null,
-                                              hint: "Select a Currency",
+                                              hint: "Select a Notify Party",
                                               mode: Mode.MENU,
                                               enabled: (_id != null &&
                                                       _id != '' &&
@@ -920,14 +1382,168 @@ class HomePageState extends State<HomePage> {
                                                   : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
-                                              items: currencydata,
-                                              label: "Currency *",
+                                              items: notifypartydata,
+                                              label: "Notify Party *",
                                               showClearButton: false,
                                               onChanged: (val) {
                                                 setState(() {
-                                                  selectedcurrency = val;
+                                                  selectednotifyparty = val;
 
-                                                  currencyid = currencydetails
+                                                  notifypartyid =
+                                                      notifypartydetails
+                                                          .where((element) =>
+                                                              element
+                                                                  .customerName ==
+                                                              val)
+                                                          .map((e) => e.custId)
+                                                          .first
+                                                          .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectednotifyparty,
+                                            ),
+                                          ),
+                                        SizedBox(height: 10),
+                                        if (supplierdata != null &&
+                                            supplierdata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 300,
+                                            ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .3, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Supplier",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: supplierdata,
+                                              label: "Supplier *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedsupplier = val;
+
+                                                  supplierid = supplierdetails
+                                                      .where((element) =>
+                                                          element
+                                                              .customerName ==
+                                                          val)
+                                                      .map((e) => e.custId)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedsupplier,
+                                            ),
+                                          ),
+                                        // ],
+                                      ],
+                                    ),
+                                    flex: 2),
+                                Expanded(
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (currencydata != null &&
+                                              currencydata.isNotEmpty)
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 100,
+                                                maxWidth: 300,
+                                              ),
+                                              //padding: EdgeInsets.,
+                                              width: maxwidth * .3, //* 0.50,
+                                              child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Currency",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: currencydata,
+                                                label: "Currency *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedcurrency = val;
+
+                                                    currencyid = currencydetails
+                                                        .where((element) =>
+                                                            element
+                                                                .columnname ==
+                                                            val)
+                                                        .map((e) =>
+                                                            e.columnMasterid)
+                                                        .first
+                                                        .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem: selectedcurrency,
+                                              ),
+                                            ),
+                                          SizedBox(height: 10),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 200,
+                                            ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Type",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: prodtypedata,
+                                              label: "Type *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedprodtype = val;
+
+                                                  prodtypeid = prodtypedetails
                                                       .where((element) =>
                                                           element.columnname ==
                                                           val)
@@ -935,86 +1551,42 @@ class HomePageState extends State<HomePage> {
                                                           e.columnMasterid)
                                                       .first
                                                       .toString();
+
+                                                  if (selectedprodtype
+                                                          .toString()
+                                                          .toLowerCase() ==
+                                                      'fabric') {
+                                                    getfabricdetails('');
+                                                    getfabknittypedetails('');
+                                                    getcolordetails('');
+                                                    getdiadetails('');
+                                                    getuomdetails('');
+                                                    getcompositiondetails('');
+                                                    getfabrictypedetails('');
+                                                  }
+
+                                                  if (selectedprodtype
+                                                          .toString()
+                                                          .toLowerCase() ==
+                                                      'yarn') {
+                                                    getyarncountdetails('');
+                                                    getyarntypedetails('');
+                                                    getyarnmilldetails('');
+                                                    getcolordetails('');
+                                                  }
                                                 });
                                               },
                                               popupItemDisabled: (String s) =>
                                                   s.startsWith('I'),
-                                              selectedItem: selectedcurrency,
+                                              selectedItem: selectedprodtype,
                                             ),
                                           ),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          constraints: BoxConstraints(
-                                            minWidth: 100,
-                                            maxWidth: 200,
-                                          ),
-                                          //padding: EdgeInsets.,
-                                          width: maxwidth * .7, //* 0.50,
-                                          child: DropdownSearch<String>(
-                                            dropDownButton: Image.asset(
-                                                'Images/arrow_drop_down.png',
-                                                color: Colors.white),
-                                            validator: (v) => v == null
-                                                ? "required field"
-                                                : null,
-                                            hint: "Select a Type",
-                                            mode: Mode.MENU,
-                                            enabled: (_id != null &&
-                                                    _id != '' &&
-                                                    _id != '0')
-                                                ? false
-                                                : true,
-                                            showSelectedItem: true,
-                                            showSearchBox: true,
-                                            items: prodtypedata,
-                                            label: "Type *",
-                                            showClearButton: false,
-                                            onChanged: (val) {
-                                              setState(() {
-                                                selectedprodtype = val;
-
-                                                prodtypeid = prodtypedetails
-                                                    .where((element) =>
-                                                        element.columnname ==
-                                                        val)
-                                                    .map(
-                                                        (e) => e.columnMasterid)
-                                                    .first
-                                                    .toString();
-
-                                                if (selectedprodtype
-                                                        .toString()
-                                                        .toLowerCase() ==
-                                                    'fabric') {
-                                                  getfabricdetails('');
-                                                  getfabknittypedetails('');
-                                                  getcolordetails('');
-                                                  getdiadetails('');
-                                                  getuomdetails('');
-                                                  getcompositiondetails('');
-                                                  getfabrictypedetails('');
-                                                }
-
-                                                if (selectedprodtype
-                                                        .toString()
-                                                        .toLowerCase() ==
-                                                    'yarn') {
-                                                  getyarncountdetails('');
-                                                  getyarntypedetails('');
-                                                  getyarnmilldetails('');
-                                                  getcolordetails('');
-                                                }
-                                              });
-                                            },
-                                            popupItemDisabled: (String s) =>
-                                                s.startsWith('I'),
-                                            selectedItem: selectedprodtype,
-                                          ),
-                                        ),
-                                      ]),
-                                  flex: 1),
-                            ],
+                                        ]),
+                                    flex: 1),
+                              ],
+                            ),
                           ),
+                          color: Colors.white70,
                         ),
 
                         SizedBox(height: 10),
@@ -1811,23 +2383,44 @@ class HomePageState extends State<HomePage> {
                                 heroTag: "btn1",
 
                                 onPressed: () {
-                                  // ItemMaster _data;
-                                  // _data = Getitemdetails(); //= <ItemMaster>[];
+                                  purchaseorderdetl.PurchaseOrder _data;
+                                  _data = Getitemdetails(); //= <ItemMaster>[];
 
-                                  // if (this.mounted)
-                                  //   setState(() {
-                                  //     if (_itemdetails
-                                  //         .where((e) =>
-                                  //             e.itemMasterID ==
-                                  //             _data.itemMasterID)
-                                  //         .isEmpty) {
-                                  //       _itemdetails.add(_data);
+                                  if (this.mounted)
+                                    setState(() {
+                                      if (_itemdetails
+                                          .where((e) =>
+                                              e.fabricid == _data.fabricid &&
+                                              e.fabrictypeid ==
+                                                  _data.fabrictypeid &&
+                                              e.knittypeid ==
+                                                  _data.knittypeid &&
+                                              e.colorid == _data.colorid &&
+                                              e.diaid == _data.diaid &&
+                                              e.uomid == _data.uomid &&
+                                              e.compositionid ==
+                                                  _data.compositionid)
+                                          .isEmpty) {
+                                        _itemdetails.add(_data);
 
-                                  //       Selecteditem = '';
-                                  //       Selectedgroup = '';
-                                  //       _pricerateController.text = '';
-                                  //     }
-                                  //   });
+                                        selectedcolor = '';
+                                        selecteddia = '';
+                                        selecteduom = '';
+                                        selectedfabric = '';
+                                        selectedfabknittype = '';
+                                        selectedcomposition = '';
+                                        selectedfabtype = '';
+                                        selectedyarnmill = '';
+                                        selectedyarncolor = '';
+                                        selectedyarntype = '';
+                                        _custgsmController.text = '';
+                                        _custweightController.text = '';
+                                        _custnoofboxController.text = '';
+                                        _custrateController.text = '';
+                                        _custamountController.text = '';
+                                        _custkgsperboxController.text = '';
+                                      }
+                                    });
                                 },
                                 //clearData(context);
                                 //idFocusNode.dispose();
@@ -1844,20 +2437,20 @@ class HomePageState extends State<HomePage> {
                                 heroTag: "btn2",
                                 backgroundColor: widgetcolor,
                                 onPressed: () {
-//                                   ItemMaster _data;
-//                                   _data = Getitemdetails();
-//                                   if (selrate != '' && selrate != null) {
-//                                     if (this.mounted)
-//                                       setState(() {
-//                                         if (_previousitem != null)
-//                                           _itemdetails.add(_previousitem);
-//                                         Selecteditem = '';
-//                                         Selectedgroup = '';
-//                                         _pricerateController.text = '';
-//                                         _previousitem = null;
-//                                       });
-// //});
-//                                   }
+                                  //                                   ItemMaster _data;
+                                  //                                   _data = Getitemdetails();
+                                  //                                   if (selrate != '' && selrate != null) {
+                                  //                                     if (this.mounted)
+                                  //                                       setState(() {
+                                  //                                         if (_previousitem != null)
+                                  //                                           _itemdetails.add(_previousitem);
+                                  //                                         Selecteditem = '';
+                                  //                                         Selectedgroup = '';
+                                  //                                         _pricerateController.text = '';
+                                  //                                         _previousitem = null;
+                                  //                                       });
+                                  // //});
+                                  //                                   }
                                   //clearData(context);
                                   //idFocusNode.dispose();
                                 },
@@ -1867,6 +2460,9 @@ class HomePageState extends State<HomePage> {
                               )),
                         ]),
 
+                        Container(
+                            decoration: getBoxDecoration(),
+                            child: listtableView(maxwidth, maxheight)),
                         Container(
                           height: maxheight * .30,
                           width: maxwidth,
@@ -1905,7 +2501,8 @@ class HomePageState extends State<HomePage> {
                                                     TextStyle(fontSize: 20.0)),
                                             keyboardType: TextInputType.text,
                                             style: textStyle,
-                                            controller: _custgsmController,
+                                            controller:
+                                                _custnoofcontainerController,
                                             //   focusNode: custidFocusNode,
                                             readOnly: enable,
                                             //enableInteractiveSelection: enable,
@@ -1983,7 +2580,8 @@ class HomePageState extends State<HomePage> {
                                                     TextStyle(fontSize: 20.0)),
                                             keyboardType: TextInputType.text,
                                             style: textStyle,
-                                            controller: _custgsmController,
+                                            controller:
+                                                _custpackingdetailController,
                                             //   focusNode: custidFocusNode,
 
                                             readOnly: enable,
@@ -2021,7 +2619,8 @@ class HomePageState extends State<HomePage> {
                                                   TextStyle(fontSize: 20.0)),
                                           keyboardType: TextInputType.text,
                                           style: textStyle,
-                                          controller: _custgsmController,
+                                          controller:
+                                              _custpaymenttermsController,
                                           //   focusNode: custidFocusNode,
 
                                           readOnly: enable,
@@ -2089,7 +2688,7 @@ class HomePageState extends State<HomePage> {
                                             Container(
                                               constraints: BoxConstraints(
                                                 minWidth: 100,
-                                                maxWidth: 100,
+                                                maxWidth: 200,
                                               ),
                                               //padding: EdgeInsets.,
                                               width: maxwidth * .3, //* 0.50,
@@ -2139,7 +2738,7 @@ class HomePageState extends State<HomePage> {
                                             constraints: BoxConstraints(
                                               //minHeight: 20,
                                               minWidth: 100,
-                                              maxWidth: 100,
+                                              maxWidth: 200,
                                             ),
                                             width: maxwidth * .3,
                                             child: TextFormField(
@@ -2150,7 +2749,7 @@ class HomePageState extends State<HomePage> {
                                                 focusedBorder:
                                                     UnderlineInputBorder(
                                                   borderSide: BorderSide(
-                                                      color: Colors.orange),
+                                                      color: widgetcolor),
                                                 ),
                                                 border: InputBorder.none,
                                                 hintText:
@@ -2208,7 +2807,7 @@ class HomePageState extends State<HomePage> {
                                                   TextStyle(fontSize: 20.0)),
                                           keyboardType: TextInputType.text,
                                           style: textStyle,
-                                          controller: _custgsmController,
+                                          controller: _custremarksController,
                                           //   focusNode: custidFocusNode,
 
                                           readOnly: enable,
@@ -2230,6 +2829,8 @@ class HomePageState extends State<HomePage> {
                           ),
                           width: maxwidth * .9,
                           child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
                             decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(color: widgetcolor),
@@ -2238,9 +2839,9 @@ class HomePageState extends State<HomePage> {
                                 //disabledBorder: InputDecoration.collapsed(hintText: null),
                                 labelText: "Terms & Conditions",
                                 labelStyle: TextStyle(fontSize: 20.0)),
-                            keyboardType: TextInputType.text,
+                            //keyboardType: TextInputType.text,
                             style: textStyle,
-                            controller: _custgsmController,
+                            controller: _custtermsandconditionsController,
                             //   focusNode: custidFocusNode,
 
                             readOnly: enable,
@@ -2263,6 +2864,7 @@ class HomePageState extends State<HomePage> {
               Container(
                 child: RaisedButton(
                     onPressed: () async {
+                      //saveItems();
                       if ((_id != "") && (_id != null) && (_id != "0")) {
                         setState(() {
                           enable = true;
@@ -2372,6 +2974,97 @@ class HomePageState extends State<HomePage> {
   }
 
   void saveItems() async {
+    final http.Response response = await http.post(
+      'http://tap.suninfotechnologies.in/api/Touchpo',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        "spname": "GetAndSubmitPODetails",
+        "Mode": "PO",
+        "intFlag": "1",
+        "intHeaderID": "0",
+        "strPoNo": '"' + _custPONoController.text + '"',
+        "dtPoDate": '"' + seldate + '"',
+        "strProductType": '"' + prodtypeid + '"',
+        "intConsigneeID": "1",
+        "intSupplierID": '"' + supplierid + '"',
+        "intCurrencyID": '"' + currencyid + '"',
+        "intNoofContainers": '"' + _custnoofcontainerController.text + '"',
+        "strPaymentTerms": '"' + _custpaymenttermsController.text + '"',
+        "intShipmenModeID": '"' + shipmentmodeid + '"',
+        "intPortofLoadingID": '"' + portofloadid + '"',
+        "intShipmentDate": '"' + selshipmentdate + '"',
+        "intPackingDetailsID": "1",
+        "strRemarks": '"' + _custremarksController.text + '"',
+        "strTermsConditions1":
+            '"' + _custtermsandconditionsController.text + '"',
+        "strTermsConditions2": "1",
+        "strTermsConditions3": "1",
+        "strTermsConditions4": "1",
+        "strTermsConditions5": "1",
+        "strTermsConditions6": "1",
+        "strTermsConditions7": "1",
+        "strTermsConditions8": "1",
+        "intUserID": "1",
+        "yarn": [
+          {
+            "Mode": "yarn",
+            "spname": "GetAndSubmitPOYarnDetail",
+            "intFlag": "1",
+            "PurchaseOrdeYarnrDetailID": "1",
+            "intHeaderID": "0",
+            "intYarnCountID": "12",
+            "intYarnMillID": "23",
+            "intYarnColorID": "16",
+            "intNoofBox": "2",
+            "intWeight": "4",
+            "intRate": "4",
+            "intAmount": "6",
+            "intUserID": "200"
+          },
+          {
+            "Mode": "yarn",
+            "spname": "GetAndSubmitPOYarnDetail",
+            "intFlag": "1",
+            "PurchaseOrdeYarnrDetailID": "1",
+            "intHeaderID": "1",
+            "intYarnCountID": "12",
+            "intYarnMillID": "23",
+            "intYarnColorID": "16",
+            "intNoofBox": "2",
+            "intWeight": "4",
+            "intRate": "4",
+            "intAmount": "6",
+            "intUserID": "200"
+          }
+        ]
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      Alert(
+          context: context,
+          title: "Done!",
+          desc: "Data saved successfully",
+          type: AlertType.success,
+          style: AlertStyle(isCloseButton: false),
+          buttons: [
+            DialogButton(
+              child: Text(
+                "Close",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+//pr.hide();
+              },
+              width: 120,
+            )
+          ]).show();
+    } else {
+      throw Exception('Failed to create album.');
+    }
     String custId = _custIdController.text;
     String custName = _custPONoController.text;
     String custMobile = _custMobileController.text;
@@ -2463,7 +3156,153 @@ class HomePageState extends State<HomePage> {
     _custGstinController.text = '';
     _custMobileController.text = '';
     _custRemarksController.text = '';
+
+    _custPONoController.text = '';
+    _custIdController.text = '';
+    _custMobileController.text = '';
+    _custRemarksController.text = '';
+    _custDateController.text = '';
+    _custNotifypartyController.text = '';
+    _custAdd3Controller.text = '';
+    _custAdd4Controller.text = '';
+    _custEmailController.text = '';
+    _custGstinController.text = '';
+    _custgsmController.text = '';
+    _custnoofboxController.text = '';
+    _custkgsperboxController.text = '';
+    _custweightController.text = '';
+    _custrateController.text = '';
+    _custamountController.text = '';
+    _custconsigneeAddressController.text = '';
+    _custtermsandconditionsController.text = '';
+    _custnoofcontainerController.text = '';
+    _custpackingdetailController.text = '';
+    _custpaymenttermsController.text = '';
+    _custremarksController.text = '';
+
     _id = '0';
+  }
+
+  purchaseorderdetl.PurchaseOrder Getitemdetails() {
+    purchaseorderdetl.PurchaseOrder _data;
+    selamount = _custamountController.text;
+
+    if (selamount != '' &&
+        selamount != null &&
+        (selectedprodtype.toString().toLowerCase() == 'fabric' ||
+            selectedprodtype.toString().toLowerCase() == 'yarn')) {
+      var convertDataToJson = json.decode('[{"fabric": ' +
+          '"' +
+          selectedfabric.toString() +
+          '" , ' +
+          '"fabricid": ' +
+          '"' +
+          fabricid.toString() +
+          '"' +
+          ' , "amount": ' +
+          '"' +
+          _custamountController.text.toString() +
+          '"' +
+          ' , "color": ' +
+          '"' +
+          selectedcolor.toString() +
+          '"' +
+          ' , "colorid": ' +
+          '"' +
+          colorid.toString() +
+          '"' +
+          ', "composition": ' +
+          '"' +
+          selectedcomposition.toString() +
+          '"' +
+          ', "compositionid": ' +
+          '"' +
+          compositionid.toString() +
+          '"' +
+          ', "dia": ' +
+          '"' +
+          selecteddia.toString() +
+          '"' +
+          ', "diaid": ' +
+          '"' +
+          diaid.toString() +
+          '"' +
+          ', "fabrictype": ' +
+          '"' +
+          selectedfabtype.toString() +
+          '"' +
+          ', "fabrictypeid": ' +
+          '"' +
+          fabtypeid.toString() +
+          '"' +
+          ', "gsm": ' +
+          '"' +
+          _custgsmController.text.toString() +
+          '"' +
+          ', "kgsperbox": ' +
+          '"' +
+          _custkgsperboxController.text.toString() +
+          '"' +
+          ', "knittype": ' +
+          '"' +
+          selectedfabknittype.toString() +
+          '"' +
+          ', "knittypeid": ' +
+          '"' +
+          fabknittypeid.toString() +
+          '"' +
+          ', "noofbox": ' +
+          '"' +
+          _custnoofboxController.text.toString() +
+          '"' +
+          ', "rate": ' +
+          '"' +
+          _custrateController.text.toString() +
+          '"' +
+          ', "uom": ' +
+          '"' +
+          selecteduom.toString() +
+          '"' +
+          ', "uomid": ' +
+          '"' +
+          uomid.toString() +
+          '"' +
+          ', "weight": ' +
+          '"' +
+          _custweightController.text.toString() +
+          '"' +
+          ', "yarnmill": ' +
+          '"' +
+          selectedyarnmill.toString() +
+          '"' +
+          ', "yarnmillid": ' +
+          '"' +
+          yarnmillid.toString() +
+          '"' +
+          ', "yarntype": ' +
+          '"' +
+          selectedyarntype.toString() +
+          '"' +
+          ', "yanrtypeid": ' +
+          '"' +
+          yarntypeid.toString() +
+          '"' +
+          ', "yarncount": ' +
+          '"' +
+          selectedyarncount.toString() +
+          '"' +
+          ', "yarncountid": ' +
+          '"' +
+          yarncountid.toString() +
+          '"' +
+          '}]');
+      final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+      _data = parsed
+          .map<purchaseorderdetl.PurchaseOrder>(
+              (json) => purchaseorderdetl.PurchaseOrder.fromJSON(json))
+          .first;
+    }
+    return _data;
   }
 
   List<customer.Customer> data = new List<customer.Customer>();
@@ -3325,6 +4164,21 @@ class HomePageState extends State<HomePage> {
     _custGstinController.dispose();
     _custEmailController.dispose();
     custidFocusNode.dispose();
+
+    _custGstinController.dispose();
+    _custgsmController.dispose();
+    _custnoofboxController.dispose();
+    _custkgsperboxController.dispose();
+    _custweightController.dispose();
+    _custrateController.dispose();
+    _custamountController.dispose();
+    _custconsigneeAddressController.dispose();
+    _custtermsandconditionsController.dispose();
+    _custnoofcontainerController.dispose();
+    _custpackingdetailController.dispose();
+    _custpaymenttermsController.dispose();
+    _custremarksController.dispose();
+
     _controller.dispose();
     super.dispose();
   }
