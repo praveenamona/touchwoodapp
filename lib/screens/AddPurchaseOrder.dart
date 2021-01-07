@@ -34,9 +34,11 @@ void main() => runApp(new MaterialApp(
       ),
     ));
 PageController controller = PageController();
-List<Customer> _reportItems = <Customer>[];
+List<purchaseorderdetl.PurchaseOrderHeader> _reportItems =
+    <purchaseorderdetl.PurchaseOrderHeader>[];
 
-List<Customer> data = <Customer>[];
+List<purchaseorderdetl.PurchaseOrderHeader> data =
+    <purchaseorderdetl.PurchaseOrderHeader>[];
 
 bool ShowAddWidget = false;
 List<Paging> paging = new List<Paging>();
@@ -101,9 +103,10 @@ List<master.Master> prodtypedetails = <master.Master>[];
 List<master.Master> fabricdetails = <master.Master>[];
 List<master.Master> fabrictypetypedetails = <master.Master>[];
 List<master.Master> fabricknittypedetails = <master.Master>[];
-List<purchaseorderdetl.PurchaseOrder> details =
-    <purchaseorderdetl.PurchaseOrder>[];
-List<purchaseorderdetl.PurchaseOrder> _itemdetails = [];
+//List<master.Master> fabricknittypedetails = <master.Master>[];
+List<purchaseorderdetl.PurchaseOrderDetails> details =
+    <purchaseorderdetl.PurchaseOrderDetails>[];
+List<purchaseorderdetl.PurchaseOrderDetails> _itemdetails = [];
 List<master.Master> colordetails = <master.Master>[];
 List<master.Master> diadetails = <master.Master>[];
 List<uom.Uom> uomdetails = <uom.Uom>[];
@@ -183,8 +186,8 @@ class HomePage extends StatefulWidget {
 GlobalKey _keyRed = GlobalKey();
 double xaxis;
 String selamount;
-List<purchaseorderdetl.PurchaseOrder> Itemdetails =
-    <purchaseorderdetl.PurchaseOrder>[];
+List<purchaseorderdetl.PurchaseOrderDetails> Itemdetails =
+    <purchaseorderdetl.PurchaseOrderDetails>[];
 
 class HomePageState extends State<HomePage> {
   _getPositions() {
@@ -1305,7 +1308,7 @@ class HomePageState extends State<HomePage> {
 
                                                     if (today != null) {
                                                       seldate =
-                                                          "${today.year.toString()}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+                                                          "${today.year.toString()}/${today.month.toString().padLeft(2, '0')}/${today.day.toString().padLeft(2, '0')}";
 
                                                       dateCtl.text =
                                                           "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year.toString()}";
@@ -2383,8 +2386,8 @@ class HomePageState extends State<HomePage> {
                                 heroTag: "btn1",
 
                                 onPressed: () {
-                                  purchaseorderdetl.PurchaseOrder _data;
-                                  _data = Getitemdetails(); //= <ItemMaster>[];
+                                  purchaseorderdetl.PurchaseOrderDetails _data;
+                                  _data = getitemdetails(); //= <ItemMaster>[];
 
                                   if (this.mounted)
                                     setState(() {
@@ -2773,7 +2776,7 @@ class HomePageState extends State<HomePage> {
 
                                                     if (today != null) {
                                                       selshipmentdate =
-                                                          "${today.year.toString()}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+                                                          "${today.year.toString()}/${today.month.toString().padLeft(2, '0')}/${today.day.toString().padLeft(2, '0')}";
 
                                                       shipmentdateCtl.text =
                                                           "${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year.toString()}";
@@ -2974,31 +2977,102 @@ class HomePageState extends State<HomePage> {
   }
 
   void saveItems() async {
+    List<purchaseorderdetl.PurchaseOrderDetails> yarndetail =
+        List<purchaseorderdetl.PurchaseOrderDetails>.generate(
+            _itemdetails.length, (int index) {
+      return purchaseorderdetl.PurchaseOrderDetails(
+          headerid: "0",
+          yarnmillid: _itemdetails[index].yarnmillid,
+          yarntypeid: _itemdetails[index].yarntypeid,
+          yarncountid: _itemdetails[index].yarncountid,
+          colorid: _itemdetails[index].colorid,
+          noofbox: _itemdetails[index].noofbox,
+          weight: _itemdetails[index].weight,
+          rate: _itemdetails[index].rate,
+          amount: _itemdetails[index].amount);
+    });
+
+    List<purchaseorderdetl.PurchaseOrderFabricDetails> fabricdetail =
+        List<purchaseorderdetl.PurchaseOrderFabricDetails>.generate(
+            _itemdetails.length, (int index) {
+      return purchaseorderdetl.PurchaseOrderFabricDetails(
+          headerid: "0",
+          fabrictypeid: _itemdetails[index].fabrictypeid,
+          fabricid: _itemdetails[index].fabricid,
+          compositionid: _itemdetails[index].compositionid,
+          gsm: _itemdetails[index].gsm,
+          diaid: _itemdetails[index].diaid,
+          knittypeid: _itemdetails[index].knittypeid,
+          uomid: _itemdetails[index].uomid,
+          colorid: _itemdetails[index].colorid,
+          noofbox: _itemdetails[index].noofbox,
+          weight: _itemdetails[index].weight,
+          rate: _itemdetails[index].rate,
+          amount: _itemdetails[index].amount);
+    });
+
+    final purchaseorderdetl.PurchaseOrderHeader purchaseorderList =
+        (selectedprodtype.toString().toLowerCase() == 'yarn')
+            ? purchaseorderdetl.PurchaseOrderHeader(
+                purchaseorderdetail: yarndetail,
+                headerid: "0",
+                pono: _custPONoController.text,
+                podate: seldate,
+                producttype: selectedprodtype,
+                consigneeid: _custconsigneeAddressController.text,
+                supplierid: supplierid,
+                currencyid: currencyid,
+                noofcontainers: _custnoofcontainerController.text,
+                paymentterms: _custpaymenttermsController.text,
+                shipmentmodeid: shipmentmodeid,
+                portofloadingid: portofloadid,
+                shipmentdate: selshipmentdate,
+                packinglistid: _custpackingdetailController.text,
+                remarks: _custRemarksController.text,
+                termsandconditions: _custtermsandconditionsController.text)
+            : purchaseorderdetl.PurchaseOrderHeader(
+                purchaseorderfabricdetail: fabricdetail,
+                headerid: "0",
+                pono: _custPONoController.text,
+                podate: seldate,
+                producttype: selectedprodtype,
+                consigneeid: _custconsigneeAddressController.text,
+                supplierid: supplierid,
+                currencyid: currencyid,
+                noofcontainers: _custnoofcontainerController.text,
+                paymentterms: _custpaymenttermsController.text,
+                shipmentmodeid: shipmentmodeid,
+                portofloadingid: portofloadid,
+                shipmentdate: selshipmentdate,
+                packinglistid: _custpackingdetailController.text,
+                remarks: _custRemarksController.text,
+                termsandconditions: _custtermsandconditionsController.text);
+    final String requestBody = json.encoder.convert(purchaseorderList);
     final http.Response response = await http.post(
       'http://tap.suninfotechnologies.in/api/Touchpo',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, dynamic>{
+      body: // requestBody
+          jsonEncode(<String, dynamic>{
         "spname": "GetAndSubmitPODetails",
         "Mode": "PO",
         "intFlag": "1",
         "intHeaderID": "0",
-        "strPoNo": '"' + _custPONoController.text + '"',
-        "dtPoDate": '"' + seldate + '"',
-        "strProductType": '"' + prodtypeid + '"',
+        "strPoNo": "1",
+        "dtPoDate": "2020/12/20",
+        "strProductType": "1",
         "intConsigneeID": "1",
-        "intSupplierID": '"' + supplierid + '"',
-        "intCurrencyID": '"' + currencyid + '"',
-        "intNoofContainers": '"' + _custnoofcontainerController.text + '"',
-        "strPaymentTerms": '"' + _custpaymenttermsController.text + '"',
-        "intShipmenModeID": '"' + shipmentmodeid + '"',
-        "intPortofLoadingID": '"' + portofloadid + '"',
-        "intShipmentDate": '"' + selshipmentdate + '"',
+        "intSupplierID": "1",
+        "intCurrencyID": "1",
+        "intNoofContainers": "1",
+        "strPaymentTerms": "1",
+        "intShipmenModeID": "1",
+        "intPortofLoadingID": "1",
+        "intShipmentDate": "1",
         "intPackingDetailsID": "1",
-        "strRemarks": '"' + _custremarksController.text + '"',
-        "strTermsConditions1":
-            '"' + _custtermsandconditionsController.text + '"',
+        "strRemarks": "1",
+        "strTermsConditions1": "1",
         "strTermsConditions2": "1",
         "strTermsConditions3": "1",
         "strTermsConditions4": "1",
@@ -3007,42 +3081,62 @@ class HomePageState extends State<HomePage> {
         "strTermsConditions7": "1",
         "strTermsConditions8": "1",
         "intUserID": "1",
-        "yarn": [
+        "fabric": [
           {
-            "Mode": "yarn",
-            "spname": "GetAndSubmitPOYarnDetail",
+            "Mode": "fabric",
+            "spname": "GetAndSubmitPOFabricDetails",
             "intFlag": "1",
-            "PurchaseOrdeYarnrDetailID": "1",
-            "intHeaderID": "0",
-            "intYarnCountID": "12",
-            "intYarnMillID": "23",
-            "intYarnColorID": "16",
-            "intNoofBox": "2",
-            "intWeight": "4",
-            "intRate": "4",
-            "intAmount": "6",
+            "intPurchaseOrdeFabricrDetailID": "1",
+            "intHeaderID": "1",
+            "intFabricTypeID": "12",
+            "strSortNumber": "23",
+            "intFabricID": "16",
+            "intCompositionID": "2",
+            "intColorID": "4",
+            "intGsm": "4",
+            "intDiaID": "6",
+            "intFabricKnitTypeID": "200",
+            "intUomID": "200",
+            "intNoofBox": "200",
+            "intKgsperbox": "200",
+            "intWeight": "200",
+            "intRate": "200",
+            "intAmount": "200",
+            "strRemarks": "200",
             "intUserID": "200"
           },
           {
-            "Mode": "yarn",
-            "spname": "GetAndSubmitPOYarnDetail",
+            "Mode": "fabric",
+            "spname": "GetAndSubmitPOFabricDetails",
             "intFlag": "1",
-            "PurchaseOrdeYarnrDetailID": "1",
+            "intPurchaseOrdeFabricrDetailID": "1",
             "intHeaderID": "1",
-            "intYarnCountID": "12",
-            "intYarnMillID": "23",
-            "intYarnColorID": "16",
-            "intNoofBox": "2",
-            "intWeight": "4",
-            "intRate": "4",
-            "intAmount": "6",
-            "intUserID": "200"
+            "intFabricTypeID": "12",
+            "strSortNumber": "23",
+            "intFabricID": "16",
+            "intCompositionID": "2",
+            "intColorID": "4",
+            "intGsm": "4",
+            "intDiaID": "6",
+            "intFabricKnitTypeID": "200",
+            "intUomID": "200",
+            "intNoofBox": "200",
+            "intKgsperbox": "200",
+            "intWeight": "200",
+            "intRate": "200",
+            "intAmount": "200",
+            "strRemarks": "200",
+            "intUserID": "453"
           }
         ]
       }),
     );
 
     if (response.statusCode == 200) {
+      setState(() {
+        clearData(context);
+        enable = false;
+      });
       Alert(
           context: context,
           title: "Done!",
@@ -3065,90 +3159,15 @@ class HomePageState extends State<HomePage> {
     } else {
       throw Exception('Failed to create album.');
     }
-    String custId = _custIdController.text;
-    String custName = _custPONoController.text;
-    String custMobile = _custMobileController.text;
-    String custGstin = _custGstinController.text;
-    String custAdd1 = _custDateController.text;
-    String custAdd2 = _custNotifypartyController.text;
-    String custAdd3 = _custAdd3Controller.text;
-    String custAdd4 = _custAdd4Controller.text;
-    String custemail = _custEmailController.text;
-    if (custId != '' && custName != '') {
-      try {
-        Stream<String> stream = await insertCustomer(1, "", "", "", "", "", "",
-            "", "", "1", "", "", "", "", "", "", "", "", "");
-        stream.listen((String message) {
-          if (message.contains("""[{"RESULT":1}]""") ||
-              message.contains("""[{"RESULT":2}]""")) {
-            setState(() {
-              ShowAddWidget = false;
-            });
-            Alert(
-                context: context,
-                title: "Done!",
-                desc: "Data saved successfully",
-                type: AlertType.success,
-                style: AlertStyle(isCloseButton: false),
-                buttons: [
-                  DialogButton(
-                    child: Text(
-                      "Close",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    onPressed: () {
-                      // clearData(context);
-                      //    pr.dismiss();
-                      Navigator.of(context, rootNavigator: true).pop();
-                      getCustomerJson();
-                      clearData(context);
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) =>
-                      //             HomePage(custselectedtype, custpageno)));
-
-                      //    pr.dismiss();
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) => HomePage()));
-                      // // pr.dismiss();
-//pr.hide();
-                    },
-                    width: 120,
-                  )
-                ]).show();
-          } else {
-            setState(() {
-              ShowAddWidget = false;
-            });
-            Alert(
-                    context: context,
-                    type: AlertType.error,
-                    title: "Error",
-                    desc: "Error during the Save. Please try again.",
-                    style: AlertStyle(isCloseButton: false))
-                .show();
-          }
-        });
-      } on Exception catch (_) {}
-    } else {
-      setState(() {
-        ShowAddWidget = true;
-      });
-      Alert(
-              context: context,
-              type: AlertType.error,
-              title: "Error",
-              desc: "Enter Customer ID and Name",
-              style: AlertStyle(isCloseButton: false))
-          .show();
-    }
   }
 
   void clearData(context) {
     _custIdController.text = '0';
     _custPONoController.text = '';
     _custDateController.text = '';
+    //_cust
+    shipmentdateCtl.text = '';
+    dateCtl.text = '';
     _custNotifypartyController.text = '';
     _custAdd3Controller.text = '';
     _custAdd4Controller.text = '';
@@ -3156,17 +3175,6 @@ class HomePageState extends State<HomePage> {
     _custGstinController.text = '';
     _custMobileController.text = '';
     _custRemarksController.text = '';
-
-    _custPONoController.text = '';
-    _custIdController.text = '';
-    _custMobileController.text = '';
-    _custRemarksController.text = '';
-    _custDateController.text = '';
-    _custNotifypartyController.text = '';
-    _custAdd3Controller.text = '';
-    _custAdd4Controller.text = '';
-    _custEmailController.text = '';
-    _custGstinController.text = '';
     _custgsmController.text = '';
     _custnoofboxController.text = '';
     _custkgsperboxController.text = '';
@@ -3179,14 +3187,21 @@ class HomePageState extends State<HomePage> {
     _custpackingdetailController.text = '';
     _custpaymenttermsController.text = '';
     _custremarksController.text = '';
+    colorid = '0';
+    yarncountid = '0';
+    yarnmillid = '0';
+    yarntypeid = '0';
 
     _id = '0';
   }
 
-  purchaseorderdetl.PurchaseOrder Getitemdetails() {
-    purchaseorderdetl.PurchaseOrder _data;
-    selamount = _custamountController.text;
+  purchaseorderdetl.PurchaseOrderDetails getitemdetails() {
+    purchaseorderdetl.PurchaseOrderDetails _data;
 
+    selamount = _custamountController.text;
+    if (_id != "" && _id != null) {
+      if (selectedprodtype.toString().toLowerCase() == 'yarn') {}
+    }
     if (selamount != '' &&
         selamount != null &&
         (selectedprodtype.toString().toLowerCase() == 'fabric' ||
@@ -3298,14 +3313,15 @@ class HomePageState extends State<HomePage> {
           '}]');
       final parsed = convertDataToJson.cast<Map<String, dynamic>>();
       _data = parsed
-          .map<purchaseorderdetl.PurchaseOrder>(
-              (json) => purchaseorderdetl.PurchaseOrder.fromJSON(json))
+          .map<purchaseorderdetl.PurchaseOrderDetails>(
+              (json) => purchaseorderdetl.PurchaseOrderDetails.fromJSON(json))
           .first;
     }
     return _data;
   }
 
-  List<customer.Customer> data = new List<customer.Customer>();
+  List<purchaseorderdetl.PurchaseOrderHeader> data =
+      new List<purchaseorderdetl.PurchaseOrderHeader>();
 
   Future<List<type.Customer>> getcompanyMaster(String filter) async {
     setState(() {
@@ -4065,49 +4081,52 @@ class HomePageState extends State<HomePage> {
     return prodtypedetails;
   }
 
-  Future<customer.Customer> getAddCustomerJson() async {
+  Future<purchaseorderdetl.PurchaseOrderHeader> getAddCustomerJson() async {
     String customerurl;
-
-    if (searchtext == '' || searchtext == null) {
-      customerurl =
-          'http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=4&pagesize=' +
-              custselectedtype +
-              '&pagenumber=' +
-              custpageno.toString();
-    } else {
-      customerurl =
-          'http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=4&pagesize=' +
-              custselectedtype +
-              '&pagenumber=' +
-              custpageno.toString() +
-              '&strPartyname=' +
-              searchtext;
-    }
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    List<customer.Customer> customer1 = new List<customer.Customer>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    customer1 = parsed
-        .map<customer.Customer>((json) => customer.Customer.fromJSON(json))
-        .toList();
-    data = customer1;
     if (_id != "" && _id != "" && _id != null)
-      customer1
-          .where((element) => element.custId == _id)
+      _reportItems
+          .where((element) => element.headerid == _id)
           .forEach((element) => setState(() {
-                _custDateController.text = element.add1;
-                _custNotifypartyController.text = element.add2;
-                _custAdd3Controller.text = element.add3;
-                _custAdd4Controller.text = element.add4;
-                compid = element.partytypeMasterID;
-                selectedcompany = element.partytype;
-                _custEmailController.text = element.email;
-                _custMobileController.text = element.mobile;
-                _custGstinController.text = element.gstin;
-                _custPONoController.text = element.customerName;
+                dateCtl.text = element.podate;
+                shipmentdateCtl.text = element.shipmentdate;
+                selectednotifyparty = element.notifyparty;
+                notifypartyid = element.notifypartyid;
+                _custPONoController.text = element
+                    .pono; //_custpackingdetailController.text = element.packing
+                selectedprodtype = element.producttype;
+                prodtypeid = element.producttype;
+                _custconsigneeAddressController.text = element.consignee;
+                selectedsupplier = element.supplier;
+                supplierid = element.supplierid;
+                selectedcurrency = element.currency;
+                currencyid = element.currencyid;
+                _custnoofcontainerController.text = element.noofcontainers;
+                _custpaymenttermsController.text = element.paymentterms;
+                selectedportofdischarge = portofdischargedetails
+                    .where(
+                        (e1) => e1.columnMasterid == element.portofdischargeid)
+                    .map((e) => e.columnname)
+                    .first
+                    .toString();
+                selectedportofload = portofloaddetails
+                    .where((e1) => e1.columnMasterid == element.portofloadingid)
+                    .map((e) => e.columnname)
+                    .first
+                    .toString();
+                selectedshipmentmode = shipmentmodedetails
+                    .where((e1) => e1.columnMasterid == element.shipmentmodeid)
+                    .map((e) => e.columnname)
+                    .first
+                    .toString();
+                shipmentmodeid = element.shipmentdate;
+                portofloadid = element.portofloadingid;
+                portofdischargeid = element.portofdischargeid;
+                //selectedshipmentmode = element.shipmentmodeid;
+                selshipmentdate = element.shipmentdate;
+                _custpackingdetailController.text = element.packinglistid;
+                _custremarksController.text = element.remarks;
+                _custtermsandconditionsController.text =
+                    element.termsandconditions;
               }));
   }
 
@@ -4442,7 +4461,9 @@ class HomePageState extends State<HomePage> {
                 custpageno = pageno;
                 custselectedtype = selectedtype;
                 getAddCustomerJson();
+
                 getcompanyMaster('');
+                clearData(context);
                 //setState(() {
                 //   getCustomerJson();
                 if ((_id != "") && (_id != null) && (_id != "0"))
@@ -4523,14 +4544,13 @@ class HomePageState extends State<HomePage> {
     if (this.mounted) {
       setState(() {
         _reportItems = [];
-
         totalPages = null;
       });
       String customerurl;
 
       if (searchtext == null || searchtext == '') {
         customerurl =
-            "https://cors-anywhere.herokuapp.com/http://posmmapi.suninfotechnologies.in/api/partymaster?&intflag=4&pagesize=" +
+            "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&Mode=PO&spname=GetAndSubmitPODetails&intflag=3&pagesize=" +
                 (selectedtype).toString() +
                 "&pagenumber=" +
                 ((pageno.toString() != 'null' &&
@@ -4574,8 +4594,10 @@ class HomePageState extends State<HomePage> {
 
       convertDataToJson = json.decode(response.body);
       final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-      _reportItems =
-          parsed.map<Customer>((json) => Customer.fromJSON(json)).toList();
+      _reportItems = parsed
+          .map<purchaseorderdetl.PurchaseOrderHeader>(
+              (json) => purchaseorderdetl.PurchaseOrderHeader.fromJSON(json))
+          .toList();
 
       data = _reportItems;
     }
@@ -4611,10 +4633,11 @@ class HomePageState extends State<HomePage> {
                           Expanded(
                             //width: maxwidth * .20,
                             child: Text(
-                              _reportItems[index]
-                                  .partytype
-                                  .toLowerCase()
-                                  .toString(),
+                              ' ' +
+                                  _reportItems[index]
+                                      .pono
+                                      .toLowerCase()
+                                      .toString(),
                               textScaleFactor: 1.2,
                               textAlign: TextAlign.left,
                             ),
@@ -4626,9 +4649,10 @@ class HomePageState extends State<HomePage> {
                             //width: maxwidth * .20,
                             child: Text(
                               _reportItems[index]
-                                  .customerName
+                                  .podate
                                   .toLowerCase()
-                                  .toString(),
+                                  .toString()
+                                  .substring(0, 10),
                               textScaleFactor: 1.2,
                               textAlign: TextAlign.left,
                             ),
@@ -4644,7 +4668,7 @@ class HomePageState extends State<HomePage> {
                               onPressed: () {
                                 setState(() {
                                   ShowAddWidget = true;
-                                  String id = _reportItems[index].custId;
+                                  String id = _reportItems[index].headerid;
                                   _id = id;
                                   custselectedtype = selectedtype;
                                   custpageno = pageno;
@@ -4681,7 +4705,7 @@ class HomePageState extends State<HomePage> {
                               icon: Image.asset('Images/delete.png',
                                   color: widgetcolor),
                               onPressed: () async {
-                                String id = _reportItems[index].custId;
+                                String id = _reportItems[index].headerid;
 
                                 _id = id;
 
@@ -4823,37 +4847,5 @@ class HomePageState extends State<HomePage> {
       // return null;
     }
     return widgets;
-  }
-
-  List<Widget> generateTables() {
-    List<Widget> widgets = <Widget>[];
-    widgets.add(ListView.builder(
-        itemCount: _reportItems.length,
-        itemBuilder: (BuildContext ctxt, int index) {
-          return Expanded(
-            child: Text(
-              _reportItems[index].customerName.toString(),
-              textScaleFactor: 1.6,
-              textAlign: TextAlign.right,
-            ),
-          );
-        }));
-
-    //widgets.add(SizedBox(height: 2.0));
-    return widgets;
-  }
-
-  Widget generateChildTable() {
-    return ListView.builder(
-        itemCount: _reportItems.length,
-        itemBuilder: (BuildContext ctxt, int index) {
-          return Expanded(
-            child: Text(
-              _reportItems[index].customerName.toString(),
-              textScaleFactor: 1.6,
-              textAlign: TextAlign.right,
-            ),
-          );
-        });
   }
 }

@@ -353,196 +353,219 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                       ),
                                       iconColor: appbarcolor,
                                       children: <Widget>[
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Product Type",
-                                              tablename: "producttypemaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Product Type"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Product Type",
+                                                tablename: "producttypemaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Product Type"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          //   contentPadding: EdgeInsets.all(2),
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Currency",
-                                              tablename: "currencymaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Currency"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            //   contentPadding: EdgeInsets.all(2),
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Currency",
+                                                tablename: "currencymaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Currency"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Port of Discharge",
-                                              tablename:
-                                                  "portofdischargemaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Port of Discharge"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Port of Discharge",
+                                                tablename:
+                                                    "portofdischargemaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Port of Discharge"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Port of Loading",
-                                              tablename: "portofloadingmaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Port of Loading"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Port of Loading",
+                                                tablename:
+                                                    "portofloadingmaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Port of Loading"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Shipment",
-                                              tablename: "shipmentmodemaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Shipment"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Shipment",
+                                                tablename: "shipmentmodemaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Shipment"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Color",
-                                              tablename: "colormaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Color"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Color",
+                                                tablename: "colormaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Color"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Uom.HomePage ad = new Uom.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Uom.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Uom"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Uom.HomePage ad =
+                                                  new Uom.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Uom.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Uom"),
+                                          ),
                                         ),
                                       ]),
                                   custom.ExpansionTile(
@@ -628,85 +651,94 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Fabric Type",
-                                              tablename: "fabrictypemaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Fabric Type"),
+                                        Container(
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Fabric Type",
+                                                tablename: "fabrictypemaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Fabric Type"),
+                                          ),
+                                          padding: EdgeInsets.only(bottom: 5),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Fabric Name",
-                                              tablename: "fabricnamemaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Fabric Name"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Fabric Name",
+                                                tablename: "fabricnamemaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Fabric Name"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Fabric Dia",
-                                              tablename: "fabricdiamaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Fabric Dia"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Fabric Dia",
+                                                tablename: "fabricdiamaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Fabric Dia"),
+                                          ),
                                         ),
                                       ]),
                                   custom.ExpansionTile(
@@ -723,97 +755,106 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                       ),
                                       iconColor: appbarcolor,
                                       children: <Widget>[
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Yarn Count",
-                                              tablename: "yarncountmaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                          headername:
-                                                              "Yarn Count",
-                                                          tablename:
-                                                              "yarncountmaster",
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Counts"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Yarn Count",
+                                                tablename: "yarncountmaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                            headername:
+                                                                "Yarn Count",
+                                                            tablename:
+                                                                "yarncountmaster",
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Counts"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Yarn Type",
-                                              tablename: "yarntypemaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                          headername:
-                                                              "Yarn Type",
-                                                          tablename:
-                                                              "yarntypemaster",
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Yarn Type"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Yarn Type",
+                                                tablename: "yarntypemaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                            headername:
+                                                                "Yarn Type",
+                                                            tablename:
+                                                                "yarntypemaster",
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Yarn Type"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Master.HomePage ad =
-                                                new Master.HomePage(
-                                              selectedType: "10",
-                                              pageNo: 1,
-                                              headername: "Yarn Mill",
-                                              tablename: "yarnmillmaster",
-                                            );
-                                            ad.custid;
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Master.HomePage(
-                                                          selectedType: "10",
-                                                          pageNo: 1,
-                                                          headername:
-                                                              "Yarn Mill",
-                                                          tablename:
-                                                              "yarnmillmaster",
-                                                        )));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Yarn Mill"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Yarn Mill",
+                                                tablename: "yarnmillmaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Master.HomePage(
+                                                            selectedType: "10",
+                                                            pageNo: 1,
+                                                            headername:
+                                                                "Yarn Mill",
+                                                            tablename:
+                                                                "yarnmillmaster",
+                                                          )));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Yarn Mill"),
+                                          ),
                                         ),
                                       ]),
                                   custom.ExpansionTile(
@@ -830,37 +871,43 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                       ),
                                       iconColor: appbarcolor,
                                       children: <Widget>[
-                                        ListTile(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        supplier.HomePage(
-                                                            "10", 1)));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Supplier"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          supplier.HomePage(
+                                                              "10", 1)));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Supplier"),
+                                          ),
                                         ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
                                         ),
-                                        ListTile(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        customer.HomePage(
-                                                            "10", 1)));
-                                          },
-                                          // leading: Image.asset(
-                                          //   'images/people.png',
-                                          // ),
-                                          title: Text("Customer"),
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          customer.HomePage(
+                                                              "10", 1)));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("Customer"),
+                                          ),
                                         ),
                                       ]),
                                   // Divider(
@@ -975,28 +1022,31 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                 title: Text("Transaction"),
                               ),
                               children: [
-                                ListTile(
-                                  onTap: () {
-                                    PurchaseOrder.HomePage ad =
-                                        new PurchaseOrder.HomePage(
-                                      selectedType: "10",
-                                      pageNo: 1,
-                                    );
-                                    ad.custid;
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 5),
+                                  child: ListTile(
+                                    onTap: () {
+                                      PurchaseOrder.HomePage ad =
+                                          new PurchaseOrder.HomePage(
+                                        selectedType: "10",
+                                        pageNo: 1,
+                                      );
+                                      ad.custid;
 
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PurchaseOrder.HomePage(
-                                                  selectedType: "10",
-                                                  pageNo: 1,
-                                                )));
-                                  },
-                                  // leading: Image.asset(
-                                  //   'images/people.png',
-                                  // ),
-                                  title: Text("Purchase Order"),
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PurchaseOrder.HomePage(
+                                                    selectedType: "10",
+                                                    pageNo: 1,
+                                                  )));
+                                    },
+                                    // leading: Image.asset(
+                                    //   'images/people.png',
+                                    // ),
+                                    title: Text("Purchase Order"),
+                                  ),
                                 ),
                               ],
                             ),
