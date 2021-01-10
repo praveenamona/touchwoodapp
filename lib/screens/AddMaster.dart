@@ -157,10 +157,10 @@ class HomePageState extends State<HomePage> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: <Widget>[
-                                          Text(
-                                            "Enter " + headerName + " Details",
-                                            style: TextStyle(fontSize: 16),
-                                          ),
+                                          // Text(
+                                          //   "Enter " + headerName + " Details",
+                                          //   style: TextStyle(fontSize: 16),
+                                          // ),
                                           SizedBox(
                                             height: 10,
                                           ),
@@ -181,7 +181,7 @@ class HomePageState extends State<HomePage> {
                                             //   focusNode: _nameFocus,
                                             child: TextField(
                                               focusNode: _nameFocus,
-                                              decoration: const InputDecoration(
+                                              decoration: InputDecoration(
                                                   focusedBorder:
                                                       UnderlineInputBorder(
                                                     borderSide: BorderSide(
@@ -189,7 +189,7 @@ class HomePageState extends State<HomePage> {
                                                   ),
                                                   border: InputBorder.none,
                                                   //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                  labelText: "Name",
+                                                  labelText: headerName,
                                                   labelStyle: TextStyle(
                                                       fontSize: 20.0)),
                                               keyboardType: TextInputType.text,
