@@ -32,6 +32,13 @@ class PurchaseOrderHeader {
   String packinglistid;
   String remarks;
   String termsandconditions;
+  String termsandconditions2;
+  String termsandconditions3;
+  String termsandconditions4;
+  String termsandconditions5;
+  String termsandconditions6;
+  String termsandconditions7;
+  String termsandconditions8;
   String userid;
   String notifypartyid;
   String notifyparty;
@@ -64,7 +71,14 @@ class PurchaseOrderHeader {
         shipmentdate = jsonMap['ShipmentDate'].toString(),
         packinglistid = jsonMap['PackingDetailsID'].toString(),
         remarks = jsonMap['Remarks'].toString(),
-        termsandconditions = jsonMap['TermsConditions1'].toString();
+        termsandconditions = jsonMap['TermsConditions1'].toString(),
+        termsandconditions2 = jsonMap['TermsConditions2'].toString(),
+        termsandconditions3 = jsonMap['TermsConditions3'].toString(),
+        termsandconditions4 = jsonMap['TermsConditions4'].toString(),
+        termsandconditions5 = jsonMap['TermsConditions5'].toString(),
+        termsandconditions6 = jsonMap['TermsConditions6'].toString(),
+        termsandconditions7 = jsonMap['TermsConditions7'].toString(),
+        termsandconditions8 = jsonMap['TermsConditions8'].toString();
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'spname': 'GetAndSubmitPODetails',
@@ -85,13 +99,13 @@ class PurchaseOrderHeader {
         'intPackingDetailsID': packinglistid,
         'strRemarks': "remarks",
         'strTermsConditions1': termsandconditions,
-        'strTermsConditions2': '1',
-        'strTermsConditions3': '1',
-        'strTermsConditions4': '1',
-        'strTermsConditions5': '1',
-        'strTermsConditions6': '1',
-        'strTermsConditions7': '1',
-        'strTermsConditions8': '1',
+        'strTermsConditions2': termsandconditions2,
+        'strTermsConditions3': termsandconditions3,
+        'strTermsConditions4': termsandconditions4,
+        'strTermsConditions5': termsandconditions5,
+        'strTermsConditions6': termsandconditions6,
+        'strTermsConditions7': termsandconditions7,
+        'strTermsConditions8': termsandconditions8,
         'intUserID': '1',
         'yarn': purchaseorderdetail,
         'fabric': purchaseorderfabricdetail

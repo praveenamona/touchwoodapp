@@ -112,6 +112,7 @@ List<master.Master> fabricknittypedetails = <master.Master>[];
 List<purchaseorderdetl.PurchaseOrderDetails> details =
     <purchaseorderdetl.PurchaseOrderDetails>[];
 List<purchaseorderdetl.PurchaseOrderDetails> _itemdetails = [];
+purchaseorderdetl.PurchaseOrderDetails _previousitem;
 List<master.Master> colordetails = <master.Master>[];
 List<master.Master> diadetails = <master.Master>[];
 List<uom.Uom> uomdetails = <uom.Uom>[];
@@ -159,6 +160,13 @@ final _custweightController = TextEditingController();
 final _custrateController = TextEditingController();
 final _custamountController = TextEditingController();
 final _custtermsandconditionsController = TextEditingController();
+final _custtermsandconditionsController2 = TextEditingController();
+final _custtermsandconditionsController3 = TextEditingController();
+final _custtermsandconditionsController4 = TextEditingController();
+final _custtermsandconditionsController5 = TextEditingController();
+final _custtermsandconditionsController6 = TextEditingController();
+final _custtermsandconditionsController7 = TextEditingController();
+final _custtermsandconditionsController8 = TextEditingController();
 final _custnoofcontainerController = TextEditingController();
 final _custpackingdetailController = TextEditingController();
 final _custpaymenttermsController = TextEditingController();
@@ -346,124 +354,7 @@ class HomePageState extends State<HomePage> {
       elevation: 0,
       backgroundColor: Colors.transparent,
       child: Row(children: [
-        if (fabricdata != null && fabricdata.isNotEmpty)
-          Container(
-            constraints: BoxConstraints(
-              minWidth: 100,
-              maxWidth: 150,
-            ),
-            //padding: EdgeInsets.,
-            width: maxwidth * .7, //* 0.50,
-            child: DropdownSearch<String>(
-              dropDownButton: Image.asset('Images/arrow_drop_down.png',
-                  color: Colors.white),
-              validator: (v) => v == null ? "required field" : null,
-              hint: "Select a Fabric",
-              mode: Mode.MENU,
-              enabled: (_id != null && _id != '' && _id != '0') ? false : true,
-              showSelectedItem: true,
-              showSearchBox: true,
-              items: fabricdata,
-              label: "Fabric *",
-              showClearButton: false,
-              onChanged: (val) {
-                setState(() {
-                  selectedfabric = val;
-
-                  fabricid = fabricdetails
-                      .where((element) => element.columnname == val)
-                      .map((e) => e.columnMasterid)
-                      .first
-                      .toString();
-                });
-              },
-              popupItemDisabled: (String s) => s.startsWith('I'),
-              selectedItem: selectedfabric,
-            ),
-          ),
-        SizedBox(width: 10),
-        if (fabrictypedata != null && fabrictypedata.isNotEmpty)
-          Container(
-            constraints: BoxConstraints(
-              minWidth: 100,
-              maxWidth: 150,
-            ),
-            //padding: EdgeInsets.,
-            width: maxwidth * .7, //* 0.50,
-            child: DropdownSearch<String>(
-              dropDownButton: Image.asset('Images/arrow_drop_down.png',
-                  color: Colors.white),
-              validator: (v) => v == null ? "required field" : null,
-              hint: "Select a Fabric type",
-              mode: Mode.MENU,
-              enabled: (_id != null && _id != '' && _id != '0') ? false : true,
-              showSelectedItem: true,
-              showSearchBox: true,
-              items: fabrictypedata,
-              label: "Fabric Type*",
-              showClearButton: false,
-              onChanged: (val) {
-                setState(() {
-                  selectedfabtype = val;
-                  fabtypeid = fabrictypetypedetails
-                      .where((element) => element.columnname == val)
-                      .map((e) => e.columnMasterid)
-                      .first
-                      .toString();
-                });
-              },
-              popupItemDisabled: (String s) => s.startsWith('I'),
-              selectedItem: selectedfabtype,
-            ),
-          ),
-        SizedBox(width: 10),
-        if (fabricknitdata != null && fabricknitdata.isNotEmpty)
-          Container(
-            constraints: BoxConstraints(
-              minWidth: 100,
-              maxWidth: 150,
-            ),
-            //padding: EdgeInsets.,
-            width: maxwidth * .7, //* 0.50,
-            child: DropdownSearch<String>(
-              dropDownButton: Image.asset('Images/arrow_drop_down.png',
-                  color: Colors.white),
-              validator: (v) => v == null ? "required field" : null,
-              hint: "Select a Fabric Knit type",
-              mode: Mode.MENU,
-              enabled: (_id != null && _id != '' && _id != '0') ? false : true,
-              showSelectedItem: true,
-              showSearchBox: true,
-              items: fabricknitdata,
-              label: "Fabric Knit Type *",
-              showClearButton: false,
-              onChanged: (val) {
-                setState(() {
-                  selectedfabknittype = val;
-
-                  fabknittypeid = fabricknittypedetails
-                      .where((element) => element.columnname == val)
-                      .map((e) => e.columnMasterid)
-                      .first
-                      .toString();
-                });
-              },
-              popupItemDisabled: (String s) => s.startsWith('I'),
-              selectedItem: selectedfabknittype,
-            ),
-          ),
-      ]),
-    );
-  }
-
-  List<Widget> addfabricwid() {
-    List<Widget> widgs = [];
-    //  return Row(
-    //  children: [
-    //Text('')
-    // if (selectedprodtype.toLowerCase() == 'fabric'.toLowerCase())
-    if (fabricdata != null && fabricdata.isNotEmpty)
-      widgs.add(
+        //  if (fabricdata != null && fabricdata.isNotEmpty)
         Container(
           constraints: BoxConstraints(
             minWidth: 100,
@@ -498,11 +389,8 @@ class HomePageState extends State<HomePage> {
             selectedItem: selectedfabric,
           ),
         ),
-        // SizedBox(width: 10),
-      );
-    widgs.add(SizedBox(width: 10));
-    if (fabrictypedata != null && fabrictypedata.isNotEmpty)
-      widgs.add(
+        SizedBox(width: 10),
+        //if (fabrictypedata != null && fabrictypedata.isNotEmpty)
         Container(
           constraints: BoxConstraints(
             minWidth: 100,
@@ -525,7 +413,6 @@ class HomePageState extends State<HomePage> {
             onChanged: (val) {
               setState(() {
                 selectedfabtype = val;
-
                 fabtypeid = fabrictypetypedetails
                     .where((element) => element.columnname == val)
                     .map((e) => e.columnMasterid)
@@ -537,10 +424,8 @@ class HomePageState extends State<HomePage> {
             selectedItem: selectedfabtype,
           ),
         ),
-      );
-    widgs.add(SizedBox(width: 10));
-    if (fabricknitdata != null && fabricknitdata.isNotEmpty)
-      widgs.add(
+        SizedBox(width: 10),
+        // if (fabricknitdata != null && fabricknitdata.isNotEmpty)
         Container(
           constraints: BoxConstraints(
             minWidth: 100,
@@ -575,7 +460,130 @@ class HomePageState extends State<HomePage> {
             selectedItem: selectedfabknittype,
           ),
         ),
-      );
+      ]),
+    );
+  }
+
+  List<Widget> addfabricwid() {
+    List<Widget> widgs = [];
+    //  return Row(
+    //  children: [
+    //Text('')
+    // if (selectedprodtype.toLowerCase() == 'fabric'.toLowerCase())
+    //if (fabricdata != null && fabricdata.isNotEmpty)
+    widgs.add(
+      Container(
+        constraints: BoxConstraints(
+          minWidth: 100,
+          maxWidth: 150,
+        ),
+        //padding: EdgeInsets.,
+        width: maxwidth * .7, //* 0.50,
+        child: DropdownSearch<String>(
+          dropDownButton:
+              Image.asset('Images/arrow_drop_down.png', color: Colors.white),
+          validator: (v) => v == null ? "required field" : null,
+          hint: "Select a Fabric",
+          mode: Mode.MENU,
+          enabled: (_id != null && _id != '' && _id != '0') ? false : true,
+          showSelectedItem: true,
+          showSearchBox: true,
+          items: fabricdata,
+          label: "Fabric *",
+          showClearButton: false,
+          onChanged: (val) {
+            setState(() {
+              selectedfabric = val;
+
+              fabricid = fabricdetails
+                  .where((element) => element.columnname == val)
+                  .map((e) => e.columnMasterid)
+                  .first
+                  .toString();
+            });
+          },
+          popupItemDisabled: (String s) => s.startsWith('I'),
+          selectedItem: selectedfabric,
+        ),
+      ),
+      // SizedBox(width: 10),
+    );
+    widgs.add(SizedBox(width: 10));
+    //if (fabrictypedata != null && fabrictypedata.isNotEmpty)
+    widgs.add(
+      Container(
+        constraints: BoxConstraints(
+          minWidth: 100,
+          maxWidth: 150,
+        ),
+        //padding: EdgeInsets.,
+        width: maxwidth * .7, //* 0.50,
+        child: DropdownSearch<String>(
+          dropDownButton:
+              Image.asset('Images/arrow_drop_down.png', color: Colors.white),
+          validator: (v) => v == null ? "required field" : null,
+          hint: "Select a Fabric type",
+          mode: Mode.MENU,
+          enabled: (_id != null && _id != '' && _id != '0') ? false : true,
+          showSelectedItem: true,
+          showSearchBox: true,
+          items: fabrictypedata,
+          label: "Fabric Type*",
+          showClearButton: false,
+          onChanged: (val) {
+            setState(() {
+              selectedfabtype = val;
+
+              fabtypeid = fabrictypetypedetails
+                  .where((element) => element.columnname == val)
+                  .map((e) => e.columnMasterid)
+                  .first
+                  .toString();
+            });
+          },
+          popupItemDisabled: (String s) => s.startsWith('I'),
+          selectedItem: selectedfabtype,
+        ),
+      ),
+    );
+    widgs.add(SizedBox(width: 10));
+    //  if (fabricknitdata != null && fabricknitdata.isNotEmpty)
+    widgs.add(
+      Container(
+        constraints: BoxConstraints(
+          minWidth: 100,
+          maxWidth: 150,
+        ),
+        //padding: EdgeInsets.,
+        width: maxwidth * .7, //* 0.50,
+        child: DropdownSearch<String>(
+          dropDownButton:
+              Image.asset('Images/arrow_drop_down.png', color: Colors.white),
+          validator: (v) => v == null ? "required field" : null,
+          hint: "Select a Fabric Knit type",
+          mode: Mode.MENU,
+          enabled: (_id != null && _id != '' && _id != '0') ? false : true,
+          showSelectedItem: true,
+          showSearchBox: true,
+          items: fabricknitdata,
+          label: "Fabric Knit Type *",
+          showClearButton: false,
+          onChanged: (val) {
+            setState(() {
+              selectedfabknittype = val;
+
+              fabknittypeid = fabricknittypedetails
+                  .where((element) => element.columnname == val)
+                  .map((e) => e.columnMasterid)
+                  .first
+                  .toString();
+            });
+          },
+          popupItemDisabled: (String s) => s.startsWith('I'),
+          selectedItem: selectedfabknittype,
+        ),
+      ),
+    );
 
     return widgs; //    ],
     //  );
@@ -597,313 +605,6 @@ class HomePageState extends State<HomePage> {
       });
   }
 
-  Widget listtableView1(double maxwidth, double maxheight) {
-    return new Container(
-      color: bodycolor,
-      child: Container(
-        //color: Colors.white,
-        width: maxwidth, // * .40,
-        height: maxheight * .15,
-        padding: EdgeInsets.all(5),
-
-        child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: ListView(children: <Widget>[
-                Card(
-                    child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Expanded(
-                          child: Text("headerName",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.left,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                        Spacer(),
-                        Expanded(
-                          child: Text("Action",
-                              textScaleFactor: 1.7,
-                              textAlign: TextAlign.right,
-                              style: new TextStyle(
-                                color: widgetcolor,
-                              )),
-                        ),
-                      ]),
-                )),
-                //  ),
-                Container(
-                    width: maxwidth,
-                    //height: maxheight,
-                    //padding: EdgeInsets.all(5)
-                    child: SizedBox(
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          itemCount: _itemdetails.length,
-                          itemBuilder: (BuildContext ctxt, int index) {
-                            return Container(
-                              width: maxwidth,
-                              height: 50,
-                              child: Card(
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '  ' +
-                                            (fabricdetails
-                                                    .where((element) =>
-                                                        element
-                                                            .columnMasterid ==
-                                                        _itemdetails[index]
-                                                            .fabricid)
-                                                    .isNotEmpty
-                                                ? fabricdetails
-                                                    .where((element) =>
-                                                        element
-                                                            .columnMasterid ==
-                                                        _itemdetails[index]
-                                                            .fabricid)
-                                                    .first
-                                                    .toString()
-                                                : ""),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .fabrictype
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .knittype
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .color
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .dia
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .uom
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .kgsperbox
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .weight
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .rate
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .amount
-                                                .toLowerCase()
-                                                .toString(),
-                                        textScaleFactor: 1.3,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    Expanded(
-                                        flex: 1,
-                                        //width: maxwidth * .20,
-                                        child: Row(children: [
-                                          Spacer(),
-                                          new IconButton(
-                                            alignment: Alignment.bottomRight,
-                                            icon: Image.asset('Images/edit.png',
-                                                color: widgetcolor),
-                                            onPressed: () {
-                                              if (this.mounted)
-                                                setState(() {
-                                                  removeItem(_itemdetails);
-                                                });
-                                            },
-                                            highlightColor: Colors.pink,
-                                          ),
-                                          SizedBox(width: 3),
-                                          // Spacer(),
-                                          new IconButton(
-                                            alignment: Alignment.bottomRight,
-                                            icon: Image.asset(
-                                                'Images/delete.png',
-                                                color: widgetcolor),
-                                            onPressed: () async {
-                                              removeItem(_itemdetails);
-                                            },
-                                            highlightColor: Colors.pink,
-                                          ),
-                                        ]))
-                                    //   ],
-                                    // )),
-                                  ],
-                                ), //,
-                                //),
-                              ),
-                            );
-                          }),
-                    )),
-              ]),
-            )),
-      ),
-    );
-  }
-
   Widget listtableView(double maxwidth, double maxheight) {
     // selrate = '';
     // Selecteditem = '';
@@ -919,19 +620,19 @@ class HomePageState extends State<HomePage> {
                   if (selectedprodtype.toString().toLowerCase() == 'fabric')
                     DataColumn(
                       label: Container(
-                          width: maxwidth * 0.25, child: Text("Fabric")),
+                          width: maxwidth * 0.10, child: Text("Fabric")),
                       numeric: false,
                     ),
                   if (selectedprodtype.toString().toLowerCase() == 'fabric')
                     DataColumn(
                       label: Container(
-                          width: maxwidth * 0.15, child: Text("Fabric Type")),
+                          width: maxwidth * 0.10, child: Text("Fabric Type")),
                       numeric: false,
                     ),
                   if (selectedprodtype.toString().toLowerCase() == 'fabric')
                     DataColumn(
                       label: Container(
-                        width: maxwidth * 0.25,
+                        width: maxwidth * 0.10,
                         child: Text("knit Type"),
                       ),
                       numeric: false,
@@ -939,26 +640,26 @@ class HomePageState extends State<HomePage> {
                   if (selectedprodtype.toString().toLowerCase() == 'yarn')
                     DataColumn(
                       label: Container(
-                          width: maxwidth * 0.25, child: Text("Yarn Mill")),
+                          width: maxwidth * .10, child: Text("Yarn Mill")),
                       numeric: false,
                     ),
                   if (selectedprodtype.toString().toLowerCase() == 'yarn')
                     DataColumn(
                       label: Container(
-                          width: maxwidth * 0.15, child: Text("Yarn Count")),
+                          width: maxwidth * 0.10, child: Text("Yarn Count")),
                       numeric: false,
                     ),
                   if (selectedprodtype.toString().toLowerCase() == 'yarn')
                     DataColumn(
                       label: Container(
-                        width: maxwidth * 0.25,
+                        width: maxwidth * 0.10,
                         child: Text("Yarn Type"),
                       ),
                       numeric: false,
                     ),
                   DataColumn(
                     label: Container(
-                      width: maxwidth * 0.10,
+                      width: maxwidth * 0.12,
                       child: Text("Color"),
                     ),
                     numeric: true,
@@ -1020,7 +721,7 @@ class HomePageState extends State<HomePage> {
                             if (selectedprodtype.toString().toLowerCase() ==
                                 'fabric')
                               DataCell(Container(
-                                width: maxwidth * 0.25,
+                                width: maxwidth * 0.10,
                                 child: Text((fabricdetails
                                         .where((element) =>
                                             element.columnMasterid ==
@@ -1039,7 +740,7 @@ class HomePageState extends State<HomePage> {
                             if (selectedprodtype.toString().toLowerCase() ==
                                 'fabric')
                               DataCell(Container(
-                                width: maxwidth * 0.15,
+                                width: maxwidth * 0.10,
                                 child: Text(
                                     item.fabrictype.toString().toUpperCase()),
                               )),
@@ -1047,7 +748,7 @@ class HomePageState extends State<HomePage> {
                                 'fabric')
                               DataCell(
                                 Container(
-                                  width: maxwidth * 0.25,
+                                  width: maxwidth * 0.10,
                                   child: Text(item.knittype.toString()),
                                 ),
                               ),
@@ -1055,7 +756,7 @@ class HomePageState extends State<HomePage> {
                                 'yarn')
                               DataCell(
                                 Container(
-                                  width: maxwidth * 0.25,
+                                  width: maxwidth * 0.10,
                                   child: Text(item.yarnmill.toString()),
                                 ),
                               ),
@@ -1063,7 +764,7 @@ class HomePageState extends State<HomePage> {
                                 'yarn')
                               DataCell(
                                 Container(
-                                  width: maxwidth * 0.25,
+                                  width: maxwidth * 0.10,
                                   child: Text(item.yarncount.toString()),
                                 ),
                               ),
@@ -1071,13 +772,13 @@ class HomePageState extends State<HomePage> {
                                 'yarn')
                               DataCell(
                                 Container(
-                                  width: maxwidth * 0.25,
+                                  width: maxwidth * 0.10,
                                   child: Text(item.yarntype.toString()),
                                 ),
                               ),
                             DataCell(
                               Container(
-                                width: maxwidth * 0.10,
+                                width: maxwidth * 0.12,
                                 child: Text(item.color.toString()),
                               ),
                             ),
@@ -1129,6 +830,45 @@ class HomePageState extends State<HomePage> {
                                           onPressed: () {
                                             if (this.mounted)
                                               setState(() {
+                                                selectedcolor = item.color;
+                                                if (selectedprodtype
+                                                        .toString()
+                                                        .toLowerCase() ==
+                                                    'fabric') {
+                                                  selectedfabric = item.fabric;
+                                                  selecteddia = item.dia;
+                                                  selecteduom = item.uom;
+                                                  selectedfabknittype =
+                                                      item.knittype;
+                                                  selectedcomposition =
+                                                      item.composition;
+                                                  selectedfabtype =
+                                                      item.fabrictype;
+
+                                                  _custgsmController.text =
+                                                      item.gsm;
+                                                } else {
+                                                  selectedyarnmill =
+                                                      item.yarnmill;
+                                                  //selectedyarncolor = item.color;
+                                                  selectedyarntype =
+                                                      item.yarntype;
+                                                  selectedyarncount =
+                                                      item.yarncount;
+                                                }
+
+                                                _custweightController.text =
+                                                    item.weight;
+                                                _custnoofboxController.text =
+                                                    item.noofbox;
+                                                _custrateController.text =
+                                                    item.rate;
+                                                _custamountController.text =
+                                                    item.amount;
+                                                _custkgsperboxController.text =
+                                                    item.kgsperbox;
+
+                                                _previousitem = item;
                                                 removeItem(item);
                                               });
 
@@ -1221,53 +961,52 @@ class HomePageState extends State<HomePage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          if (companydata != null &&
-                                              companydata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 200,
-                                                maxWidth: 380,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .4, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Company",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: companydata,
-                                                label:
-                                                    Text("Type *").toString(),
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedcompany = val;
-
-                                                    compid = companydetails
-                                                        .where((element) =>
-                                                            element.ptyname ==
-                                                            val)
-                                                        .map((e) => e.partyid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedcompany,
-                                              ),
+                                          // if (companydata != null &&
+                                          //     companydata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 200,
+                                              maxWidth: 380,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .4, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Company",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: companydata,
+                                              label: "Type *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedcompany = val;
+
+                                                  compid = companydetails
+                                                      .where((element) =>
+                                                          element.ptyname ==
+                                                          val)
+                                                      .map((e) => e.partyid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedcompany,
+                                            ),
+                                          ),
                                           SizedBox(height: 10),
                                           Container(
                                             constraints: BoxConstraints(
@@ -1358,72 +1097,23 @@ class HomePageState extends State<HomePage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        if (consigneedata != null &&
-                                            consigneedata.isNotEmpty)
-                                          Container(
-                                            constraints: BoxConstraints(
-                                              minWidth: 100,
-                                              maxWidth: 300,
-                                            ),
-                                            //padding: EdgeInsets.,
-                                            width: maxwidth * .3, //* 0.50,
-                                            child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Consignee",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: consigneedata,
-                                                label: "Consignee *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedconsignee = val;
-
-                                                    consigneeid = consigneedetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem:
-                                                    selectedconsignee),
+                                        // if (consigneedata != null &&
+                                        //     consigneedata.isNotEmpty)
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 100,
+                                            maxWidth: 300,
                                           ),
-                                        SizedBox(height: 10),
-                                        if (notifypartydata != null &&
-                                            notifypartydata.isNotEmpty)
-                                          Container(
-                                            constraints: BoxConstraints(
-                                              minWidth: 100,
-                                              maxWidth: 300,
-                                            ),
-                                            //padding: EdgeInsets.,
-                                            width: maxwidth * .3, //* 0.50,
-                                            child: DropdownSearch<String>(
+                                          //padding: EdgeInsets.,
+                                          width: maxwidth * .3, //* 0.50,
+                                          child: DropdownSearch<String>(
                                               dropDownButton: Image.asset(
                                                   'Images/arrow_drop_down.png',
                                                   color: Colors.white),
                                               validator: (v) => v == null
                                                   ? "required field"
                                                   : null,
-                                              hint: "Select a Notify Party",
+                                              hint: "Select a Consignee",
                                               mode: Mode.MENU,
                                               enabled: (_id != null &&
                                                       _id != '' &&
@@ -1432,77 +1122,123 @@ class HomePageState extends State<HomePage> {
                                                   : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
-                                              items: notifypartydata,
-                                              label: "Notify Party *",
+                                              items: consigneedata,
+                                              label: "Consignee *",
                                               showClearButton: false,
                                               onChanged: (val) {
                                                 setState(() {
-                                                  selectednotifyparty = val;
+                                                  selectedconsignee = val;
 
-                                                  notifypartyid =
-                                                      notifypartydetails
-                                                          .where((element) =>
-                                                              element
-                                                                  .customerName ==
-                                                              val)
-                                                          .map((e) => e.custId)
-                                                          .first
-                                                          .toString();
-                                                });
-                                              },
-                                              popupItemDisabled: (String s) =>
-                                                  s.startsWith('I'),
-                                              selectedItem: selectednotifyparty,
-                                            ),
-                                          ),
-                                        SizedBox(height: 10),
-                                        if (supplierdata != null &&
-                                            supplierdata.isNotEmpty)
-                                          Container(
-                                            constraints: BoxConstraints(
-                                              minWidth: 100,
-                                              maxWidth: 300,
-                                            ),
-                                            //padding: EdgeInsets.,
-                                            width: maxwidth * .3, //* 0.50,
-                                            child: DropdownSearch<String>(
-                                              dropDownButton: Image.asset(
-                                                  'Images/arrow_drop_down.png',
-                                                  color: Colors.white),
-                                              validator: (v) => v == null
-                                                  ? "required field"
-                                                  : null,
-                                              hint: "Select a Supplier",
-                                              mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
-                                              showSelectedItem: true,
-                                              showSearchBox: true,
-                                              items: supplierdata,
-                                              label: "Supplier *",
-                                              showClearButton: false,
-                                              onChanged: (val) {
-                                                setState(() {
-                                                  selectedsupplier = val;
-
-                                                  supplierid = supplierdetails
+                                                  consigneeid = consigneedetails
                                                       .where((element) =>
-                                                          element
-                                                              .customerName ==
+                                                          element.columnname ==
                                                           val)
-                                                      .map((e) => e.custId)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
                                                       .first
                                                       .toString();
                                                 });
                                               },
                                               popupItemDisabled: (String s) =>
                                                   s.startsWith('I'),
-                                              selectedItem: selectedsupplier,
-                                            ),
+                                              selectedItem: selectedconsignee),
+                                        ),
+                                        SizedBox(height: 10),
+                                        // if (notifypartydata != null &&
+                                        //     notifypartydata.isNotEmpty)
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 100,
+                                            maxWidth: 300,
                                           ),
+                                          //padding: EdgeInsets.,
+                                          width: maxwidth * .3, //* 0.50,
+                                          child: DropdownSearch<String>(
+                                            dropDownButton: Image.asset(
+                                                'Images/arrow_drop_down.png',
+                                                color: Colors.white),
+                                            validator: (v) => v == null
+                                                ? "required field"
+                                                : null,
+                                            hint: "Select a Notify Party",
+                                            mode: Mode.MENU,
+                                            enabled: (_id != null &&
+                                                    _id != '' &&
+                                                    _id != '0')
+                                                ? false
+                                                : true,
+                                            showSelectedItem: true,
+                                            showSearchBox: true,
+                                            items: notifypartydata,
+                                            label: "Notify Party *",
+                                            showClearButton: false,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                selectednotifyparty = val;
+
+                                                notifypartyid =
+                                                    notifypartydetails
+                                                        .where((element) =>
+                                                            element
+                                                                .customerName ==
+                                                            val)
+                                                        .map((e) => e.custId)
+                                                        .first
+                                                        .toString();
+                                              });
+                                            },
+                                            popupItemDisabled: (String s) =>
+                                                s.startsWith('I'),
+                                            selectedItem: selectednotifyparty,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        // if (supplierdata != null &&
+                                        //     supplierdata.isNotEmpty)
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 100,
+                                            maxWidth: 300,
+                                          ),
+                                          //padding: EdgeInsets.,
+                                          width: maxwidth * .3, //* 0.50,
+                                          child: DropdownSearch<String>(
+                                            dropDownButton: Image.asset(
+                                                'Images/arrow_drop_down.png',
+                                                color: Colors.white),
+                                            validator: (v) => v == null
+                                                ? "required field"
+                                                : null,
+                                            hint: "Select a Supplier",
+                                            mode: Mode.MENU,
+                                            enabled: (_id != null &&
+                                                    _id != '' &&
+                                                    _id != '0')
+                                                ? false
+                                                : true,
+                                            showSelectedItem: true,
+                                            showSearchBox: true,
+                                            items: supplierdata,
+                                            label: "Supplier *",
+                                            showClearButton: false,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                selectedsupplier = val;
+
+                                                supplierid = supplierdetails
+                                                    .where((element) =>
+                                                        element.customerName ==
+                                                        val)
+                                                    .map((e) => e.custId)
+                                                    .first
+                                                    .toString();
+                                              });
+                                            },
+                                            popupItemDisabled: (String s) =>
+                                                s.startsWith('I'),
+                                            selectedItem: selectedsupplier,
+                                          ),
+                                        ),
                                         // ],
                                       ],
                                     ),
@@ -1514,54 +1250,53 @@ class HomePageState extends State<HomePage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          if (currencydata != null &&
-                                              currencydata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 300,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .3, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Currency",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: currencydata,
-                                                label: "Currency *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedcurrency = val;
-
-                                                    currencyid = currencydetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedcurrency,
-                                              ),
+                                          // if (currencydata != null &&
+                                          //     currencydata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 300,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .3, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Currency",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: currencydata,
+                                              label: "Currency *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedcurrency = val;
+
+                                                  currencyid = currencydetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedcurrency,
+                                            ),
+                                          ),
                                           SizedBox(height: 10),
                                           Container(
                                             constraints: BoxConstraints(
@@ -1664,355 +1399,346 @@ class HomePageState extends State<HomePage> {
                                           'fabric')
                                         Row(children: [
                                           SizedBox(width: 10),
-                                          if (fabricdata != null &&
-                                              fabricdata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Fabric",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabricdata,
-                                                label: "Fabric *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedfabric = val;
-
-                                                    fabricid = fabricdetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedfabric,
-                                              ),
+                                          // if (fabricdata != null &&
+                                          //     fabricdata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 150,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Fabric",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: fabricdata,
+                                              label: "Fabric *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedfabric = val;
+
+                                                  fabricid = fabricdetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedfabric,
+                                            ),
+                                          ),
                                           SizedBox(width: 20),
-                                          if (fabrictypedata != null &&
-                                              fabrictypedata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Fabric type",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabrictypedata,
-                                                label: "Fabric Type*",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedfabtype = val;
-
-                                                    fabtypeid =
-                                                        fabrictypetypedetails
-                                                            .where((element) =>
-                                                                element
-                                                                    .columnname ==
-                                                                val)
-                                                            .map((e) => e
-                                                                .columnMasterid)
-                                                            .first
-                                                            .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedfabtype,
-                                              ),
+                                          // if (fabrictypedata != null &&
+                                          //     fabrictypedata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 150,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Fabric type",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: fabrictypedata,
+                                              label: "Fabric Type*",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedfabtype = val;
+
+                                                  fabtypeid =
+                                                      fabrictypetypedetails
+                                                          .where((element) =>
+                                                              element
+                                                                  .columnname ==
+                                                              val)
+                                                          .map((e) =>
+                                                              e.columnMasterid)
+                                                          .first
+                                                          .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedfabtype,
+                                            ),
+                                          ),
                                           SizedBox(width: 20),
-                                          if (fabricknitdata != null &&
-                                              fabricknitdata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint:
-                                                    "Select a Fabric Knit type",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: fabricknitdata,
-                                                label: "Fabric Knit Type *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedfabknittype = val;
-
-                                                    fabknittypeid =
-                                                        fabricknittypedetails
-                                                            .where((element) =>
-                                                                element
-                                                                    .columnname ==
-                                                                val)
-                                                            .map((e) => e
-                                                                .columnMasterid)
-                                                            .first
-                                                            .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem:
-                                                    selectedfabknittype,
-                                              ),
+                                          // if (fabricknitdata != null &&
+                                          //     fabricknitdata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 150,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Fabric Knit type",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: fabricknitdata,
+                                              label: "Fabric Knit Type *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedfabknittype = val;
+
+                                                  fabknittypeid =
+                                                      fabricknittypedetails
+                                                          .where((element) =>
+                                                              element
+                                                                  .columnname ==
+                                                              val)
+                                                          .map((e) =>
+                                                              e.columnMasterid)
+                                                          .first
+                                                          .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedfabknittype,
+                                            ),
+                                          ),
                                           SizedBox(width: 20),
-                                          if (compositiondata != null &&
-                                              compositiondata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint:
-                                                    "Select a Fabric Composition",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: compositiondata,
-                                                label: "Fabric Composition *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedcomposition = val;
-
-                                                    compositionid =
-                                                        compositiondetails
-                                                            .where((element) =>
-                                                                element
-                                                                    .columnname ==
-                                                                val)
-                                                            .map((e) => e
-                                                                .columnMasterid)
-                                                            .first
-                                                            .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem:
-                                                    selectedcomposition,
-                                              ),
+                                          // if (compositiondata != null &&
+                                          //     compositiondata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 150,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint:
+                                                  "Select a Fabric Composition",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: compositiondata,
+                                              label: "Fabric Composition *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedcomposition = val;
+
+                                                  compositionid = compositiondetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedcomposition,
+                                            ),
+                                          ),
                                           SizedBox(width: 20),
-                                          if (diadata != null &&
-                                              diadata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 100,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Dia",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: diadata,
-                                                label: "Dia *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selecteddia = val;
-
-                                                    diaid = diadetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selecteddia,
-                                              ),
+                                          // if (diadata != null &&
+                                          //     diadata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 100,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Dia",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: diadata,
+                                              label: "Dia *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selecteddia = val;
+
+                                                  diaid = diadetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selecteddia,
+                                            ),
+                                          ),
                                           SizedBox(width: 20),
-                                          if (colordata != null &&
-                                              colordata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 100,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Color",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: colordata,
-                                                label: "Color*",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedcolor = val;
-
-                                                    colorid = colordetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedcolor,
-                                              ),
+                                          // if (colordata != null &&
+                                          //     colordata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 100,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Color",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: colordata,
+                                              label: "Color*",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedcolor = val;
+
+                                                  colorid = colordetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedcolor,
+                                            ),
+                                          ),
                                           SizedBox(width: 20),
-                                          if (uomdata != null &&
-                                              uomdata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 70,
-                                                maxWidth: 100,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Uom",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: uomdata,
-                                                label: "Uom *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selecteduom = val;
-
-                                                    uomid = uomdetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selecteduom,
-                                              ),
+                                          // if (uomdata != null &&
+                                          //     uomdata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 70,
+                                              maxWidth: 100,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .7, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Uom",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: uomdata,
+                                              label: "Uom *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selecteduom = val;
+
+                                                  uomid = uomdetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selecteduom,
+                                            ),
+                                          ),
                                         ]),
                                       if (selectedprodtype
                                               .toString()
@@ -2022,201 +1748,197 @@ class HomePageState extends State<HomePage> {
                                           SizedBox(
                                             width: 10,
                                           ),
-                                          if (yarncountdata != null &&
-                                              yarncountdata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: 100, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a YarnCount",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: yarncountdata,
-                                                label: "Yarn Count *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedyarncount = val;
-
-                                                    yarncountid = yarncountdetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedyarncount,
-                                              ),
+                                          // if (yarncountdata != null &&
+                                          //     yarncountdata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 150,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: 100, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a YarnCount",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: yarncountdata,
+                                              label: "Yarn Count *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedyarncount = val;
+
+                                                  yarncountid = yarncountdetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedyarncount,
+                                            ),
+                                          ),
                                           SizedBox(width: 10),
-                                          if (yarnmilldata != null &&
-                                              yarnmilldata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: 120, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Yarn Mill",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: yarnmilldata,
-                                                label: "Yarn Mill*",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedyarnmill = val;
-
-                                                    yarnmillid = yarnmilldetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedyarnmill,
-                                              ),
+                                          // if (yarnmilldata != null &&
+                                          //     yarnmilldata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 150,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: 120, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Yarn Mill",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: yarnmilldata,
+                                              label: "Yarn Mill*",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedyarnmill = val;
+
+                                                  yarnmillid = yarnmilldetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedyarnmill,
+                                            ),
+                                          ),
                                           SizedBox(width: 10),
-                                          if (yarntypedata != null &&
-                                              yarntypedata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: 120, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Yarn type",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: yarntypedata,
-                                                label: "Yarn Type *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedyarntype = val;
-
-                                                    yarntypeid = yarntypedetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedyarntype,
-                                              ),
+                                          // if (yarntypedata != null &&
+                                          //     yarntypedata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 150,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: 120, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Yarn type",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: yarntypedata,
+                                              label: "Yarn Type *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedyarntype = val;
+
+                                                  yarntypeid = yarntypedetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedyarntype,
+                                            ),
+                                          ),
                                           SizedBox(width: 10),
-                                          if (colordata != null &&
-                                              colordata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: 150, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Color",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: colordata,
-                                                label: "Color*",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedcolor = val;
-
-                                                    colorid = colordetails
-                                                        .where((element) =>
-                                                            element
-                                                                .columnname ==
-                                                            val)
-                                                        .map((e) =>
-                                                            e.columnMasterid)
-                                                        .first
-                                                        .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem: selectedcolor,
-                                              ),
+                                          // if (colordata != null &&
+                                          //     colordata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 150,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: 150, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Color",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: colordata,
+                                              label: "Color*",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedcolor = val;
+
+                                                  colorid = colordetails
+                                                      .where((element) =>
+                                                          element.columnname ==
+                                                          val)
+                                                      .map((e) =>
+                                                          e.columnMasterid)
+                                                      .first
+                                                      .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem: selectedcolor,
+                                            ),
+                                          ),
                                           SizedBox(width: 10),
                                           if (selectedprodtype
                                                   .toString()
@@ -2729,22 +2451,27 @@ class HomePageState extends State<HomePage> {
                                 heroTag: "btn2",
                                 backgroundColor: widgetcolor,
                                 onPressed: () {
-                                  //                                   ItemMaster _data;
-                                  //                                   _data = Getitemdetails();
-                                  //                                   if (selrate != '' && selrate != null) {
-                                  //                                     if (this.mounted)
-                                  //                                       setState(() {
-                                  //                                         if (_previousitem != null)
-                                  //                                           _itemdetails.add(_previousitem);
-                                  //                                         Selecteditem = '';
-                                  //                                         Selectedgroup = '';
-                                  //                                         _pricerateController.text = '';
-                                  //                                         _previousitem = null;
-                                  //                                       });
-                                  // //});
-                                  //                                   }
-                                  //clearData(context);
-                                  //idFocusNode.dispose();
+                                  setState(() {
+                                    if (_previousitem != null)
+                                      _itemdetails.add(_previousitem);
+                                    selectedcolor = '';
+                                    selecteddia = '';
+                                    selecteduom = '';
+                                    selectedfabric = '';
+                                    selectedfabknittype = '';
+                                    selectedcomposition = '';
+                                    selectedfabtype = '';
+                                    selectedyarnmill = '';
+                                    selectedyarncolor = '';
+                                    selectedyarntype = '';
+                                    _custgsmController.text = '';
+                                    _custweightController.text = '';
+                                    _custnoofboxController.text = '';
+                                    _custrateController.text = '';
+                                    _custamountController.text = '';
+                                    _custkgsperboxController.text = '';
+                                    _previousitem = null;
+                                  });
                                 },
                                 tooltip: 'Cancel Item ',
                                 child: Image.asset('Images/cancel.png',
@@ -2801,55 +2528,53 @@ class HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         SizedBox(height: 10),
-                                        if (portofloaddata != null &&
-                                            portofloaddata.isNotEmpty)
-                                          Container(
-                                            constraints: BoxConstraints(
-                                              minWidth: 100,
-                                              maxWidth: 200,
-                                            ),
-                                            //padding: EdgeInsets.,
-                                            width: maxwidth * .7, //* 0.50,
-                                            child: DropdownSearch<String>(
-                                              dropDownButton: Image.asset(
-                                                  'Images/arrow_drop_down.png',
-                                                  color: Colors.white),
-                                              validator: (v) => v == null
-                                                  ? "required field"
-                                                  : null,
-                                              hint: "Select a Port of Load",
-                                              mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
-                                              showSelectedItem: true,
-                                              showSearchBox: true,
-                                              items: portofloaddata,
-                                              label: "Port of Loading *",
-                                              showClearButton: false,
-                                              onChanged: (val) {
-                                                setState(() {
-                                                  selectedportofload = val;
-
-                                                  portofloadid =
-                                                      portofloaddetails
-                                                          .where((element) =>
-                                                              element
-                                                                  .columnname ==
-                                                              val)
-                                                          .map((e) =>
-                                                              e.columnMasterid)
-                                                          .first
-                                                          .toString();
-                                                });
-                                              },
-                                              popupItemDisabled: (String s) =>
-                                                  s.startsWith('I'),
-                                              selectedItem: selectedportofload,
-                                            ),
+                                        // if (portofloaddata != null &&
+                                        //     portofloaddata.isNotEmpty)
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 100,
+                                            maxWidth: 300,
                                           ),
+                                          //padding: EdgeInsets.,
+                                          width: maxwidth * .2, //* 0.50,
+                                          child: DropdownSearch<String>(
+                                            dropDownButton: Image.asset(
+                                                'Images/arrow_drop_down.png',
+                                                color: Colors.white),
+                                            validator: (v) => v == null
+                                                ? "required field"
+                                                : null,
+                                            hint: "Select a Port of Load",
+                                            mode: Mode.MENU,
+                                            enabled: (_id != null &&
+                                                    _id != '' &&
+                                                    _id != '0')
+                                                ? false
+                                                : true,
+                                            showSelectedItem: true,
+                                            showSearchBox: true,
+                                            items: portofloaddata,
+                                            label: "Port of Loading *",
+                                            showClearButton: false,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                selectedportofload = val;
+
+                                                portofloadid = portofloaddetails
+                                                    .where((element) =>
+                                                        element.columnname ==
+                                                        val)
+                                                    .map(
+                                                        (e) => e.columnMasterid)
+                                                    .first
+                                                    .toString();
+                                              });
+                                            },
+                                            popupItemDisabled: (String s) =>
+                                                s.startsWith('I'),
+                                            selectedItem: selectedportofload,
+                                          ),
+                                        ),
                                         SizedBox(height: 10),
                                         Container(
                                           constraints: BoxConstraints(
@@ -2922,109 +2647,108 @@ class HomePageState extends State<HomePage> {
                                       SizedBox(height: 10),
                                       Row(
                                         children: [
-                                          if (portofdischargedata != null &&
-                                              portofdischargedata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 150,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              //width: maxwidth * .3, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint:
-                                                    "Select a Port of Discharge",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: portofdischargedata,
-                                                label: "Port of Discharge *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedportofdischarge =
-                                                        val;
-
-                                                    portofdischargeid =
-                                                        portofdischargedetails
-                                                            .where((element) =>
-                                                                element
-                                                                    .columnname ==
-                                                                val)
-                                                            .map((e) => e
-                                                                .columnMasterid)
-                                                            .first
-                                                            .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem:
-                                                    selectedportofdischarge,
-                                              ),
+                                          // if (portofdischargedata != null &&
+                                          //     portofdischargedata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 250,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .25, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint:
+                                                  "Select a Port of Discharge",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: portofdischargedata,
+                                              label: "Port of Discharge *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedportofdischarge = val;
+
+                                                  portofdischargeid =
+                                                      portofdischargedetails
+                                                          .where((element) =>
+                                                              element
+                                                                  .columnname ==
+                                                              val)
+                                                          .map((e) =>
+                                                              e.columnMasterid)
+                                                          .first
+                                                          .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem:
+                                                  selectedportofdischarge,
+                                            ),
+                                          ),
                                           Spacer(),
-                                          if (shipmentmodedata != null &&
-                                              shipmentmodedata.isNotEmpty)
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 200,
-                                              ),
-                                              //padding: EdgeInsets.,
-                                              width: maxwidth * .3, //* 0.50,
-                                              child: DropdownSearch<String>(
-                                                dropDownButton: Image.asset(
-                                                    'Images/arrow_drop_down.png',
-                                                    color: Colors.white),
-                                                validator: (v) => v == null
-                                                    ? "required field"
-                                                    : null,
-                                                hint: "Select a Shipment Mode",
-                                                mode: Mode.MENU,
-                                                enabled: (_id != null &&
-                                                        _id != '' &&
-                                                        _id != '0')
-                                                    ? false
-                                                    : true,
-                                                showSelectedItem: true,
-                                                showSearchBox: true,
-                                                items: shipmentmodedata,
-                                                label: "Shipment Mode *",
-                                                showClearButton: false,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    selectedshipmentmode = val;
-
-                                                    shipmentmodeid =
-                                                        shipmentmodedetails
-                                                            .where((element) =>
-                                                                element
-                                                                    .columnname ==
-                                                                val)
-                                                            .map((e) => e
-                                                                .columnMasterid)
-                                                            .first
-                                                            .toString();
-                                                  });
-                                                },
-                                                popupItemDisabled: (String s) =>
-                                                    s.startsWith('I'),
-                                                selectedItem:
-                                                    selectedshipmentmode,
-                                              ),
+                                          // if (shipmentmodedata != null &&
+                                          //     shipmentmodedata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 250,
                                             ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .2, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                              dropDownButton: Image.asset(
+                                                  'Images/arrow_drop_down.png',
+                                                  color: Colors.white),
+                                              validator: (v) => v == null
+                                                  ? "required field"
+                                                  : null,
+                                              hint: "Select a Shipment Mode",
+                                              mode: Mode.MENU,
+                                              enabled: (_id != null &&
+                                                      _id != '' &&
+                                                      _id != '0')
+                                                  ? false
+                                                  : true,
+                                              showSelectedItem: true,
+                                              showSearchBox: true,
+                                              items: shipmentmodedata,
+                                              label: "Shipment Mode *",
+                                              showClearButton: false,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  selectedshipmentmode = val;
+
+                                                  shipmentmodeid =
+                                                      shipmentmodedetails
+                                                          .where((element) =>
+                                                              element
+                                                                  .columnname ==
+                                                              val)
+                                                          .map((e) =>
+                                                              e.columnMasterid)
+                                                          .first
+                                                          .toString();
+                                                });
+                                              },
+                                              popupItemDisabled: (String s) =>
+                                                  s.startsWith('I'),
+                                              selectedItem:
+                                                  selectedshipmentmode,
+                                            ),
+                                          ),
                                           Spacer(),
                                           Container(
                                             constraints: BoxConstraints(
@@ -3032,7 +2756,7 @@ class HomePageState extends State<HomePage> {
                                               minWidth: 100,
                                               maxWidth: 200,
                                             ),
-                                            width: maxwidth * .3,
+                                            width: maxwidth * .2,
                                             child: TextFormField(
                                               //enabled: false,
                                               controller: shipmentdateCtl,
@@ -3141,6 +2865,209 @@ class HomePageState extends State<HomePage> {
                           ),
                         ),
 
+                        SizedBox(height: 5),
+                        Container(
+                          constraints: BoxConstraints(
+                            //minHeight: 20,
+                            minWidth: 100,
+                            maxWidth: 900,
+                          ),
+                          width: maxwidth * .9,
+                          child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: widgetcolor,
+                                      style: BorderStyle.solid),
+                                ),
+                                //border: InputBorder.none,
+                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                //: "Terms & Conditions",
+                                labelStyle: TextStyle(fontSize: 20.0)),
+                            //keyboardType: TextInputType.text,
+                            style: textStyle,
+                            controller: _custtermsandconditionsController2,
+                            //   focusNode: custidFocusNode,
+
+                            readOnly: enable,
+                            //enableInteractiveSelection: enable,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Container(
+                          constraints: BoxConstraints(
+                            //minHeight: 20,
+                            minWidth: 100,
+                            maxWidth: 900,
+                          ),
+                          width: maxwidth * .9,
+                          child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: widgetcolor,
+                                      style: BorderStyle.solid),
+                                ),
+                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                //labelText: "Terms & Conditions",
+                                labelStyle: TextStyle(fontSize: 20.0)),
+                            //keyboardType: TextInputType.text,
+                            style: textStyle,
+                            controller: _custtermsandconditionsController3,
+                            //   focusNode: custidFocusNode,
+
+                            readOnly: enable,
+                            //enableInteractiveSelection: enable,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Container(
+                          constraints: BoxConstraints(
+                            //minHeight: 20,
+                            minWidth: 100,
+                            maxWidth: 900,
+                          ),
+                          width: maxwidth * .9,
+                          child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: widgetcolor,
+                                      style: BorderStyle.solid),
+                                ),
+                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                //labelText: "Terms & Conditions",
+                                labelStyle: TextStyle(fontSize: 20.0)),
+                            //keyboardType: TextInputType.text,
+                            style: textStyle,
+                            controller: _custtermsandconditionsController4,
+                            //   focusNode: custidFocusNode,
+
+                            readOnly: enable,
+                            //enableInteractiveSelection: enable,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Container(
+                          constraints: BoxConstraints(
+                            //minHeight: 20,
+                            minWidth: 100,
+                            maxWidth: 900,
+                          ),
+                          width: maxwidth * .9,
+                          child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: widgetcolor,
+                                      style: BorderStyle.solid),
+                                ),
+                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                //labelText: "Terms & Conditions",
+                                labelStyle: TextStyle(fontSize: 20.0)),
+                            //keyboardType: TextInputType.text,
+                            style: textStyle,
+                            controller: _custtermsandconditionsController5,
+                            //   focusNode: custidFocusNode,
+
+                            readOnly: enable,
+                            //enableInteractiveSelection: enable,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Container(
+                          constraints: BoxConstraints(
+                            //minHeight: 20,
+                            minWidth: 100,
+                            maxWidth: 900,
+                          ),
+                          width: maxwidth * .9,
+                          child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: widgetcolor,
+                                      style: BorderStyle.solid),
+                                ), //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                //labelText: "Terms & Conditions",
+                                labelStyle: TextStyle(fontSize: 20.0)),
+                            //keyboardType: TextInputType.text,
+                            style: textStyle,
+                            controller: _custtermsandconditionsController6,
+                            //   focusNode: custidFocusNode,
+
+                            readOnly: enable,
+                            //enableInteractiveSelection: enable,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Container(
+                          constraints: BoxConstraints(
+                            //minHeight: 20,
+                            minWidth: 100,
+                            maxWidth: 900,
+                          ),
+                          width: maxwidth * .9,
+                          child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: widgetcolor,
+                                      style: BorderStyle.solid),
+                                ),
+                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                //labelText: "Terms & Conditions",
+                                labelStyle: TextStyle(fontSize: 20.0)),
+                            //keyboardType: TextInputType.text,
+                            style: textStyle,
+                            controller: _custtermsandconditionsController7,
+                            //   focusNode: custidFocusNode,
+
+                            readOnly: enable,
+                            //enableInteractiveSelection: enable,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Container(
+                          constraints: BoxConstraints(
+                            //minHeight: 20,
+                            minWidth: 100,
+                            maxWidth: 900,
+                          ),
+                          width: maxwidth * .9,
+                          child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: widgetcolor,
+                                      style: BorderStyle.solid),
+                                ),
+                                //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                // labelText: "Terms & Conditions",
+                                labelStyle: TextStyle(fontSize: 20.0)),
+                            //keyboardType: TextInputType.text,
+                            style: textStyle,
+                            controller: _custtermsandconditionsController8,
+                            //   focusNode: custidFocusNode,
+
+                            readOnly: enable,
+                            //enableInteractiveSelection: enable,
+                          ),
+                        ),
                         // //  addfabricwid()
                       ]),
                 ))),
@@ -3394,6 +3321,13 @@ class HomePageState extends State<HomePage> {
     _custrateController.text = '';
     _custamountController.text = '';
     _custtermsandconditionsController.text = '';
+    _custtermsandconditionsController2.text = '';
+    _custtermsandconditionsController3.text = '';
+    _custtermsandconditionsController4.text = '';
+    _custtermsandconditionsController5.text = '';
+    _custtermsandconditionsController6.text = '';
+    _custtermsandconditionsController7.text = '';
+    _custtermsandconditionsController8.text = '';
     _custnoofcontainerController.text = '';
     _custpackingdetailController.text = '';
     _custpaymenttermsController.text = '';
@@ -4422,7 +4356,21 @@ class HomePageState extends State<HomePage> {
                 _custpackingdetailController.text = element.packinglistid;
                 _custremarksController.text = element.remarks;
                 _custtermsandconditionsController.text =
-                    element.termsandconditions;
+                    element.termsandconditions.toString();
+                _custtermsandconditionsController2.text =
+                    element.termsandconditions2.toString();
+                _custtermsandconditionsController3.text =
+                    element.termsandconditions3.toString();
+                _custtermsandconditionsController4.text =
+                    element.termsandconditions4.toString();
+                _custtermsandconditionsController5.text =
+                    element.termsandconditions5.toString();
+                _custtermsandconditionsController6.text =
+                    element.termsandconditions6.toString();
+                _custtermsandconditionsController7.text =
+                    element.termsandconditions7.toString();
+                _custtermsandconditionsController8.text =
+                    element.termsandconditions8.toString();
               }));
       getpurchaseitemdetails();
     }
@@ -4487,6 +4435,13 @@ class HomePageState extends State<HomePage> {
     _custamountController.dispose();
     //_custconsigneeAddressController.dispose();
     _custtermsandconditionsController.dispose();
+    _custtermsandconditionsController2.dispose();
+    _custtermsandconditionsController3.dispose();
+    _custtermsandconditionsController4.dispose();
+    _custtermsandconditionsController5.dispose();
+    _custtermsandconditionsController6.dispose();
+    _custtermsandconditionsController7.dispose();
+    _custtermsandconditionsController8.dispose();
     _custnoofcontainerController.dispose();
     _custpackingdetailController.dispose();
     _custpaymenttermsController.dispose();
