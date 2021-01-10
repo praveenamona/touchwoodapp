@@ -25,7 +25,7 @@ class CollapsingNavigationDrawer extends StatefulWidget {
 
 class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
     with SingleTickerProviderStateMixin {
-  double maxWidth = 210;
+  double maxWidth = 280;
   double minWidth = 70;
   bool isCollapsed = false;
   AnimationController _animationController;
@@ -271,7 +271,7 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
           children: <Widget>[
             Container(
                 color: appbarcolor,
-                width: 250, //mediaQuery.size.width * 0.40,
+                width: 350, //mediaQuery.size.width * 0.40,
                 height: mediaQuery.size.height,
                 //child: Drawer(
                 child: Column(
@@ -341,16 +341,12 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                 children: <Widget>[
                                   custom.ExpansionTile(
                                       backgroundColor: appbarcolor,
-                                      // initiallyExpanded: true,
                                       headerBackgroundColor: widgetcolor,
                                       title: ListTile(
-                                        //   tileColor: Colors.pink,
-                                        onTap: () {
-                                          //  mastertapped = (mastertapped) ? false : true;
-                                        },
-                                        //  leading: Icon(Icons.settings_applications),
-                                        title: Text("General"),
-                                      ),
+                                          onTap: () {},
+                                          title: Center(
+                                            child: Text("General"),
+                                          )),
                                       iconColor: appbarcolor,
                                       children: <Widget>[
                                         Container(

@@ -164,16 +164,23 @@ class _ExpansionTileState extends State<ExpansionTile>
             data: IconThemeData(color: _iconColor.value),
             child: Container(
               color: widget.headerBackgroundColor ?? Colors.grey[800],
+              //  padding: EdgeInsets.all(25),
               child: ListTile(
                 onTap: _handleTap,
                 leading: widget.leading,
-                title: DefaultTextStyle(
-                  style: Theme.of(context)
-                      .textTheme
-                      .subhead
-                      .copyWith(color: titleColor),
-                  child: widget.title,
-                ),
+                title: new Column(children: <Widget>[
+                  new Align(
+                    child: new DefaultTextStyle(
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .subhead
+                          .copyWith(color: titleColor),
+                      child: widget.title,
+                    ), //so big text
+                    alignment: FractionalOffset.topLeft,
+                  ),
+                ]),
                 trailing: widget.trailing ??
                     RotationTransition(
                       turns: _iconTurns,

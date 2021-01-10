@@ -138,7 +138,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add Supplier',
+              'Supplier',
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -178,10 +178,10 @@ class HomePageState extends State<HomePage> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: <Widget>[
-                                          Text(
-                                            "Enter Supplier Details",
-                                            style: TextStyle(fontSize: 16),
-                                          ),
+                                          // Text(
+                                          //   "Enter Supplier Details",
+                                          //   style: TextStyle(fontSize: 16),
+                                          // ),
                                           SizedBox(
                                             height: 10,
                                           ),
@@ -963,6 +963,9 @@ class HomePageState extends State<HomePage> {
         stream.asBroadcastStream().listen((String message) {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
+            clearData(context);
+            enable = false;
+
             setState(() {
               ShowAddWidget = false;
             });
@@ -1030,8 +1033,15 @@ class HomePageState extends State<HomePage> {
   void clearData(context) {
     _custIdController.text = '0';
     _custNameController.text = '';
+
+    _custBankAddressController.text = '';
+    _custBankBranchController.text = '';
+    _custBanknameController.text = '';
     _custAdd1Controller.text = '';
     _custAdd2Controller.text = '';
+    _custContactPersonController.text = '';
+    _custCountryController.text = '';
+    _custSwiftCodeController.text = '';
     _custAdd3Controller.text = '';
     _custAdd4Controller.text = '';
     _custEmailController.text = '';

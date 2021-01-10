@@ -63,6 +63,7 @@ String nextPage;
 int pageno;
 FocusNode idFocusNode;
 String searchtext;
+String appbartitle = 'Customer';
 
 String partytypeid;
 
@@ -121,7 +122,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add Customer',
+              appbartitle.toString(),
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -161,10 +162,10 @@ class HomePageState extends State<HomePage> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: <Widget>[
-                                          Text(
-                                            "Enter Customer Details",
-                                            style: TextStyle(fontSize: 16),
-                                          ),
+                                          // Text(
+                                          //   "Enter Customer Details",
+                                          //   style: TextStyle(fontSize: 16),
+                                          // ),
                                           SizedBox(
                                             height: 10,
                                           ),
@@ -199,7 +200,7 @@ class HomePageState extends State<HomePage> {
                                                 onChanged: (val) {
                                                   setState(() {
                                                     selectedpartytype = val;
-
+                                                    appbartitle = val;
                                                     partytypeid = partytypedetails
                                                         .where((element) =>
                                                             element.ptyname ==
@@ -727,6 +728,12 @@ class HomePageState extends State<HomePage> {
     String custAdd3 = _custAdd3Controller.text;
     String custcontactperson = _custcontactpersonController.text;
     String custemail = _custemailController.text;
+
+    setState(() {
+      enable = false;
+    });
+    clearData(context);
+
     if (custId != '' && custName != '') {
       //   pr.show();
 
@@ -826,6 +833,7 @@ class HomePageState extends State<HomePage> {
     _custIdController.text = '0';
     _custNameController.text = '';
     _custAdd1Controller.text = '';
+
     _custAdd2Controller.text = '';
     _custcontactpersonController.text = '';
     _custcontactnumberController.text = '';
@@ -852,7 +860,6 @@ class HomePageState extends State<HomePage> {
 
     var response = await http.get(Uri.encodeFull(customerurl),
         headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
 
     var convertDataToJson = json.decode(response.body);
     final parsed = convertDataToJson.cast<Map<String, dynamic>>();
@@ -872,11 +879,14 @@ class HomePageState extends State<HomePage> {
             .toList();
 
       partytypedata = partytypedetails.map((e) => e.ptyname).toList();
-      if (partytypeid == '' || partytypeid == null || partytypeid == '0')
-        selectedcompany = partytypedata.first;
+      if (partytypeid == '' || partytypeid == null || partytypeid == '0') {
+        selectedpartytype = partytypedata.first;
+
+        appbartitle = selectedpartytype;
+      }
 
       partytypeid = partytypedetails
-          .where((element) => element.ptyname == selectedcompany)
+          .where((element) => element.ptyname == selectedpartytype)
           .map((e) => e.partyid)
           .first
           .toString();
@@ -1007,6 +1017,7 @@ class HomePageState extends State<HomePage> {
             icon: Image.asset('images/add.png', color: Colors.black),
             onPressed: () {
               setState(() {
+                enable = false;
                 _id = '0';
                 ShowAddWidget = true;
                 custpageno = pageno;

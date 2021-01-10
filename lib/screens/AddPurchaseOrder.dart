@@ -87,9 +87,13 @@ String colorid;
 String diaid;
 String yarntypeid;
 String uomid;
+String consigneeid;
 String portofdischargeid;
+String selectedconsignee;
 String portofloadid;
 String shipmentmodeid;
+
+String labeltext = new Text("", style: TextStyle(fontSize: 20)).toString();
 
 GlobalKey key = new GlobalKey<AutoCompleteTextFieldState<customer.Customer>>();
 String _id = "";
@@ -100,6 +104,7 @@ AutoCompleteTextField<customer.Customer> textField;
 List<type.Customer> companydetails = <type.Customer>[];
 List<master.Master> currencydetails = <master.Master>[];
 List<master.Master> prodtypedetails = <master.Master>[];
+List<master.Master> consigneedetails = <master.Master>[];
 List<master.Master> fabricdetails = <master.Master>[];
 List<master.Master> fabrictypetypedetails = <master.Master>[];
 List<master.Master> fabricknittypedetails = <master.Master>[];
@@ -126,6 +131,7 @@ List<String> yarnmilldata = [];
 List<String> yarncolordata = [];
 List<String> yarntypedata = [];
 List<String> fabricdata = [];
+List<String> consigneedata = [];
 List<String> fabrictypedata = [];
 List<String> fabricknitdata = [];
 List<String> diadata = [];
@@ -152,7 +158,6 @@ final _custkgsperboxController = TextEditingController();
 final _custweightController = TextEditingController();
 final _custrateController = TextEditingController();
 final _custamountController = TextEditingController();
-final _custconsigneeAddressController = TextEditingController();
 final _custtermsandconditionsController = TextEditingController();
 final _custnoofcontainerController = TextEditingController();
 final _custpackingdetailController = TextEditingController();
@@ -400,7 +405,6 @@ class HomePageState extends State<HomePage> {
               onChanged: (val) {
                 setState(() {
                   selectedfabtype = val;
-
                   fabtypeid = fabrictypetypedetails
                       .where((element) => element.columnname == val)
                       .map((e) => e.columnMasterid)
@@ -724,11 +728,23 @@ class HomePageState extends State<HomePage> {
                                     Expanded(
                                       flex: 3,
                                       child: Text(
-                                        '    ' +
-                                            _itemdetails[index]
-                                                .fabric
-                                                .toLowerCase()
-                                                .toString(),
+                                        '  ' +
+                                            (fabricdetails
+                                                    .where((element) =>
+                                                        element
+                                                            .columnMasterid ==
+                                                        _itemdetails[index]
+                                                            .fabricid)
+                                                    .isNotEmpty
+                                                ? fabricdetails
+                                                    .where((element) =>
+                                                        element
+                                                            .columnMasterid ==
+                                                        _itemdetails[index]
+                                                            .fabricid)
+                                                    .first
+                                                    .toString()
+                                                : ""),
                                         textScaleFactor: 1.3,
                                         textAlign: TextAlign.left,
                                       ),
@@ -1005,8 +1021,20 @@ class HomePageState extends State<HomePage> {
                                 'fabric')
                               DataCell(Container(
                                 width: maxwidth * 0.25,
-                                child:
-                                    Text(item.fabric.toString().toUpperCase()),
+                                child: Text((fabricdetails
+                                        .where((element) =>
+                                            element.columnMasterid ==
+                                            item.fabricid)
+                                        .map((e) => e.columnname)
+                                        .isNotEmpty
+                                    ? fabricdetails
+                                        .where((element) =>
+                                            element.columnMasterid ==
+                                            item.fabricid)
+                                        .map((e) => e.columnname)
+                                        .first
+                                        .toString()
+                                    : "")),
                               )),
                             if (selectedprodtype.toString().toLowerCase() ==
                                 'fabric')
@@ -1142,7 +1170,7 @@ class HomePageState extends State<HomePage> {
               bottom: 30,
             ),
             child: Text(
-              'Add PurchaseOrder',
+              'Purchase Order',
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -1169,16 +1197,16 @@ class HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        Text(
-                          "Enter Purchase Order Details",
-                          style: TextStyle(fontSize: 16),
-                        ),
+                        // Text(
+                        //   "Enter Purchase Order Details",
+                        //   style: TextStyle(fontSize: 16),
+                        // ),
                         SizedBox(
                           height: 10,
                         ),
                         Card(
                           child: Container(
-                            height: maxheight * .30,
+                            height: 190,
                             width: maxwidth,
                             margin: EdgeInsets.only(top: 0),
 
@@ -1219,7 +1247,8 @@ class HomePageState extends State<HomePage> {
                                                 showSelectedItem: true,
                                                 showSearchBox: true,
                                                 items: companydata,
-                                                label: "Type *",
+                                                label:
+                                                    Text("Type *").toString(),
                                                 showClearButton: false,
                                                 onChanged: (val) {
                                                   setState(() {
@@ -1329,36 +1358,54 @@ class HomePageState extends State<HomePage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Container(
-                                          constraints: BoxConstraints(
-                                            //minHeight: 20,
-                                            minWidth: 100,
-                                            maxWidth: 400,
-                                          ),
-                                          key: _keyRed,
-                                          width: maxwidth * .5,
-                                          child: TextField(
-                                            decoration: const InputDecoration(
-                                                focusedBorder:
-                                                    UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color: widgetcolor),
-                                                ),
-                                                border: InputBorder.none,
-                                                //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                labelText: "Consignee Address",
-                                                labelStyle:
-                                                    TextStyle(fontSize: 20.0)),
-                                            keyboardType: TextInputType.text,
-                                            style: textStyle,
-                                            controller:
-                                                _custconsigneeAddressController,
-                                            // focusNode: custidFocusNode,
+                                        if (consigneedata != null &&
+                                            consigneedata.isNotEmpty)
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 300,
+                                            ),
+                                            //padding: EdgeInsets.,
+                                            width: maxwidth * .3, //* 0.50,
+                                            child: DropdownSearch<String>(
+                                                dropDownButton: Image.asset(
+                                                    'Images/arrow_drop_down.png',
+                                                    color: Colors.white),
+                                                validator: (v) => v == null
+                                                    ? "required field"
+                                                    : null,
+                                                hint: "Select a Consignee",
+                                                mode: Mode.MENU,
+                                                enabled: (_id != null &&
+                                                        _id != '' &&
+                                                        _id != '0')
+                                                    ? false
+                                                    : true,
+                                                showSelectedItem: true,
+                                                showSearchBox: true,
+                                                items: consigneedata,
+                                                label: "Consignee *",
+                                                showClearButton: false,
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    selectedconsignee = val;
 
-                                            readOnly: enable,
-                                            //enableInteractiveSelection: enable,
+                                                    consigneeid = consigneedetails
+                                                        .where((element) =>
+                                                            element
+                                                                .columnname ==
+                                                            val)
+                                                        .map((e) =>
+                                                            e.columnMasterid)
+                                                        .first
+                                                        .toString();
+                                                  });
+                                                },
+                                                popupItemDisabled: (String s) =>
+                                                    s.startsWith('I'),
+                                                selectedItem:
+                                                    selectedconsignee),
                                           ),
-                                        ),
                                         SizedBox(height: 10),
                                         if (notifypartydata != null &&
                                             notifypartydata.isNotEmpty)
@@ -1597,9 +1644,8 @@ class HomePageState extends State<HomePage> {
                         SizedBox(height: 10),
                         Container(
                             // margin: EdgeInsets.symmetric(vertical: 20.0),
-                            height: 200.0,
-                            // padding: EdgeInsets.only(
-                            //     top: 5, bottom: 5, left: 5, right: 5),
+                            height: 130,
+                            padding: EdgeInsets.only(top: 8),
                             decoration: BoxDecoration(
                               //  color: widgetcolor,
                               border: Border.all(
@@ -1973,7 +2019,9 @@ class HomePageState extends State<HomePage> {
                                               .toLowerCase() ==
                                           'yarn')
                                         Row(children: [
-                                          SizedBox(width: 10),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
                                           if (yarncountdata != null &&
                                               yarncountdata.isNotEmpty)
                                             Container(
@@ -1982,7 +2030,7 @@ class HomePageState extends State<HomePage> {
                                                 maxWidth: 150,
                                               ),
                                               //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
+                                              width: 100, //* 0.50,
                                               child: DropdownSearch<String>(
                                                 dropDownButton: Image.asset(
                                                     'Images/arrow_drop_down.png',
@@ -2022,7 +2070,7 @@ class HomePageState extends State<HomePage> {
                                                 selectedItem: selectedyarncount,
                                               ),
                                             ),
-                                          SizedBox(width: 20),
+                                          SizedBox(width: 10),
                                           if (yarnmilldata != null &&
                                               yarnmilldata.isNotEmpty)
                                             Container(
@@ -2031,7 +2079,7 @@ class HomePageState extends State<HomePage> {
                                                 maxWidth: 150,
                                               ),
                                               //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
+                                              width: 120, //* 0.50,
                                               child: DropdownSearch<String>(
                                                 dropDownButton: Image.asset(
                                                     'Images/arrow_drop_down.png',
@@ -2071,7 +2119,7 @@ class HomePageState extends State<HomePage> {
                                                 selectedItem: selectedyarnmill,
                                               ),
                                             ),
-                                          SizedBox(width: 20),
+                                          SizedBox(width: 10),
                                           if (yarntypedata != null &&
                                               yarntypedata.isNotEmpty)
                                             Container(
@@ -2080,7 +2128,7 @@ class HomePageState extends State<HomePage> {
                                                 maxWidth: 150,
                                               ),
                                               //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
+                                              width: 120, //* 0.50,
                                               child: DropdownSearch<String>(
                                                 dropDownButton: Image.asset(
                                                     'Images/arrow_drop_down.png',
@@ -2120,16 +2168,16 @@ class HomePageState extends State<HomePage> {
                                                 selectedItem: selectedyarntype,
                                               ),
                                             ),
-                                          SizedBox(width: 20),
+                                          SizedBox(width: 10),
                                           if (colordata != null &&
                                               colordata.isNotEmpty)
                                             Container(
                                               constraints: BoxConstraints(
                                                 minWidth: 100,
-                                                maxWidth: 100,
+                                                maxWidth: 150,
                                               ),
                                               //padding: EdgeInsets.,
-                                              width: maxwidth * .7, //* 0.50,
+                                              width: 150, //* 0.50,
                                               child: DropdownSearch<String>(
                                                 dropDownButton: Image.asset(
                                                     'Images/arrow_drop_down.png',
@@ -2169,7 +2217,207 @@ class HomePageState extends State<HomePage> {
                                                 selectedItem: selectedcolor,
                                               ),
                                             ),
-                                          SizedBox(width: 20),
+                                          SizedBox(width: 10),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                //minHeight: 20,
+                                                minWidth: 100,
+                                                maxWidth: 100,
+                                              ),
+                                              width: maxwidth * .7,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                        labelText: "No of Box",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custnoofboxController,
+                                                // focusNode: custidFocusNode,
+
+                                                readOnly: enable,
+                                                //enableInteractiveSelection: enable,
+                                              ),
+                                            ),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            SizedBox(width: 10),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                //minHeight: 20,
+                                                minWidth: 100,
+                                                maxWidth: 100,
+                                              ),
+                                              width: maxwidth * .7,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                        labelText: "Kgs/Box",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custkgsperboxController,
+                                                //     focusNode: custidFocusNode,
+
+                                                readOnly: enable,
+                                                //enableInteractiveSelection: enable,
+                                              ),
+                                            ),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            SizedBox(width: 10),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 100,
+                                                maxWidth: 100,
+                                              ),
+                                              width: maxwidth * .7,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                        labelText: "Weight",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custweightController,
+                                                //   focusNode: custidFocusNode,
+
+                                                readOnly: enable,
+                                                //enableInteractiveSelection: enable,
+                                              ),
+                                            ),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            SizedBox(width: 10),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 100,
+                                                maxWidth: 100,
+                                              ),
+                                              width: maxwidth * .7,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                        labelText: "Rate",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller: _custrateController,
+                                                //focusNode: custidFocusNode,
+
+                                                readOnly: enable,
+                                                //enableInteractiveSelection: enable,
+                                              ),
+                                            ),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            SizedBox(width: 20),
+                                          if (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 100,
+                                                maxWidth: 100,
+                                              ),
+                                              width: maxwidth * .7,
+                                              child: TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        focusedBorder:
+                                                            UnderlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  widgetcolor),
+                                                        ),
+                                                        border:
+                                                            InputBorder.none,
+                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                        labelText: "Amount",
+                                                        labelStyle: TextStyle(
+                                                            fontSize: 20.0)),
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                style: textStyle,
+                                                controller:
+                                                    _custamountController,
+                                                // focusNode: custidFocusNode,
+                                                readOnly: enable,
+                                                //enableInteractiveSelection: enable,
+                                              ),
+                                            ),
                                         ]),
                                     ]),
                               ),
@@ -2218,141 +2466,182 @@ class HomePageState extends State<HomePage> {
                                             .toLowerCase() ==
                                         'fabric')
                                       SizedBox(width: 20),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        //minHeight: 20,
-                                        minWidth: 100,
-                                        maxWidth: 100,
-                                      ),
-                                      width: maxwidth * .7,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                            focusedBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: widgetcolor),
-                                            ),
-                                            border: InputBorder.none,
-                                            //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                            labelText: "No of Box",
-                                            labelStyle:
-                                                TextStyle(fontSize: 20.0)),
-                                        keyboardType: TextInputType.text,
-                                        style: textStyle,
-                                        controller: _custnoofboxController,
-                                        // focusNode: custidFocusNode,
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          //minHeight: 20,
+                                          minWidth: 100,
+                                          maxWidth: 100,
+                                        ),
+                                        width: maxwidth * .7,
+                                        child: TextField(
+                                          decoration: const InputDecoration(
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: widgetcolor),
+                                              ),
+                                              border: InputBorder.none,
+                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                              labelText: "No of Box",
+                                              labelStyle:
+                                                  TextStyle(fontSize: 20.0)),
+                                          keyboardType: TextInputType.text,
+                                          style: textStyle,
+                                          controller: _custnoofboxController,
+                                          // focusNode: custidFocusNode,
 
-                                        readOnly: enable,
-                                        //enableInteractiveSelection: enable,
+                                          readOnly: enable,
+                                          //enableInteractiveSelection: enable,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: 20),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        //minHeight: 20,
-                                        minWidth: 100,
-                                        maxWidth: 100,
-                                      ),
-                                      width: maxwidth * .7,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                            focusedBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: widgetcolor),
-                                            ),
-                                            border: InputBorder.none,
-                                            //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                            labelText: "Kgs/Box",
-                                            labelStyle:
-                                                TextStyle(fontSize: 20.0)),
-                                        keyboardType: TextInputType.text,
-                                        style: textStyle,
-                                        controller: _custkgsperboxController,
-                                        //     focusNode: custidFocusNode,
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      SizedBox(width: 10),
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          //minHeight: 20,
+                                          minWidth: 100,
+                                          maxWidth: 100,
+                                        ),
+                                        width: maxwidth * .7,
+                                        child: TextField(
+                                          decoration: const InputDecoration(
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: widgetcolor),
+                                              ),
+                                              border: InputBorder.none,
+                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                              labelText: "Kgs/Box",
+                                              labelStyle:
+                                                  TextStyle(fontSize: 20.0)),
+                                          keyboardType: TextInputType.text,
+                                          style: textStyle,
+                                          controller: _custkgsperboxController,
+                                          //     focusNode: custidFocusNode,
 
-                                        readOnly: enable,
-                                        //enableInteractiveSelection: enable,
+                                          readOnly: enable,
+                                          //enableInteractiveSelection: enable,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: 20),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        minWidth: 100,
-                                        maxWidth: 100,
-                                      ),
-                                      width: maxwidth * .7,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                            focusedBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: widgetcolor),
-                                            ),
-                                            border: InputBorder.none,
-                                            //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                            labelText: "Weight",
-                                            labelStyle:
-                                                TextStyle(fontSize: 20.0)),
-                                        keyboardType: TextInputType.text,
-                                        style: textStyle,
-                                        controller: _custweightController,
-                                        //   focusNode: custidFocusNode,
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      SizedBox(width: 10),
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          minWidth: 100,
+                                          maxWidth: 100,
+                                        ),
+                                        width: maxwidth * .7,
+                                        child: TextField(
+                                          decoration: const InputDecoration(
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: widgetcolor),
+                                              ),
+                                              border: InputBorder.none,
+                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                              labelText: "Weight",
+                                              labelStyle:
+                                                  TextStyle(fontSize: 20.0)),
+                                          keyboardType: TextInputType.text,
+                                          style: textStyle,
+                                          controller: _custweightController,
+                                          //   focusNode: custidFocusNode,
 
-                                        readOnly: enable,
-                                        //enableInteractiveSelection: enable,
+                                          readOnly: enable,
+                                          //enableInteractiveSelection: enable,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: 20),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        minWidth: 100,
-                                        maxWidth: 100,
-                                      ),
-                                      width: maxwidth * .7,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                            focusedBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: widgetcolor),
-                                            ),
-                                            border: InputBorder.none,
-                                            //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                            labelText: "Rate",
-                                            labelStyle:
-                                                TextStyle(fontSize: 20.0)),
-                                        keyboardType: TextInputType.text,
-                                        style: textStyle,
-                                        controller: _custrateController,
-                                        //focusNode: custidFocusNode,
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      SizedBox(width: 10),
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          minWidth: 100,
+                                          maxWidth: 100,
+                                        ),
+                                        width: maxwidth * .7,
+                                        child: TextField(
+                                          decoration: const InputDecoration(
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: widgetcolor),
+                                              ),
+                                              border: InputBorder.none,
+                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                              labelText: "Rate",
+                                              labelStyle:
+                                                  TextStyle(fontSize: 20.0)),
+                                          keyboardType: TextInputType.text,
+                                          style: textStyle,
+                                          controller: _custrateController,
+                                          //focusNode: custidFocusNode,
 
-                                        readOnly: enable,
-                                        //enableInteractiveSelection: enable,
+                                          readOnly: enable,
+                                          //enableInteractiveSelection: enable,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: 20),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        minWidth: 100,
-                                        maxWidth: 100,
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      SizedBox(width: 20),
+                                    if (selectedprodtype
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'fabric')
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          minWidth: 100,
+                                          maxWidth: 100,
+                                        ),
+                                        width: maxwidth * .7,
+                                        child: TextField(
+                                          decoration: const InputDecoration(
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: widgetcolor),
+                                              ),
+                                              border: InputBorder.none,
+                                              //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                              labelText: "Amount",
+                                              labelStyle:
+                                                  TextStyle(fontSize: 20.0)),
+                                          keyboardType: TextInputType.text,
+                                          style: textStyle,
+                                          controller: _custamountController,
+                                          // focusNode: custidFocusNode,
+                                          readOnly: enable,
+                                          //enableInteractiveSelection: enable,
+                                        ),
                                       ),
-                                      width: maxwidth * .7,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                            focusedBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: widgetcolor),
-                                            ),
-                                            border: InputBorder.none,
-                                            //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                            labelText: "Amount",
-                                            labelStyle:
-                                                TextStyle(fontSize: 20.0)),
-                                        keyboardType: TextInputType.text,
-                                        style: textStyle,
-                                        controller: _custamountController,
-                                        // focusNode: custidFocusNode,
-                                        readOnly: enable,
-                                        //enableInteractiveSelection: enable,
-                                      ),
-                                    ),
                                   ])
                                 ],
                               ))
@@ -3019,7 +3308,7 @@ class HomePageState extends State<HomePage> {
                 pono: _custPONoController.text,
                 podate: seldate,
                 producttype: selectedprodtype,
-                consigneeid: _custconsigneeAddressController.text,
+                consigneeid: consigneeid,
                 supplierid: supplierid,
                 currencyid: currencyid,
                 noofcontainers: _custnoofcontainerController.text,
@@ -3036,7 +3325,7 @@ class HomePageState extends State<HomePage> {
                 pono: _custPONoController.text,
                 podate: seldate,
                 producttype: selectedprodtype,
-                consigneeid: _custconsigneeAddressController.text,
+                consigneeid: consigneeid,
                 supplierid: supplierid,
                 currencyid: currencyid,
                 noofcontainers: _custnoofcontainerController.text,
@@ -3048,89 +3337,12 @@ class HomePageState extends State<HomePage> {
                 remarks: _custRemarksController.text,
                 termsandconditions: _custtermsandconditionsController.text);
     final String requestBody = json.encoder.convert(purchaseorderList);
-    final http.Response response = await http.post(
-      'http://tap.suninfotechnologies.in/api/Touchpo',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: // requestBody
-          jsonEncode(<String, dynamic>{
-        "spname": "GetAndSubmitPODetails",
-        "Mode": "PO",
-        "intFlag": "1",
-        "intHeaderID": "0",
-        "strPoNo": "1",
-        "dtPoDate": "2020/12/20",
-        "strProductType": "1",
-        "intConsigneeID": "1",
-        "intSupplierID": "1",
-        "intCurrencyID": "1",
-        "intNoofContainers": "1",
-        "strPaymentTerms": "1",
-        "intShipmenModeID": "1",
-        "intPortofLoadingID": "1",
-        "intShipmentDate": "1",
-        "intPackingDetailsID": "1",
-        "strRemarks": "1",
-        "strTermsConditions1": "1",
-        "strTermsConditions2": "1",
-        "strTermsConditions3": "1",
-        "strTermsConditions4": "1",
-        "strTermsConditions5": "1",
-        "strTermsConditions6": "1",
-        "strTermsConditions7": "1",
-        "strTermsConditions8": "1",
-        "intUserID": "1",
-        "fabric": [
-          {
-            "Mode": "fabric",
-            "spname": "GetAndSubmitPOFabricDetails",
-            "intFlag": "1",
-            "intPurchaseOrdeFabricrDetailID": "1",
-            "intHeaderID": "1",
-            "intFabricTypeID": "12",
-            "strSortNumber": "23",
-            "intFabricID": "16",
-            "intCompositionID": "2",
-            "intColorID": "4",
-            "intGsm": "4",
-            "intDiaID": "6",
-            "intFabricKnitTypeID": "200",
-            "intUomID": "200",
-            "intNoofBox": "200",
-            "intKgsperbox": "200",
-            "intWeight": "200",
-            "intRate": "200",
-            "intAmount": "200",
-            "strRemarks": "200",
-            "intUserID": "200"
-          },
-          {
-            "Mode": "fabric",
-            "spname": "GetAndSubmitPOFabricDetails",
-            "intFlag": "1",
-            "intPurchaseOrdeFabricrDetailID": "1",
-            "intHeaderID": "1",
-            "intFabricTypeID": "12",
-            "strSortNumber": "23",
-            "intFabricID": "16",
-            "intCompositionID": "2",
-            "intColorID": "4",
-            "intGsm": "4",
-            "intDiaID": "6",
-            "intFabricKnitTypeID": "200",
-            "intUomID": "200",
-            "intNoofBox": "200",
-            "intKgsperbox": "200",
-            "intWeight": "200",
-            "intRate": "200",
-            "intAmount": "200",
-            "strRemarks": "200",
-            "intUserID": "453"
-          }
-        ]
-      }),
-    );
+    final http.Response response =
+        await http.post('http://tap.suninfotechnologies.in/api/Touchpo',
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: requestBody);
 
     if (response.statusCode == 200) {
       setState(() {
@@ -3181,7 +3393,6 @@ class HomePageState extends State<HomePage> {
     _custweightController.text = '';
     _custrateController.text = '';
     _custamountController.text = '';
-    _custconsigneeAddressController.text = '';
     _custtermsandconditionsController.text = '';
     _custnoofcontainerController.text = '';
     _custpackingdetailController.text = '';
@@ -3199,9 +3410,6 @@ class HomePageState extends State<HomePage> {
     purchaseorderdetl.PurchaseOrderDetails _data;
 
     selamount = _custamountController.text;
-    if (_id != "" && _id != null) {
-      if (selectedprodtype.toString().toLowerCase() == 'yarn') {}
-    }
     if (selamount != '' &&
         selamount != null &&
         (selectedprodtype.toString().toLowerCase() == 'fabric' ||
@@ -3214,15 +3422,15 @@ class HomePageState extends State<HomePage> {
           '"' +
           fabricid.toString() +
           '"' +
-          ' , "amount": ' +
+          ' , "Amount": ' +
           '"' +
           _custamountController.text.toString() +
           '"' +
-          ' , "color": ' +
+          ' , "YarnColor": ' +
           '"' +
           selectedcolor.toString() +
           '"' +
-          ' , "colorid": ' +
+          ' , "YarnColorID": ' +
           '"' +
           colorid.toString() +
           '"' +
@@ -3254,7 +3462,7 @@ class HomePageState extends State<HomePage> {
           '"' +
           _custgsmController.text.toString() +
           '"' +
-          ', "kgsperbox": ' +
+          ', "Kgsperbox": ' +
           '"' +
           _custkgsperboxController.text.toString() +
           '"' +
@@ -3266,11 +3474,11 @@ class HomePageState extends State<HomePage> {
           '"' +
           fabknittypeid.toString() +
           '"' +
-          ', "noofbox": ' +
+          ', "NoofBox": ' +
           '"' +
           _custnoofboxController.text.toString() +
           '"' +
-          ', "rate": ' +
+          ', "Rate": ' +
           '"' +
           _custrateController.text.toString() +
           '"' +
@@ -3282,15 +3490,15 @@ class HomePageState extends State<HomePage> {
           '"' +
           uomid.toString() +
           '"' +
-          ', "weight": ' +
+          ', "Weight": ' +
           '"' +
           _custweightController.text.toString() +
           '"' +
-          ', "yarnmill": ' +
+          ', "YarnMill": ' +
           '"' +
           selectedyarnmill.toString() +
           '"' +
-          ', "yarnmillid": ' +
+          ', "YarnMillID": ' +
           '"' +
           yarnmillid.toString() +
           '"' +
@@ -3302,11 +3510,11 @@ class HomePageState extends State<HomePage> {
           '"' +
           yarntypeid.toString() +
           '"' +
-          ', "yarncount": ' +
+          ', "YarnCount": ' +
           '"' +
           selectedyarncount.toString() +
           '"' +
-          ', "yarncountid": ' +
+          ', "YarnCountID": ' +
           '"' +
           yarncountid.toString() +
           '"' +
@@ -3363,6 +3571,32 @@ class HomePageState extends State<HomePage> {
     });
 
     return companydetails;
+  }
+
+  Future<List<purchaseorderdetl.PurchaseOrderDetails>>
+      getpurchaseitemdetails() async {
+    setState(() {
+      _itemdetails = [];
+    });
+    final String customerurl =
+        'http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=20&Mode=PO&spname=GetAndSubmitPODetails&intflag=4&intHeaderID=' +
+            _id;
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      _itemdetails = (selectedprodtype.toString().toLowerCase() == 'fabric')
+          ? parsed
+              .map<purchaseorderdetl.PurchaseOrderDetails>((json) =>
+                  purchaseorderdetl.PurchaseOrderDetails.fromJSON(json))
+              .toList()
+          : parsed
+              .map<purchaseorderdetl.PurchaseOrderDetails>((json) =>
+                  purchaseorderdetl.PurchaseOrderDetails.fromyarnJSON(json))
+              .toList();
+    });
+    return _itemdetails;
   }
 
   Future<List<customer.Customer>> getsupplierdetails(String filter) async {
@@ -3955,6 +4189,48 @@ class HomePageState extends State<HomePage> {
     return yarncountdetails;
   }
 
+  Future<List<master.Master>> getconsigneedetails(String filter) async {
+    setState(() {
+      consigneedetails = [];
+      consigneedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=yarncountmaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      consigneedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        consigneedetails = consigneedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      consigneedata = consigneedetails.map((e) => e.columnname).toList();
+      if (consigneeid == '' || consigneeid == null || consigneeid == '0')
+        selectedconsignee = consigneedata.first;
+
+      consigneeid = consigneedetails
+          .where((element) => element.columnname == selectedconsignee)
+          .map((e) => e.columnMasterid)
+          .first
+          .toString();
+    });
+
+    return consigneedetails;
+  }
+
   Future<List<master.Master>> getyarntypedetails(String filter) async {
     setState(() {
       yarntypedetails = [];
@@ -4083,7 +4359,7 @@ class HomePageState extends State<HomePage> {
 
   Future<purchaseorderdetl.PurchaseOrderHeader> getAddCustomerJson() async {
     String customerurl;
-    if (_id != "" && _id != "" && _id != null)
+    if (_id != "" && _id != "0" && _id != null) {
       _reportItems
           .where((element) => element.headerid == _id)
           .forEach((element) => setState(() {
@@ -4091,43 +4367,65 @@ class HomePageState extends State<HomePage> {
                 shipmentdateCtl.text = element.shipmentdate;
                 selectednotifyparty = element.notifyparty;
                 notifypartyid = element.notifypartyid;
-                _custPONoController.text = element
-                    .pono; //_custpackingdetailController.text = element.packing
+                _custPONoController.text = element.pono;
                 selectedprodtype = element.producttype;
                 prodtypeid = element.producttype;
-                _custconsigneeAddressController.text = element.consignee;
+                selectedconsignee = element.consignee;
                 selectedsupplier = element.supplier;
                 supplierid = element.supplierid;
                 selectedcurrency = element.currency;
                 currencyid = element.currencyid;
                 _custnoofcontainerController.text = element.noofcontainers;
                 _custpaymenttermsController.text = element.paymentterms;
+
                 selectedportofdischarge = portofdischargedetails
-                    .where(
-                        (e1) => e1.columnMasterid == element.portofdischargeid)
-                    .map((e) => e.columnname)
-                    .first
-                    .toString();
+                        .where((e1) =>
+                            e1.columnMasterid == element.portofdischargeid)
+                        .map((e) => e.columnname)
+                        .isNotEmpty
+                    ? portofdischargedetails
+                        .where((e1) =>
+                            e1.columnMasterid == element.portofdischargeid)
+                        .map((e) => e.columnname)
+                        .first
+                        .toString()
+                    : "";
                 selectedportofload = portofloaddetails
-                    .where((e1) => e1.columnMasterid == element.portofloadingid)
-                    .map((e) => e.columnname)
-                    .first
-                    .toString();
+                        .where((e1) =>
+                            e1.columnMasterid == element.portofloadingid)
+                        .map((e) => e.columnname)
+                        .isNotEmpty
+                    ? portofloaddetails
+                        .where((e1) =>
+                            e1.columnMasterid == element.portofloadingid)
+                        .map((e) => e.columnname)
+                        .first
+                        .toString()
+                    : "";
                 selectedshipmentmode = shipmentmodedetails
-                    .where((e1) => e1.columnMasterid == element.shipmentmodeid)
-                    .map((e) => e.columnname)
-                    .first
-                    .toString();
+                        .where(
+                            (e1) => e1.columnMasterid == element.shipmentmodeid)
+                        .map((e) => e.columnname)
+                        .first
+                        .isNotEmpty
+                    ? shipmentmodedetails
+                        .where(
+                            (e1) => e1.columnMasterid == element.shipmentmodeid)
+                        .map((e) => e.columnname)
+                        .first
+                        .toString()
+                    : "";
                 shipmentmodeid = element.shipmentdate;
                 portofloadid = element.portofloadingid;
                 portofdischargeid = element.portofdischargeid;
-                //selectedshipmentmode = element.shipmentmodeid;
                 selshipmentdate = element.shipmentdate;
                 _custpackingdetailController.text = element.packinglistid;
                 _custremarksController.text = element.remarks;
                 _custtermsandconditionsController.text =
                     element.termsandconditions;
               }));
+      getpurchaseitemdetails();
+    }
   }
 
   @override
@@ -4136,7 +4434,6 @@ class HomePageState extends State<HomePage> {
     setState(() {
       _load = true;
     });
-    //getPagingDetails();
     searchtext = '';
     getCustomerJson();
     custidFocusNode = FocusNode();
@@ -4147,29 +4444,26 @@ class HomePageState extends State<HomePage> {
     getnotifypartydetails('');
     getportofdischargedetails('');
     getportofloaddetails('');
+    getconsigneedetails('');
     getshipmentmodedetails('');
-
     getproddetails('');
+    getfabricdetails('');
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
-    //_getPositions();
     setState(() {
       getAddCustomerJson();
       if ((_id != "") && (_id != null) && (_id != "0"))
         _custIdController.text = _id.toString();
     });
-
     super.initState();
   }
 
   _afterLayout(_) {
-    //_getSizes();
     _getPositions();
   }
 
   PageController _controller = PageController(
     initialPage: 1,
   );
-
   @override
   void dispose() {
     _custRemarksController.dispose();
@@ -4191,7 +4485,7 @@ class HomePageState extends State<HomePage> {
     _custweightController.dispose();
     _custrateController.dispose();
     _custamountController.dispose();
-    _custconsigneeAddressController.dispose();
+    //_custconsigneeAddressController.dispose();
     _custtermsandconditionsController.dispose();
     _custnoofcontainerController.dispose();
     _custpackingdetailController.dispose();
@@ -4461,7 +4755,7 @@ class HomePageState extends State<HomePage> {
                 custpageno = pageno;
                 custselectedtype = selectedtype;
                 getAddCustomerJson();
-
+                enable = false;
                 getcompanyMaster('');
                 clearData(context);
                 //setState(() {
@@ -4672,6 +4966,7 @@ class HomePageState extends State<HomePage> {
                                   _id = id;
                                   custselectedtype = selectedtype;
                                   custpageno = pageno;
+                                  getfabricdetails('');
                                   getAddCustomerJson();
                                   getcompanyMaster('');
                                   //setState(() {
