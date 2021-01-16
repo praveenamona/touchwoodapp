@@ -15,6 +15,7 @@ import 'package:touchwoodapp/screens/AddMaster.dart' as Master;
 import 'package:touchwoodapp/screens/AddFabric.dart' as Fabric;
 import 'package:touchwoodapp/screens/AddGranite.dart' as Granite;
 import 'package:touchwoodapp/repository/assigncolor.dart';
+import 'package:touchwoodapp/screens/searchable.dart' as searchable;
 
 class CollapsingNavigationDrawer extends StatefulWidget {
   @override
@@ -349,6 +350,34 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                           )),
                                       iconColor: appbarcolor,
                                       children: <Widget>[
+                                        Container(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Master.HomePage ad =
+                                                  new Master.HomePage(
+                                                selectedType: "10",
+                                                pageNo: 1,
+                                                headername: "Product Type",
+                                                tablename: "producttypemaster",
+                                              );
+                                              ad.custid;
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          searchable.MyApp()));
+                                            },
+                                            // leading: Image.asset(
+                                            //   'images/people.png',
+                                            // ),
+                                            title: Text("searchable"),
+                                          ),
+                                        ),
+                                        Divider(
+                                          height: 1,
+                                          color: widgetcolor,
+                                        ),
                                         Container(
                                           padding: EdgeInsets.only(bottom: 5),
                                           child: ListTile(

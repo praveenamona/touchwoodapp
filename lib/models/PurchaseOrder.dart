@@ -16,7 +16,8 @@ class PurchaseOrderHeader {
       this.shipmentdate,
       this.packinglistid,
       this.remarks,
-      this.termsandconditions});
+      this.termsandconditions,
+      this.intflag});
   String headerid;
   String pono;
   String podate;
@@ -46,6 +47,7 @@ class PurchaseOrderHeader {
   String consignee;
   String currency;
   String portofdischargeid;
+  String intflag;
 
   List<PurchaseOrderDetails> purchaseorderdetail;
   List<PurchaseOrderFabricDetails> purchaseorderfabricdetail;
@@ -83,7 +85,7 @@ class PurchaseOrderHeader {
   Map<String, dynamic> toJson() => <String, dynamic>{
         'spname': 'GetAndSubmitPODetails',
         'Mode': 'PO',
-        'intFlag': '1',
+        'intFlag': intflag,
         'intHeaderID': headerid,
         'strPoNo': pono,
         'dtPoDate': podate,
@@ -113,21 +115,21 @@ class PurchaseOrderHeader {
 }
 
 class PurchaseOrderFabricDetails {
-  PurchaseOrderFabricDetails({
-    this.headerid,
-    this.colorid,
-    this.noofbox,
-    this.weight,
-    this.rate,
-    this.amount,
-    this.fabrictypeid,
-    this.fabricid,
-    this.compositionid,
-    this.gsm,
-    this.diaid,
-    this.knittypeid,
-    this.uomid,
-  });
+  PurchaseOrderFabricDetails(
+      {this.headerid,
+      this.colorid,
+      this.noofbox,
+      this.weight,
+      this.rate,
+      this.amount,
+      this.fabrictypeid,
+      this.fabricid,
+      this.compositionid,
+      this.gsm,
+      this.diaid,
+      this.knittypeid,
+      this.uomid,
+      this.intflag});
   String colorid;
   String compositionid;
   String uomid;
@@ -146,12 +148,13 @@ class PurchaseOrderFabricDetails {
   String sortnumber;
   String detailid;
   String headerid;
+  String intflag;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'Mode': 'fabric',
         'spname': 'GetAndSubmitPOFabricDetails',
-        'intFlag': '1',
-        'intPurchaseOrdeFabricrDetailID': '1',
+        'intFlag': intflag,
+        'intPurchaseOrdeFabricrDetailID': detailid,
         'intHeaderID': headerid,
         'intFabricTypeID': fabrictypeid,
         'strSortNumber': '23',
@@ -173,28 +176,29 @@ class PurchaseOrderFabricDetails {
 }
 
 class PurchaseOrderDetails {
-  PurchaseOrderDetails({
-    this.headerid,
-    this.yarnmillid,
-    this.yarntypeid,
-    this.yarncountid,
-    this.colorid,
-    this.noofbox,
-    this.weight,
-    this.rate,
-    this.amount,
-    this.fabrictypeid,
-    this.fabricid,
-    this.compositionid,
-    this.gsm,
-    this.diaid,
-    this.knittypeid,
-    this.uomid,
-  });
+  PurchaseOrderDetails(
+      {this.headerid,
+      this.yarnmillid,
+      this.yarntypeid,
+      this.yarncountid,
+      this.colorid,
+      this.noofbox,
+      this.weight,
+      this.rate,
+      this.amount,
+      this.fabrictypeid,
+      this.fabricid,
+      this.compositionid,
+      this.gsm,
+      this.diaid,
+      this.knittypeid,
+      this.uomid,
+      this.intflag});
 
   String headerid;
   String yarnmillid;
   //   String
+  String intflag;
   String yarntypeid;
   String yarntype;
   String yarnmill;
@@ -230,11 +234,12 @@ class PurchaseOrderDetails {
   Map<String, dynamic> toJson() => <String, dynamic>{
         'Mode': 'yarn',
         'spname': 'GetAndSubmitPOYarnDetail',
-        'intFlag': '1',
-        'PurchaseOrdeYarnrDetailID': '1',
+        'intFlag': intflag,
+        'PurchaseOrdeYarnrDetailID': detailid,
         'intHeaderID': headerid,
         'intYarnCountID': yarncountid,
         'intYarnMillID': yarnmillid,
+        'intYarnTypeID': yarntypeid,
         'intYarnColorID': colorid,
         'intNoofBox': noofbox,
         'intWeight': weight,
@@ -250,6 +255,8 @@ class PurchaseOrderDetails {
         colorid = jsonMap['YarnColorID'].toString(),
         yarncount = jsonMap['YarnCount'].toString(),
         yarnmill = jsonMap['YarnMill'].toString(),
+        yarntype = jsonMap['YarnType'].toString(),
+        yarntypeid = jsonMap['YarnTypeId'].toString(),
         color = jsonMap['YarnColor'].toString(),
         noofbox = jsonMap['NoofBox'].toString(),
         weight = jsonMap['Weight'].toString(),

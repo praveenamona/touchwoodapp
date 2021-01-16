@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -26,6 +29,9 @@ import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:touchwoodapp/models/uom.dart' as uom;
 import 'package:dropdown_search/dropdown_search.dart';
 
+import 'package:touchwoodapp/widgets/searchable_dropdown.dart';
+import 'package:provider/provider.dart';
+
 void main() => runApp(new MaterialApp(
       home: new HomePage(),
       theme: ThemeData(
@@ -51,17 +57,14 @@ String previousPage;
 String nextPage;
 int pageno;
 FocusNode idFocusNode;
+FocusNode focusnoofbox;
 String searchtext;
 
 String selectedcompany;
 String selectedcurrency;
 String custselectedtype;
-String selectedyarnmill;
-//String selectedyarncolor;
-String selectedyarntype;
-String selectedyarncount;
 String selectedfabric;
-String selectedcolor;
+String Selectedcolor;
 String selecteddia;
 String selecteduom;
 String selectedfabtype;
@@ -104,7 +107,7 @@ AutoCompleteTextField<customer.Customer> textField;
 List<type.Customer> companydetails = <type.Customer>[];
 List<master.Master> currencydetails = <master.Master>[];
 List<master.Master> prodtypedetails = <master.Master>[];
-List<master.Master> consigneedetails = <master.Master>[];
+List<Customer> consigneedetails = <Customer>[];
 List<master.Master> fabricdetails = <master.Master>[];
 List<master.Master> fabrictypetypedetails = <master.Master>[];
 List<master.Master> fabricknittypedetails = <master.Master>[];
@@ -157,6 +160,9 @@ final _custgsmController = TextEditingController();
 final _custnoofboxController = TextEditingController();
 final _custkgsperboxController = TextEditingController();
 final _custweightController = TextEditingController();
+final _custyarntypeController = TextEditingController();
+final _custyarnmillController = TextEditingController();
+final _custyarncountController = TextEditingController();
 final _custrateController = TextEditingController();
 final _custamountController = TextEditingController();
 final _custtermsandconditionsController = TextEditingController();
@@ -183,8 +189,8 @@ var selshipmentdate;
 bool enable = false;
 
 class HomePage extends StatefulWidget {
-  String selectedType;
-  int pageNo;
+  final String selectedType;
+  final int pageNo;
   HomePage({this.selectedType, this.pageNo});
 
   String get custid {
@@ -202,7 +208,51 @@ String selamount;
 List<purchaseorderdetl.PurchaseOrderDetails> Itemdetails =
     <purchaseorderdetl.PurchaseOrderDetails>[];
 
+class DecimalTextInputFormatter extends TextInputFormatter {
+  DecimalTextInputFormatter({this.decimalRange})
+      : assert(decimalRange == null || decimalRange > 0);
+
+  final int decimalRange;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue, // unused.
+    TextEditingValue newValue,
+  ) {
+    TextSelection newSelection = newValue.selection;
+    String truncated = newValue.text;
+
+    if (decimalRange != null) {
+      String value = newValue.text;
+
+      if (value.contains(".") &&
+          value.substring(value.indexOf(".") + 1).length > decimalRange) {
+        truncated = oldValue.text;
+        newSelection = oldValue.selection;
+      } else if (value == ".") {
+        truncated = "0.";
+
+        newSelection = newValue.selection.copyWith(
+          baseOffset: math.min(truncated.length, truncated.length + 1),
+          extentOffset: math.min(truncated.length, truncated.length + 1),
+        );
+      }
+
+      return TextEditingValue(
+        text: truncated,
+        selection: newSelection,
+        composing: TextRange.empty,
+      );
+    }
+    return newValue;
+  }
+}
+
 class HomePageState extends State<HomePage> {
+  String Selectedyarnmill;
+//String selectedyarncolor;
+  String Selectedyarntype;
+  String Selectedyarncount;
   _getPositions() {
     final RenderBox renderBoxRed = _keyRed.currentContext.findRenderObject();
     final positionRed = renderBoxRed.localToGlobal(Offset.zero);
@@ -213,6 +263,21 @@ class HomePageState extends State<HomePage> {
     print("POSITION of Red: $positionRed ");
   }
 
+  void _handleKeyEvent(RawKeyEvent event) {
+    setState(() {
+      if (event.logicalKey == LogicalKeyboardKey.keyQ) {
+        //   _message = 'Pressed the "Q" key!';
+      } else {
+        if (kReleaseMode) {
+          //    _message =
+          print(' Key label is "${event.logicalKey.keyLabel ?? '<none>'}"');
+        } else {
+          // This will only print useful information in debug mode.
+          //_message = 'Not a Q: Pressed ${event.logicalKey.debugName}';
+        }
+      }
+    });
+  }
   // Widget listtableView() {
   //   // selrate = '';
   //   // Selecteditem = '';
@@ -345,8 +410,7 @@ class HomePageState extends State<HomePage> {
   //   }
   //   return null;
   // }
-  _modalBottomSheetMenu(
-      double maxwidth, double maxheight, BuildContext context) {
+  _modalBottomSheetMenu(double maxwidth, double maxheight, context) {
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5.0),
@@ -605,7 +669,1447 @@ class HomePageState extends State<HomePage> {
       });
   }
 
-  Widget listtableView(double maxwidth, double maxheight) {
+  void saveItems() async {
+    if (_id == "" || _id == null) {
+      _id = "0";
+    }
+    List<purchaseorderdetl.PurchaseOrderDetails> yarndetail =
+        List<purchaseorderdetl.PurchaseOrderDetails>.generate(
+            _itemdetails.length, (int index) {
+      return purchaseorderdetl.PurchaseOrderDetails(
+          intflag: (_id == '0' || _id == '' || _id == null) ? '1' : '0',
+          headerid: _id,
+          yarnmillid: _itemdetails[index].yarnmillid,
+          yarntypeid: _itemdetails[index].yarntypeid,
+          yarncountid: _itemdetails[index].yarncountid,
+          colorid: _itemdetails[index].colorid,
+          noofbox: _itemdetails[index].noofbox,
+          weight: _itemdetails[index].weight,
+          rate: _itemdetails[index].rate,
+          amount: _itemdetails[index].amount);
+    });
+
+    List<purchaseorderdetl.PurchaseOrderFabricDetails> fabricdetail =
+        List<purchaseorderdetl.PurchaseOrderFabricDetails>.generate(
+            _itemdetails.length, (int index) {
+      return purchaseorderdetl.PurchaseOrderFabricDetails(
+          headerid: _id,
+          intflag: (_id == '0' || _id == '' || _id == null) ? '1' : '0',
+          fabrictypeid: _itemdetails[index].fabrictypeid,
+          fabricid: _itemdetails[index].fabricid,
+          compositionid: _itemdetails[index].compositionid,
+          gsm: _itemdetails[index].gsm,
+          diaid: _itemdetails[index].diaid,
+          knittypeid: _itemdetails[index].knittypeid,
+          uomid: _itemdetails[index].uomid,
+          colorid: _itemdetails[index].colorid,
+          noofbox: _itemdetails[index].noofbox,
+          weight: _itemdetails[index].weight,
+          rate: _itemdetails[index].rate,
+          amount: _itemdetails[index].amount);
+    });
+
+    final purchaseorderdetl.PurchaseOrderHeader purchaseorderList =
+        (selectedprodtype.toString().toLowerCase() == 'yarn')
+            ? purchaseorderdetl.PurchaseOrderHeader(
+                intflag: (_id == '0' || _id == '' || _id == null) ? '1' : '0',
+                purchaseorderdetail: yarndetail,
+                headerid: _id,
+                pono: _custPONoController.text,
+                podate: seldate,
+                producttype: selectedprodtype,
+                consigneeid: consigneeid,
+                supplierid: supplierid,
+                currencyid: currencyid,
+                noofcontainers: _custnoofcontainerController.text,
+                paymentterms: _custpaymenttermsController.text,
+                shipmentmodeid: shipmentmodeid,
+                portofloadingid: portofloadid,
+                shipmentdate: selshipmentdate,
+                packinglistid: _custpackingdetailController.text,
+                remarks: _custRemarksController.text,
+                termsandconditions: _custtermsandconditionsController.text)
+            : purchaseorderdetl.PurchaseOrderHeader(
+                intflag: (_id == '0' || _id == '' || _id == null) ? '1' : '0',
+                purchaseorderfabricdetail: fabricdetail,
+                headerid: _id,
+                pono: _custPONoController.text,
+                podate: seldate,
+                producttype: selectedprodtype,
+                consigneeid: consigneeid,
+                supplierid: supplierid,
+                currencyid: currencyid,
+                noofcontainers: _custnoofcontainerController.text,
+                paymentterms: _custpaymenttermsController.text,
+                shipmentmodeid: shipmentmodeid,
+                portofloadingid: portofloadid,
+                shipmentdate: selshipmentdate,
+                packinglistid: _custpackingdetailController.text,
+                remarks: _custRemarksController.text,
+                termsandconditions: _custtermsandconditionsController.text);
+    final String requestBody = json.encoder.convert(purchaseorderList);
+    final http.Response response =
+        await http.post('http://tap.suninfotechnologies.in/api/Touchpo',
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: requestBody);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        clearData(context);
+        enable = false;
+      });
+      Alert(
+          context: context,
+          title: "Done!",
+          desc: "Data saved successfully",
+          type: AlertType.success,
+          style: AlertStyle(isCloseButton: false),
+          buttons: [
+            DialogButton(
+              child: Text(
+                "Close",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+//pr.hide();
+              },
+              width: 120,
+            )
+          ]).show();
+    } else {
+      throw Exception('Failed to create album.');
+    }
+  }
+
+  void clearData(context) {
+    _custIdController.text = '0';
+    _custPONoController.text = '';
+    _custDateController.text = '';
+    //_cust
+    shipmentdateCtl.text = '';
+    dateCtl.text = '';
+    _custNotifypartyController.text = '';
+    _custAdd3Controller.text = '';
+    _custAdd4Controller.text = '';
+    _custEmailController.text = '';
+    _custGstinController.text = '';
+    _custMobileController.text = '';
+    _custRemarksController.text = '';
+    _custgsmController.text = '';
+    _custnoofboxController.text = '';
+    _custkgsperboxController.text = '';
+    _custweightController.text = '';
+    _custrateController.text = '';
+    _custamountController.text = '';
+    _custtermsandconditionsController.text = '';
+    _custtermsandconditionsController2.text = '';
+    _custtermsandconditionsController3.text = '';
+    _custtermsandconditionsController4.text = '';
+    _custtermsandconditionsController5.text = '';
+    _custtermsandconditionsController6.text = '';
+    _custtermsandconditionsController7.text = '';
+    _custtermsandconditionsController8.text = '';
+    _custnoofcontainerController.text = '';
+    _custpackingdetailController.text = '';
+    _custpaymenttermsController.text = '';
+    _custremarksController.text = '';
+    colorid = '0';
+    yarncountid = '0';
+    yarnmillid = '0';
+    yarntypeid = '0';
+    fabricid = '0';
+    diaid = '0';
+    fabtypeid = '0';
+    fabknittypeid = '0';
+    compositionid = '0';
+    selectedconsignee = '';
+    selectednotifyparty = '';
+    selectedcurrency = '';
+    selectedsupplier = '';
+    _itemdetails = [];
+    _id = '0';
+    // Selectedcolor = 'white';
+    // colorid = '2';
+    // _custyarntypeController.text = 'TESoGT';
+    // yarntypeid = '5';
+  }
+
+  purchaseorderdetl.PurchaseOrderDetails getitemdetails() {
+    purchaseorderdetl.PurchaseOrderDetails _data;
+
+    selamount = _custamountController.text;
+    if (selamount != '' &&
+        selamount != null &&
+        (selectedprodtype.toString().toLowerCase() == 'fabric' ||
+            selectedprodtype.toString().toLowerCase() == 'yarn')) {
+      var convertDataToJson =
+          (selectedprodtype.toString().toLowerCase() == 'fabric')
+              ? json.decode('[{"fabric": ' +
+                  '"' +
+                  selectedfabric.toString() +
+                  '" , ' +
+                  '"FabricID": ' +
+                  '"' +
+                  fabricid.toString() +
+                  '"' +
+                  ' , "Amount": ' +
+                  '' +
+                  _custamountController.text.toString() +
+                  '' +
+                  ', "Composition": ' +
+                  '"' +
+                  selectedcomposition.toString() +
+                  '"' +
+                  ', "CompositionID": ' +
+                  '"' +
+                  compositionid.toString() +
+                  '"' +
+                  ', "Dia": ' +
+                  '"' +
+                  selecteddia.toString() +
+                  '"' +
+                  ', "DiaID": ' +
+                  '"' +
+                  diaid.toString() +
+                  '"' +
+                  ', "FabricType": ' +
+                  '"' +
+                  selectedfabtype.toString() +
+                  '"' +
+                  ', "FabricTypeID": ' +
+                  '"' +
+                  fabtypeid.toString() +
+                  '"' +
+                  ', "gsm": ' +
+                  '' +
+                  _custgsmController.text.toString() +
+                  '' +
+                  ', "Kgsperbox": ' +
+                  '' +
+                  _custkgsperboxController.text.toString() +
+                  '' +
+                  ', "FabricKnitType": ' +
+                  '"' +
+                  selectedfabknittype.toString() +
+                  '"' +
+                  ', "FabricKnitTypeID": ' +
+                  '"' +
+                  fabknittypeid.toString() +
+                  '"' +
+                  ', "NoofBox": ' +
+                  '' +
+                  _custnoofboxController.text.toString() +
+                  '' +
+                  ', "Rate": ' +
+                  '' +
+                  _custrateController.text.toString() +
+                  '' +
+                  ', "Uom": ' +
+                  '"' +
+                  selecteduom.toString() +
+                  '"' +
+                  ', "UomID": ' +
+                  '"' +
+                  uomid.toString() +
+                  '"' +
+                  ', "Weight": ' +
+                  '' +
+                  _custweightController.text.toString() +
+                  '' +
+                  '}]')
+              : json.decode('[{"YarnColor": ' +
+                  '"' +
+                  Selectedcolor.toString() +
+                  '"' +
+                  ', "Amount": ' +
+                  '"' +
+                  _custamountController.text.toString() +
+                  '"' +
+                  ', "YarnColorID": ' +
+                  '"' +
+                  colorid.toString() +
+                  '"' +
+                  ', "Kgsperbox": ' +
+                  '"' +
+                  _custkgsperboxController.text.toString() +
+                  '"' +
+                  ', "NoofBox": ' +
+                  '"' +
+                  _custnoofboxController.text.toString() +
+                  '"' +
+                  ', "Rate": ' +
+                  '"' +
+                  _custrateController.text.toString() +
+                  '"' +
+                  ', "YarnMill": ' +
+                  '"' +
+                  Selectedyarnmill.toString() +
+                  '"' +
+                  ', "YarnMillID": ' +
+                  '"' +
+                  yarnmillid.toString() +
+                  '"' +
+                  ', "YarnType": ' +
+                  '"' +
+                  _custyarntypeController.text.toString() +
+                  '"' +
+                  ', "YarnTypeId": ' +
+                  '"' +
+                  yarntypeid.toString() +
+                  '"' +
+                  ', "YarnCount": ' +
+                  '"' +
+                  Selectedyarncount.toString() +
+                  '"' +
+                  ', "YarnCountID": ' +
+                  '"' +
+                  yarncountid.toString() +
+                  '"' +
+                  ', "Weight": ' +
+                  '"' +
+                  _custweightController.text.toString() +
+                  '"' +
+                  '}]');
+
+      final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+      _data = (selectedprodtype.toString().toLowerCase() == 'fabric')
+          ? parsed
+              .map<purchaseorderdetl.PurchaseOrderDetails>((json) =>
+                  purchaseorderdetl.PurchaseOrderDetails.fromJSON(json))
+              .first
+          : parsed
+              .map<purchaseorderdetl.PurchaseOrderDetails>((json) =>
+                  purchaseorderdetl.PurchaseOrderDetails.fromyarnJSON(json))
+              .first;
+    }
+    return _data;
+  }
+
+  List<purchaseorderdetl.PurchaseOrderHeader> data =
+      new List<purchaseorderdetl.PurchaseOrderHeader>();
+
+  Future<List<type.Customer>> getcompanyMaster(String filter) async {
+    setState(() {
+      companydetails = [];
+      companydata = [];
+    });
+
+    final String customerurl =
+        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      companydetails = parsed
+          .map<type.Customer>((json) => type.Customer.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        companydetails = companydetails
+            .where((element) => element.ptyname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      companydata = companydetails.map((e) => e.ptyname).toList();
+      if (compid == '' || compid == null || compid == '0')
+        selectedcompany = companydata.first;
+
+      compid = companydetails
+              .where((element) => element.ptyname == selectedcompany)
+              .map((e) => e.partyid)
+              .isEmpty
+          ? "0"
+          : companydetails
+              .where((element) => element.ptyname == selectedcompany)
+              .map((e) => e.partyid)
+              .first
+              .toString();
+    });
+
+    return companydetails;
+  }
+
+  Future<List<purchaseorderdetl.PurchaseOrderDetails>>
+      getpurchaseitemdetails() async {
+    setState(() {
+      _itemdetails = [];
+    });
+    final String customerurl =
+        'http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=20&Mode=PO&spname=GetAndSubmitPODetails&intflag=4&intHeaderID=' +
+            _id;
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      _itemdetails = (selectedprodtype.toString().toLowerCase() == 'fabric')
+          ? parsed
+              .map<purchaseorderdetl.PurchaseOrderDetails>((json) =>
+                  purchaseorderdetl.PurchaseOrderDetails.fromJSON(json))
+              .toList()
+          : parsed
+              .map<purchaseorderdetl.PurchaseOrderDetails>((json) =>
+                  purchaseorderdetl.PurchaseOrderDetails.fromyarnJSON(json))
+              .toList();
+    });
+    return _itemdetails;
+  }
+
+  Future<List<customer.Customer>> getsupplierdetails(String filter) async {
+    setState(() {
+      supplierdetails = [];
+      supplierdata = [];
+    });
+
+    final String customerurl =
+        'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&intPartytypeID=2&pagesize=50';
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      supplierdetails = parsed
+          .map<customer.Customer>((json) => customer.Customer.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        supplierdetails = supplierdetails
+            .where((element) => element.customerName
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      supplierdata = supplierdetails.map((e) => e.customerName).toList();
+      if (supplierid == '' || supplierid == null || supplierid == '0')
+        selectedsupplier = supplierdata.first;
+
+      supplierid = supplierdetails
+              .where((element) => element.customerName == selectedsupplier)
+              .map((e) => e.custId)
+              .isEmpty
+          ? "0"
+          : supplierdetails
+              .where((element) => element.customerName == selectedsupplier)
+              .map((e) => e.custId)
+              .first
+              .toString();
+    });
+
+    return supplierdetails;
+  }
+
+  Future<List<customer.Customer>> getnotifypartydetails(String filter) async {
+    setState(() {
+      notifypartydetails = [];
+      notifypartydata = [];
+    });
+
+    final String customerurl =
+        'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&intPartytypeID=4&pagesize=10';
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      notifypartydetails = parsed
+          .map<customer.Customer>((json) => customer.Customer.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        notifypartydetails = notifypartydetails
+            .where((element) => element.customerName
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      notifypartydata = notifypartydetails.map((e) => e.customerName).toList();
+      if (notifypartyid == '' || notifypartyid == null || notifypartyid == '0')
+        selectednotifyparty = notifypartydata.first;
+
+      notifypartyid = notifypartydetails
+              .where((element) => element.customerName == selectednotifyparty)
+              .map((e) => e.custId)
+              .isEmpty
+          ? "0"
+          : notifypartydetails
+              .where((element) => element.customerName == selectednotifyparty)
+              .map((e) => e.custId)
+              .first
+              .toString();
+    });
+
+    return notifypartydetails;
+  }
+
+  Future<List<master.Master>> getcurrencydetails(String filter) async {
+    setState(() {
+      currencydetails = [];
+      currencydata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=currencymaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      currencydetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        currencydetails = currencydetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      currencydata = currencydetails.map((e) => e.columnname).toList();
+      if (currencyid == '' || currencyid == null || currencyid == '0')
+        selectedcurrency = currencydata.first;
+
+      currencyid = currencydetails
+              .where((element) => element.columnname == selectedcurrency)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : currencydetails
+              .where((element) => element.columnname == selectedcurrency)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return currencydetails;
+  }
+
+  Future<List<uom.Uom>> getuomdetails(String filter) async {
+    setState(() {
+      uomdetails = [];
+      uomdata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=uom&spname=GetAndSubmituommaster&intOrgID=1&intUserID=1&intflag=4";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      uomdetails =
+          parsed.map<uom.Uom>((json) => uom.Uom.fromJSON(json)).toList();
+
+      if (filter != "")
+        uomdetails = uomdetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      uomdata = uomdetails.map((e) => e.columnname).toList();
+      if (uomid == '' || uomid == null || uomid == '0')
+        selecteduom = uomdata.first;
+
+      uomid = uomdetails
+              .where((element) => element.columnname == selecteduom)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : uomdetails
+              .where((element) => element.columnname == selecteduom)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return uomdetails;
+  }
+
+  Future<List<master.Master>> getcompositiondetails(String filter) async {
+    setState(() {
+      compositiondetails = [];
+      compositiondata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabriccompositionmaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      compositiondetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        compositiondetails = compositiondetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      compositiondata = compositiondetails.map((e) => e.columnname).toList();
+      if (compositionid == '' || compositionid == null || compositionid == '0')
+        selectedcomposition = compositiondata.first;
+
+      compositionid = compositiondetails
+              .where((element) => element.columnname == selectedcomposition)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : compositiondetails
+              .where((element) => element.columnname == selectedcomposition)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return compositiondetails;
+  }
+
+  Future<List<master.Master>> getdiadetails(String filter) async {
+    setState(() {
+      diadetails = [];
+      diadata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabricdiamaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      diadetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        diadetails = diadetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      diadata = diadetails.map((e) => e.columnname).toList();
+      if (diaid == '' || diaid == null || diaid == '0')
+        selecteddia = diadata.first;
+
+      diaid = diadetails
+              .where((element) => element.columnname == selecteddia)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : diadetails
+              .where((element) => element.columnname == selecteddia)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return diadetails;
+  }
+
+  Future<List<master.Master>> getportofdischargedetails(String filter) async {
+    setState(() {
+      portofdischargedetails = [];
+      portofdischargedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=portofdischargemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      portofdischargedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        portofdischargedetails = portofdischargedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      portofdischargedata =
+          portofdischargedetails.map((e) => e.columnname).toList();
+      if (portofdischargeid == '' ||
+          portofdischargeid == null ||
+          portofdischargeid == '0')
+        selectedportofdischarge = portofdischargedata.first;
+
+      portofdischargeid = portofdischargedetails
+              .where((element) => element.columnname == selectedportofdischarge)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : portofdischargedetails
+              .where((element) => element.columnname == selectedportofdischarge)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return portofdischargedetails;
+  }
+
+  Future<List<master.Master>> getportofloaddetails(String filter) async {
+    setState(() {
+      portofloaddetails = [];
+      portofloaddata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=portofloadingmaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      portofloaddetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        portofloaddetails = portofloaddetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      portofloaddata = portofloaddetails.map((e) => e.columnname).toList();
+      if (portofloadid == '' || portofloadid == null || portofloadid == '0')
+        selectedportofload = portofloaddata.first;
+
+      portofloadid = portofloaddetails
+              .where((element) => element.columnname == selectedportofload)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : portofloaddetails
+              .where((element) => element.columnname == selectedportofload)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return portofloaddetails;
+  }
+
+  Future<List<master.Master>> getshipmentmodedetails(String filter) async {
+    setState(() {
+      shipmentmodedetails = [];
+      shipmentmodedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=shipmentmodemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      shipmentmodedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        shipmentmodedetails = shipmentmodedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      shipmentmodedata = shipmentmodedetails.map((e) => e.columnname).toList();
+      if (shipmentmodeid == '' ||
+          shipmentmodeid == null ||
+          shipmentmodeid == '0') selectedshipmentmode = shipmentmodedata.first;
+
+      shipmentmodeid = shipmentmodedetails
+              .where((element) => element.columnname == selectedshipmentmode)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : shipmentmodedetails
+              .where((element) => element.columnname == selectedshipmentmode)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return shipmentmodedetails;
+  }
+
+  Future<List<master.Master>> getcolordetails(String filter) async {
+    setState(() {
+      colordetails = [];
+      colordata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=master&spname=GetAndSubmitmastertable&intOrgID=1&intUserID=1&intflag=4&strTableName=colormaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      colordetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        colordetails = colordetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      colordata = colordetails.map((e) => e.columnname).toList();
+      if (colorid == '' || colorid == null || colorid == '0')
+        Selectedcolor = colordata.first;
+
+      colorid = colordetails
+              .where((element) => element.columnname == Selectedcolor)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : colordetails
+              .where((element) => element.columnname == Selectedcolor)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return colordetails;
+  }
+
+  Future<List<master.Master>> getfabknittypedetails(String filter) async {
+    setState(() {
+      fabricknittypedetails = [];
+      fabricknitdata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabricdknittypemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      fabricknittypedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        fabricknittypedetails = fabricknittypedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      fabricknitdata = fabricknittypedetails.map((e) => e.columnname).toList();
+      if (fabknittypeid == '' || fabknittypeid == null || fabknittypeid == '0')
+        selectedfabknittype = fabricknitdata.first;
+
+      fabknittypeid = fabricknittypedetails
+              .where((element) => element.columnname == selectedfabknittype)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : fabricknittypedetails
+              .where((element) => element.columnname == selectedfabknittype)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return fabricknittypedetails;
+  }
+
+  Future<List<master.Master>> getfabrictypedetails(String filter) async {
+    setState(() {
+      fabrictypetypedetails = [];
+      fabrictypedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabrictypemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      fabrictypetypedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        fabrictypetypedetails = fabrictypetypedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      fabrictypedata = fabrictypetypedetails.map((e) => e.columnname).toList();
+      if (fabtypeid == '' || fabtypeid == null || fabtypeid == '0')
+        selectedfabtype = fabrictypedata.first;
+
+      fabtypeid = fabrictypetypedetails
+              .where((element) => element.columnname == selectedfabtype)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : fabrictypetypedetails
+              .where((element) => element.columnname == selectedfabtype)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return fabrictypetypedetails;
+  }
+
+  Future<List<master.Master>> getyarnmilldetails(String filter) async {
+    setState(() {
+      yarnmilldetails = [];
+      yarnmilldata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=yarnmillmaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      yarnmilldetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        yarnmilldetails = yarnmilldetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      yarnmilldata = yarnmilldetails.map((e) => e.columnname).toList();
+      if (yarnmillid == '' || yarnmillid == null || yarnmillid == '0')
+        Selectedyarnmill = yarnmilldata.first;
+
+      yarnmillid = yarnmilldetails
+              .where((element) => element.columnname == Selectedyarnmill)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : yarnmilldetails
+              .where((element) => element.columnname == Selectedyarnmill)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return yarnmilldetails;
+  }
+
+  Future<List<master.Master>> getyarncountdetails(String filter) async {
+    setState(() {
+      yarncountdetails = [];
+      yarncountdata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=yarncountmaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      yarncountdetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        yarncountdetails = yarncountdetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      yarncountdata = yarncountdetails.map((e) => e.columnname).toList();
+      if (yarncountid == '' || yarncountid == null || yarncountid == '0')
+        Selectedyarncount = yarncountdata.first;
+
+      yarncountid = yarncountdetails
+              .where((element) => element.columnname == Selectedyarncount)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : yarncountdetails
+              .where((element) => element.columnname == Selectedyarncount)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return yarncountdetails;
+  }
+
+  Future<List<Customer>> getconsigneedetails(String filter) async {
+    setState(() {
+      consigneedetails = [];
+      consigneedata = [];
+    });
+
+    final String customerurl =
+        "https://cors-anywhere.herokuapp.com/http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intPartytypeID=3&intUserID=1&pagesize=150&pagenumber=1";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      consigneedetails =
+          parsed.map<Customer>((json) => Customer.fromJSON(json)).toList();
+
+      if (filter != "")
+        consigneedetails = consigneedetails
+            .where((element) => element.customerName
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      consigneedata = consigneedetails.map((e) => e.customerName).toList();
+      if (consigneeid == '' || consigneeid == null || consigneeid == '0')
+        selectedconsignee = consigneedata.first;
+
+      consigneeid = consigneedetails
+              .where((element) => element.customerName == selectedconsignee)
+              .map((e) => e.custId)
+              .isEmpty
+          ? "0"
+          : consigneedetails
+              .where((element) => element.customerName == selectedconsignee)
+              .map((e) => e.custId)
+              .first
+              .toString();
+    });
+
+    return consigneedetails;
+  }
+
+  Future<List<master.Master>> getyarntypedetails(String filter) async {
+    setState(() {
+      yarntypedetails = [];
+      yarntypedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=yarntypemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      yarntypedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        yarntypedetails = yarntypedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      yarntypedata = yarntypedetails.map((e) => e.columnname).toList();
+      if (yarntypeid == '' || yarntypeid == null || yarntypeid == '0')
+        _custyarntypeController.text = yarntypedata.first;
+
+      yarntypeid = yarntypedetails
+              .where((element) =>
+                  element.columnname == _custyarntypeController.text)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : yarntypedetails
+              .where((element) =>
+                  element.columnname == _custyarntypeController.text)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return yarntypedetails;
+  }
+
+  Future<List<master.Master>> getfabricdetails(String filter) async {
+    setState(() {
+      fabricdetails = [];
+      fabricdata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabricnamemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      fabricdetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        fabricdetails = fabricdetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      fabricdata = fabricdetails.map((e) => e.columnname).toList();
+      if (fabricid == '' || fabricid == null || fabricid == '0')
+        selectedfabric = fabricdata.first;
+
+      fabricid = fabricdetails
+              .where((element) => element.columnname == selectedfabric)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : fabricdetails
+              .where((element) => element.columnname == selectedfabric)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return fabricdetails;
+  }
+
+  Future<List<master.Master>> getproddetails(String filter) async {
+    setState(() {
+      prodtypedetails = [];
+      prodtypedata = [];
+    });
+
+    final String customerurl =
+        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=producttypemaster";
+
+    var response = await http.get(Uri.encodeFull(customerurl),
+        headers: {"Accept": "application/json"});
+    //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+    var convertDataToJson = json.decode(response.body);
+    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+    setState(() {
+      prodtypedetails = parsed
+          .map<master.Master>((json) => master.Master.fromJSON(json))
+          .toList();
+
+      if (filter != "")
+        prodtypedetails = prodtypedetails
+            .where((element) => element.columnname
+                .toLowerCase()
+                .toString()
+                .contains(filter.toLowerCase().toString()))
+            .toList();
+
+      prodtypedata = prodtypedetails.map((e) => e.columnname).toList();
+      if (prodtypeid == '' || prodtypeid == null || prodtypeid == '0')
+        selectedprodtype = prodtypedata.first;
+
+      prodtypeid = prodtypedetails
+              .where((element) => element.columnname == selectedprodtype)
+              .map((e) => e.columnMasterid)
+              .isEmpty
+          ? "0"
+          : prodtypedetails
+              .where((element) => element.columnname == selectedprodtype)
+              .map((e) => e.columnMasterid)
+              .first
+              .toString();
+    });
+
+    return prodtypedetails;
+  }
+
+  Future<purchaseorderdetl.PurchaseOrderHeader> getAddCustomerJson() async {
+    String customerurl;
+    if (_id != "" && _id != "0" && _id != null) {
+      _reportItems
+          .where((element) => element.headerid == _id)
+          .forEach((element) => setState(() {
+                dateCtl.text = element.podate;
+                shipmentdateCtl.text = element.shipmentdate;
+                selectednotifyparty = element.notifyparty;
+                notifypartyid = element.notifypartyid;
+                _custPONoController.text = element.pono;
+                selectedprodtype = element.producttype;
+                //prodtypeid = element.producttype;
+                selectedconsignee = element.consignee;
+                selectedsupplier = element.supplier;
+                supplierid = element.supplierid;
+                selectedcurrency = element.currency;
+                currencyid = element.currencyid;
+                _custnoofcontainerController.text = element.noofcontainers;
+                _custpaymenttermsController.text = element.paymentterms;
+
+                selectedportofdischarge = portofdischargedetails
+                        .where((e1) =>
+                            e1.columnMasterid == element.portofdischargeid)
+                        .map((e) => e.columnname)
+                        .isNotEmpty
+                    ? portofdischargedetails
+                        .where((e1) =>
+                            e1.columnMasterid == element.portofdischargeid)
+                        .map((e) => e.columnname)
+                        .first
+                        .toString()
+                    : "";
+                selectedportofload = portofloaddetails
+                        .where((e1) =>
+                            e1.columnMasterid == element.portofloadingid)
+                        .map((e) => e.columnname)
+                        .isNotEmpty
+                    ? portofloaddetails
+                        .where((e1) =>
+                            e1.columnMasterid == element.portofloadingid)
+                        .map((e) => e.columnname)
+                        .first
+                        .toString()
+                    : "";
+                selectedshipmentmode = shipmentmodedetails
+                        .where(
+                            (e1) => e1.columnMasterid == element.shipmentmodeid)
+                        .map((e) => e.columnname)
+                        .first
+                        .isNotEmpty
+                    ? shipmentmodedetails
+                        .where(
+                            (e1) => e1.columnMasterid == element.shipmentmodeid)
+                        .map((e) => e.columnname)
+                        .first
+                        .toString()
+                    : "";
+                shipmentmodeid = element.shipmentdate;
+                portofloadid = element.portofloadingid;
+                portofdischargeid = element.portofdischargeid;
+                selshipmentdate = element.shipmentdate;
+                _custpackingdetailController.text = element.packinglistid;
+                _custremarksController.text = element.remarks;
+                _custtermsandconditionsController.text =
+                    element.termsandconditions.toString();
+                _custtermsandconditionsController2.text =
+                    element.termsandconditions2.toString();
+                _custtermsandconditionsController3.text =
+                    element.termsandconditions3.toString();
+                _custtermsandconditionsController4.text =
+                    element.termsandconditions4.toString();
+                _custtermsandconditionsController5.text =
+                    element.termsandconditions5.toString();
+                _custtermsandconditionsController6.text =
+                    element.termsandconditions6.toString();
+                _custtermsandconditionsController7.text =
+                    element.termsandconditions7.toString();
+                _custtermsandconditionsController8.text =
+                    element.termsandconditions8.toString();
+              }));
+      getpurchaseitemdetails();
+    }
+  }
+
+  @override
+  void initState() {
+    idFocusNode = FocusNode();
+    focusnoofbox = FocusNode();
+    setState(() {
+      _load = true;
+    });
+    searchtext = '';
+    getCustomerJson();
+    custidFocusNode = FocusNode();
+    _custIdController.text = '0';
+    getcompanyMaster('');
+    getsupplierdetails('');
+    getcurrencydetails('');
+    getnotifypartydetails('');
+    getportofdischargedetails('');
+    getportofloaddetails('');
+    getconsigneedetails('');
+    getshipmentmodedetails('');
+    getproddetails('');
+
+    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
+    setState(() {
+      getAddCustomerJson();
+      if ((_id != "") && (_id != null) && (_id != "0"))
+        _custIdController.text = _id.toString();
+      else {
+        DateTime today = DateTime.now();
+        dateCtl.text =
+            "${today.day.toString().padLeft(2, '0')}/${today.month.toString().padLeft(2, '0')}/${today.year.toString()}";
+        seldate =
+            "${today.year.toString()}/${today.month.toString().padLeft(2, '0')}/${today.day.toString().padLeft(2, '0')}";
+
+        shipmentdateCtl.text =
+            "${today.day.toString().padLeft(2, '0')}/${today.month.toString().padLeft(2, '0')}/${today.year.toString()}";
+        selshipmentdate =
+            "${today.year.toString()}/${today.month.toString().padLeft(2, '0')}/${today.day.toString().padLeft(2, '0')}";
+      }
+    });
+
+    if (selectedprodtype.toString().toLowerCase() == 'fabric') {
+      getfabricdetails('');
+      getfabknittypedetails('');
+      getcolordetails('');
+      getdiadetails('');
+      getuomdetails('');
+      getcompositiondetails('');
+      getfabrictypedetails('');
+    }
+
+    if (selectedprodtype.toString().toLowerCase() == 'yarn') {
+      getyarncountdetails('');
+      getyarntypedetails('');
+      getyarnmilldetails('');
+      getcolordetails('');
+    }
+
+    super.initState();
+  }
+
+  _afterLayout(_) {
+    _getPositions();
+  }
+
+  PageController _controller = PageController(
+    initialPage: 1,
+  );
+  @override
+  void dispose() {
+    _custRemarksController.dispose();
+    _custMobileController.dispose();
+    _custPONoController.dispose();
+    _custDateController.dispose();
+    _custNotifypartyController.dispose();
+    _custAdd3Controller.dispose();
+    _custAdd4Controller.dispose();
+    _custIdController.dispose();
+    _custGstinController.dispose();
+    _custEmailController.dispose();
+    custidFocusNode.dispose();
+
+    _custGstinController.dispose();
+    _custgsmController.dispose();
+    _custnoofboxController.dispose();
+    _custkgsperboxController.dispose();
+    _custyarntypeController.dispose();
+    _custweightController.dispose();
+    _custrateController.dispose();
+    _custamountController.dispose();
+    //_custconsigneeAddressController.dispose();
+    _custtermsandconditionsController.dispose();
+    _custtermsandconditionsController2.dispose();
+    _custtermsandconditionsController3.dispose();
+    _custtermsandconditionsController4.dispose();
+    _custtermsandconditionsController5.dispose();
+    _custtermsandconditionsController6.dispose();
+    _custtermsandconditionsController7.dispose();
+    _custtermsandconditionsController8.dispose();
+    _custnoofcontainerController.dispose();
+    _custpackingdetailController.dispose();
+    _custpaymenttermsController.dispose();
+    _custremarksController.dispose();
+
+    _controller.dispose();
+    super.dispose();
+  }
+
+  bool _load = false;
+  NotchedShape shape;
+
+  Widget listtableView(double maxwidth, double maxheight, context) {
     // selrate = '';
     // Selecteditem = '';
     //pr.show();
@@ -614,283 +2118,343 @@ class HomePageState extends State<HomePage> {
           scrollDirection: Axis.vertical,
           child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columnSpacing: 10.0,
-                columns: [
-                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
-                    DataColumn(
-                      label: Container(
-                          width: maxwidth * 0.10, child: Text("Fabric")),
-                      numeric: false,
-                    ),
-                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
-                    DataColumn(
-                      label: Container(
-                          width: maxwidth * 0.10, child: Text("Fabric Type")),
-                      numeric: false,
-                    ),
-                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
-                    DataColumn(
-                      label: Container(
-                        width: maxwidth * 0.10,
-                        child: Text("knit Type"),
+              child: Container(
+                  height: 200,
+                  child: DataTable(
+                    columnSpacing: 10.0,
+                    columns: [
+                      if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                        DataColumn(
+                          label: Container(
+                              width: maxwidth * 0.10, child: Text("Fabric")),
+                          numeric: false,
+                        ),
+                      if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                        DataColumn(
+                          label: Container(
+                              width: maxwidth * 0.10,
+                              child: Text("Fabric Type")),
+                          numeric: false,
+                        ),
+                      if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                        DataColumn(
+                          label: Container(
+                            width: maxwidth * 0.10,
+                            child: Text("knit Type"),
+                          ),
+                          numeric: false,
+                        ),
+                      if (selectedprodtype.toString().toLowerCase() == 'yarn')
+                        DataColumn(
+                          label: Container(
+                              width: maxwidth * .10, child: Text("Yarn Mill")),
+                          numeric: false,
+                        ),
+                      if (selectedprodtype.toString().toLowerCase() == 'yarn')
+                        DataColumn(
+                          label: Container(
+                              width: maxwidth * 0.10,
+                              child: Text("Yarn Count")),
+                          numeric: false,
+                        ),
+                      if (selectedprodtype.toString().toLowerCase() == 'yarn')
+                        DataColumn(
+                          label: Container(
+                            width: maxwidth * 0.10,
+                            child: Text("Yarn Type"),
+                          ),
+                          numeric: false,
+                        ),
+                      DataColumn(
+                        label: Container(
+                          width: maxwidth * 0.12,
+                          child: Text("Color"),
+                        ),
+                        numeric: true,
                       ),
-                      numeric: false,
-                    ),
-                  if (selectedprodtype.toString().toLowerCase() == 'yarn')
-                    DataColumn(
-                      label: Container(
-                          width: maxwidth * .10, child: Text("Yarn Mill")),
-                      numeric: false,
-                    ),
-                  if (selectedprodtype.toString().toLowerCase() == 'yarn')
-                    DataColumn(
-                      label: Container(
-                          width: maxwidth * 0.10, child: Text("Yarn Count")),
-                      numeric: false,
-                    ),
-                  if (selectedprodtype.toString().toLowerCase() == 'yarn')
-                    DataColumn(
-                      label: Container(
-                        width: maxwidth * 0.10,
-                        child: Text("Yarn Type"),
+                      if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                        DataColumn(
+                          label: Container(
+                            width: maxwidth * 0.10,
+                            child: Text("Dia"),
+                          ),
+                          numeric: true,
+                        ),
+                      if (selectedprodtype.toString().toLowerCase() == 'fabric')
+                        DataColumn(
+                          label: Container(
+                            width: maxwidth * 0.10,
+                            child: Text("Uom"),
+                          ),
+                          numeric: true,
+                        ),
+                      DataColumn(
+                        label: Container(
+                          width: maxwidth * 0.10,
+                          child: Text("Kgs/Box"),
+                        ),
+                        numeric: true,
                       ),
-                      numeric: false,
-                    ),
-                  DataColumn(
-                    label: Container(
-                      width: maxwidth * 0.12,
-                      child: Text("Color"),
-                    ),
-                    numeric: true,
-                  ),
-                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
-                    DataColumn(
-                      label: Container(
-                        width: maxwidth * 0.10,
-                        child: Text("Dia"),
+                      DataColumn(
+                        label: Container(
+                          width: maxwidth * 0.10,
+                          child: Text("Weight"),
+                        ),
+                        numeric: true,
                       ),
-                      numeric: true,
-                    ),
-                  if (selectedprodtype.toString().toLowerCase() == 'fabric')
-                    DataColumn(
-                      label: Container(
-                        width: maxwidth * 0.10,
-                        child: Text("Uom"),
+                      DataColumn(
+                        label: Container(
+                          width: maxwidth * 0.10,
+                          child: Text("Rate"),
+                        ),
+                        numeric: true,
                       ),
-                      numeric: true,
-                    ),
-                  DataColumn(
-                    label: Container(
-                      width: maxwidth * 0.10,
-                      child: Text("Kgs/Box"),
-                    ),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Container(
-                      width: maxwidth * 0.10,
-                      child: Text("Weight"),
-                    ),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Container(
-                      width: maxwidth * 0.10,
-                      child: Text("Rate"),
-                    ),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Container(
-                      width: maxwidth * 0.10,
-                      child: Text("Amount"),
-                    ),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Container(
-                      width: maxwidth * 0.25,
-                      child: Text("Action"),
-                    ),
-                  )
-                ],
-                rows: _itemdetails
-                        ?.map(
-                          (item) => DataRow(cells: [
-                            if (selectedprodtype.toString().toLowerCase() ==
-                                'fabric')
-                              DataCell(Container(
-                                width: maxwidth * 0.10,
-                                child: Text((fabricdetails
-                                        .where((element) =>
-                                            element.columnMasterid ==
-                                            item.fabricid)
-                                        .map((e) => e.columnname)
-                                        .isNotEmpty
-                                    ? fabricdetails
-                                        .where((element) =>
-                                            element.columnMasterid ==
-                                            item.fabricid)
-                                        .map((e) => e.columnname)
-                                        .first
+                      DataColumn(
+                        label: Container(
+                          width: maxwidth * 0.10,
+                          child: Text("Amount"),
+                        ),
+                        numeric: true,
+                      ),
+                      DataColumn(
+                        label: Container(
+                          width: maxwidth * 0.25,
+                          child: Text("Action"),
+                        ),
+                      )
+                    ],
+                    rows: _itemdetails
+                            ?.map(
+                              (item) => DataRow(cells: [
+                                if (selectedprodtype.toString().toLowerCase() ==
+                                    'fabric')
+                                  DataCell(Container(
+                                    width: maxwidth * 0.10,
+                                    child: Text((fabricdetails
+                                            .where((element) =>
+                                                element.columnMasterid ==
+                                                item.fabricid)
+                                            .map((e) => e.columnname)
+                                            .isNotEmpty
+                                        ? fabricdetails
+                                            .where((element) =>
+                                                element.columnMasterid ==
+                                                item.fabricid)
+                                            .map((e) => e.columnname)
+                                            .first
+                                            .toString()
+                                        : "")),
+                                  )),
+                                if (selectedprodtype.toString().toLowerCase() ==
+                                    'fabric')
+                                  DataCell(Container(
+                                    width: maxwidth * 0.10,
+                                    child: Text(item.fabrictype
                                         .toString()
-                                    : "")),
-                              )),
-                            if (selectedprodtype.toString().toLowerCase() ==
-                                'fabric')
-                              DataCell(Container(
-                                width: maxwidth * 0.10,
-                                child: Text(
-                                    item.fabrictype.toString().toUpperCase()),
-                              )),
-                            if (selectedprodtype.toString().toLowerCase() ==
-                                'fabric')
-                              DataCell(
-                                Container(
-                                  width: maxwidth * 0.10,
-                                  child: Text(item.knittype.toString()),
+                                        .toUpperCase()),
+                                  )),
+                                if (selectedprodtype.toString().toLowerCase() ==
+                                    'fabric')
+                                  DataCell(
+                                    Container(
+                                      width: maxwidth * 0.10,
+                                      child: Text(item.knittype.toString()),
+                                    ),
+                                  ),
+                                if (selectedprodtype.toString().toLowerCase() ==
+                                    'yarn')
+                                  DataCell(
+                                    Container(
+                                      width: maxwidth * 0.10,
+                                      child: Text(item.yarnmill.toString()),
+                                    ),
+                                  ),
+                                if (selectedprodtype.toString().toLowerCase() ==
+                                    'yarn')
+                                  DataCell(
+                                    Container(
+                                      width: maxwidth * 0.10,
+                                      child: Text(item.yarncount.toString()),
+                                    ),
+                                  ),
+                                if (selectedprodtype.toString().toLowerCase() ==
+                                    'yarn')
+                                  DataCell(
+                                    Container(
+                                      width: maxwidth * 0.10,
+                                      child: Text(item.yarntype.toString()),
+                                    ),
+                                  ),
+                                DataCell(
+                                  Container(
+                                    width: maxwidth * 0.12,
+                                    child: Text(item.color.toString()),
+                                  ),
                                 ),
-                              ),
-                            if (selectedprodtype.toString().toLowerCase() ==
-                                'yarn')
-                              DataCell(
-                                Container(
-                                  width: maxwidth * 0.10,
-                                  child: Text(item.yarnmill.toString()),
+                                if (selectedprodtype.toString().toLowerCase() ==
+                                    'fabric')
+                                  DataCell(Container(
+                                    width: maxwidth * 0.10,
+                                    child:
+                                        Text(item.dia.toString().toUpperCase()),
+                                  )),
+                                if (selectedprodtype.toString().toLowerCase() ==
+                                    'fabric')
+                                  DataCell(Container(
+                                    width: maxwidth * 0.10,
+                                    child:
+                                        Text(item.uom.toString().toUpperCase()),
+                                  )),
+                                DataCell(
+                                  Container(
+                                    width: maxwidth * 0.10,
+                                    child: Text(item.kgsperbox.toString()),
+                                  ),
                                 ),
-                              ),
-                            if (selectedprodtype.toString().toLowerCase() ==
-                                'yarn')
-                              DataCell(
-                                Container(
-                                  width: maxwidth * 0.10,
-                                  child: Text(item.yarncount.toString()),
+                                DataCell(
+                                  Container(
+                                    width: maxwidth * 0.10,
+                                    child: Text(item.weight.toString()),
+                                  ),
                                 ),
-                              ),
-                            if (selectedprodtype.toString().toLowerCase() ==
-                                'yarn')
-                              DataCell(
-                                Container(
-                                  width: maxwidth * 0.10,
-                                  child: Text(item.yarntype.toString()),
+                                DataCell(
+                                  Container(
+                                    width: maxwidth * 0.10,
+                                    child: Text(item.rate.toString()),
+                                  ),
                                 ),
-                              ),
-                            DataCell(
-                              Container(
-                                width: maxwidth * 0.12,
-                                child: Text(item.color.toString()),
-                              ),
-                            ),
-                            if (selectedprodtype.toString().toLowerCase() ==
-                                'fabric')
-                              DataCell(Container(
-                                width: maxwidth * 0.10,
-                                child: Text(item.dia.toString().toUpperCase()),
-                              )),
-                            if (selectedprodtype.toString().toLowerCase() ==
-                                'fabric')
-                              DataCell(Container(
-                                width: maxwidth * 0.10,
-                                child: Text(item.uom.toString().toUpperCase()),
-                              )),
-                            DataCell(
-                              Container(
-                                width: maxwidth * 0.10,
-                                child: Text(item.kgsperbox.toString()),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: maxwidth * 0.10,
-                                child: Text(item.weight.toString()),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: maxwidth * 0.10,
-                                child: Text(item.rate.toString()),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                width: maxwidth * 0.10,
-                                child: Text(item.amount.toString()),
-                              ),
-                            ),
-                            DataCell(Row(
-                              children: [
-                                Container(
-                                    width: maxwidth * 0.25,
-                                    child: Row(children: [
-                                      IconButton(
-                                          icon: Image.asset('Images/edit.png',
-                                              color: widgetcolor),
-                                          highlightColor: Colors.pink,
-                                          onPressed: () {
-                                            if (this.mounted)
-                                              setState(() {
-                                                selectedcolor = item.color;
-                                                if (selectedprodtype
-                                                        .toString()
-                                                        .toLowerCase() ==
-                                                    'fabric') {
-                                                  selectedfabric = item.fabric;
-                                                  selecteddia = item.dia;
-                                                  selecteduom = item.uom;
-                                                  selectedfabknittype =
-                                                      item.knittype;
-                                                  selectedcomposition =
-                                                      item.composition;
-                                                  selectedfabtype =
-                                                      item.fabrictype;
+                                DataCell(
+                                  Container(
+                                    width: maxwidth * 0.10,
+                                    child: Text(item.amount.toString()),
+                                  ),
+                                ),
+                                DataCell(Row(
+                                  children: [
+                                    Container(
+                                        width: maxwidth * 0.25,
+                                        child: Row(children: [
+                                          IconButton(
+                                              icon: Image.asset(
+                                                  'Images/edit.png',
+                                                  color: widgetcolor),
+                                              highlightColor: Colors.pink,
+                                              onPressed: () {
+                                                setState(() {
+                                                  Selectedcolor = '';
+                                                  Selectedyarncount = '';
+                                                  _custyarntypeController.text =
+                                                      '';
+                                                  Selectedyarnmill = '';
 
-                                                  _custgsmController.text =
-                                                      item.gsm;
-                                                } else {
-                                                  selectedyarnmill =
-                                                      item.yarnmill;
-                                                  //selectedyarncolor = item.color;
-                                                  selectedyarntype =
-                                                      item.yarntype;
-                                                  selectedyarncount =
-                                                      item.yarncount;
-                                                }
+                                                  Selectedcolor = item.color;
+                                                  if (selectedprodtype
+                                                          .toString()
+                                                          .toLowerCase() ==
+                                                      'fabric') {
+                                                    //   this.setState(() {
+                                                    selecteddia = item.dia;
+                                                    selecteduom = item.uom;
+                                                    selectedfabknittype =
+                                                        item.knittype;
+                                                    selectedcomposition =
+                                                        item.composition;
+                                                    selectedfabtype =
+                                                        item.fabrictype;
 
-                                                _custweightController.text =
-                                                    item.weight;
-                                                _custnoofboxController.text =
-                                                    item.noofbox;
-                                                _custrateController.text =
-                                                    item.rate;
-                                                _custamountController.text =
-                                                    item.amount;
-                                                _custkgsperboxController.text =
-                                                    item.kgsperbox;
+                                                    _custgsmController.text =
+                                                        item.gsm;
+                                                    selectedfabric =
+                                                        item.fabric;
+                                                    // });
+                                                  } else {
+                                                    // this.setState(() {
+                                                    _custyarntypeController
+                                                            .text =
+                                                        item.yarntype
+                                                            .toString();
+                                                    yarntypeid =
+                                                        item.yarntypeid;
+                                                    Selectedyarncount = item
+                                                        .yarncount
+                                                        .toString();
+                                                    yarncountid =
+                                                        item.yarncountid;
+                                                    Selectedyarnmill = item
+                                                        .yarnmill
+                                                        .toString();
+                                                    yarnmillid =
+                                                        item.yarnmillid;
+
+                                                    Selectedcolor =
+                                                        item.color.toString();
+                                                    colorid = item.colorid;
+                                                    //selectedyarncolor = item.color;});
+                                                    //  });
+                                                  }
+
+                                                  _custweightController.text =
+                                                      item.weight;
+                                                  _custnoofboxController.text =
+                                                      item.noofbox;
+                                                  _custrateController.text =
+                                                      item.rate;
+                                                  _custamountController.text =
+                                                      item.amount;
+                                                  _custkgsperboxController
+                                                      .text = item.kgsperbox;
+                                                });
+                                                //refereshdetails(item);
+                                                //  if (this.mounted)
+                                                //    this.setState(() {
+                                                //  selectedprodtype = 'fabric';
+                                                // if (selectedprodtype
+                                                //         .toString()
+                                                //         .toLowerCase() ==
+                                                //     'fabric') {
+                                                //   getfabricdetails('');
+                                                //   getfabknittypedetails('');
+                                                //   getcolordetails('');
+                                                //   getdiadetails('');
+                                                //   getuomdetails('');
+                                                //   getcompositiondetails('');
+                                                //   getfabrictypedetails('');
+                                                // }
+
+                                                // if (selectedprodtype
+                                                //         .toString()
+                                                //         .toLowerCase() ==
+                                                //     'yarn') {
+                                                //   getyarncountdetails('');
+                                                //   getyarntypedetails('');
+                                                //   getyarnmilldetails('');
+                                                //   getcolordetails('');
+                                                // }
 
                                                 _previousitem = item;
                                                 removeItem(item);
-                                              });
+                                                //});
 
-                                            //  Itemid = item.itemMasterID;
-                                            //  removeItem(item);
-                                          }),
-                                      SizedBox(width: 2),
-                                      IconButton(
-                                          icon: Image.asset('Images/delete.png',
-                                              color: widgetcolor),
-                                          highlightColor: Colors.pink,
-                                          onPressed: () {
-                                            removeItem(item);
-                                          })
-                                    ]))
-                              ],
-                            )),
-                          ]),
-                        )
-                        ?.toList() ??
-                    [],
-              )));
+                                                //  Itemid = item.itemMasterID;
+                                                //  removeItem(item);
+                                              }),
+                                          SizedBox(width: 2),
+                                          IconButton(
+                                              icon: Image.asset(
+                                                  'Images/delete.png',
+                                                  color: widgetcolor),
+                                              highlightColor: Colors.pink,
+                                              onPressed: () {
+                                                removeItem(item);
+                                              })
+                                        ]))
+                                  ],
+                                )),
+                              ]),
+                            )
+                            ?.toList() ??
+                        [],
+                  ))));
     } else {
       // pr.dismiss();
       return Text("Add details using the form below",
@@ -900,8 +2464,7 @@ class HomePageState extends State<HomePage> {
     //pr.dismiss();
   }
 
-  Widget addcustomerwid(
-      double maxwidth, double maxheight, BuildContext context) {
+  Widget addcustomerwid(double maxwidth, double maxheight) {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -1131,10 +2694,10 @@ class HomePageState extends State<HomePage> {
 
                                                   consigneeid = consigneedetails
                                                       .where((element) =>
-                                                          element.columnname ==
+                                                          element
+                                                              .customerName ==
                                                           val)
-                                                      .map((e) =>
-                                                          e.columnMasterid)
+                                                      .map((e) => e.custId)
                                                       .first
                                                       .toString();
                                                 });
@@ -1314,11 +2877,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Type",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: prodtypedata,
@@ -1363,7 +2926,11 @@ class HomePageState extends State<HomePage> {
                                               },
                                               popupItemDisabled: (String s) =>
                                                   s.startsWith('I'),
-                                              selectedItem: selectedprodtype,
+                                              selectedItem:
+                                                  selectedprodtype.toString() ==
+                                                          ''
+                                                      ? prodtypedata.first
+                                                      : selectedprodtype,
                                             ),
                                           ),
                                         ]),
@@ -1383,10 +2950,8 @@ class HomePageState extends State<HomePage> {
                             padding: EdgeInsets.only(top: 8),
                             decoration: BoxDecoration(
                               //  color: widgetcolor,
-                              border: Border.all(
-                                  width: 1.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.black),
+                              border:
+                                  Border.all(width: 1.0, color: Colors.black),
                             ),
                             child: Column(children: [
                               Expanded(
@@ -1417,11 +2982,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Fabric",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: fabricdata,
@@ -1465,11 +3030,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Fabric type",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: fabrictypedata,
@@ -1515,11 +3080,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Fabric Knit type",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: fabricknitdata,
@@ -1566,11 +3131,11 @@ class HomePageState extends State<HomePage> {
                                               hint:
                                                   "Select a Fabric Composition",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: compositiondata,
@@ -1614,11 +3179,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Dia",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: diadata,
@@ -1662,11 +3227,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Color",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: colordata,
@@ -1674,7 +3239,7 @@ class HomePageState extends State<HomePage> {
                                               showClearButton: false,
                                               onChanged: (val) {
                                                 setState(() {
-                                                  selectedcolor = val;
+                                                  Selectedcolor = val;
 
                                                   colorid = colordetails
                                                       .where((element) =>
@@ -1688,7 +3253,7 @@ class HomePageState extends State<HomePage> {
                                               },
                                               popupItemDisabled: (String s) =>
                                                   s.startsWith('I'),
-                                              selectedItem: selectedcolor,
+                                              selectedItem: Selectedcolor,
                                             ),
                                           ),
                                           SizedBox(width: 20),
@@ -1710,11 +3275,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Uom",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: uomdata,
@@ -1766,11 +3331,6 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a YarnCount",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: yarncountdata,
@@ -1778,7 +3338,8 @@ class HomePageState extends State<HomePage> {
                                               showClearButton: false,
                                               onChanged: (val) {
                                                 setState(() {
-                                                  selectedyarncount = val;
+                                                  Selectedyarncount =
+                                                      val.toString();
 
                                                   yarncountid = yarncountdetails
                                                       .where((element) =>
@@ -1792,7 +3353,7 @@ class HomePageState extends State<HomePage> {
                                               },
                                               popupItemDisabled: (String s) =>
                                                   s.startsWith('I'),
-                                              selectedItem: selectedyarncount,
+                                              selectedItem: Selectedyarncount,
                                             ),
                                           ),
                                           SizedBox(width: 10),
@@ -1814,11 +3375,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Yarn Mill",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: yarnmilldata,
@@ -1826,7 +3387,7 @@ class HomePageState extends State<HomePage> {
                                               showClearButton: false,
                                               onChanged: (val) {
                                                 setState(() {
-                                                  selectedyarnmill = val;
+                                                  Selectedyarnmill = val;
 
                                                   yarnmillid = yarnmilldetails
                                                       .where((element) =>
@@ -1840,12 +3401,11 @@ class HomePageState extends State<HomePage> {
                                               },
                                               popupItemDisabled: (String s) =>
                                                   s.startsWith('I'),
-                                              selectedItem: selectedyarnmill,
+                                              selectedItem: Selectedyarnmill,
                                             ),
                                           ),
                                           SizedBox(width: 10),
-                                          // if (yarntypedata != null &&
-                                          //     yarntypedata.isNotEmpty)
+
                                           Container(
                                             constraints: BoxConstraints(
                                               minWidth: 100,
@@ -1854,6 +3414,8 @@ class HomePageState extends State<HomePage> {
                                             //padding: EdgeInsets.,
                                             width: 120, //* 0.50,
                                             child: DropdownSearch<String>(
+                                              searchBoxController:
+                                                  _custyarntypeController,
                                               dropDownButton: Image.asset(
                                                   'Images/arrow_drop_down.png',
                                                   color: Colors.white),
@@ -1862,38 +3424,34 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Yarn type",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: yarntypedata,
                                               label: "Yarn Type *",
                                               showClearButton: false,
                                               onChanged: (val) {
-                                                setState(() {
-                                                  selectedyarntype = val;
+                                                if (this.mounted)
+                                                  setState(() {
+                                                    _custyarntypeController
+                                                        .text = val;
 
-                                                  yarntypeid = yarntypedetails
-                                                      .where((element) =>
-                                                          element.columnname ==
-                                                          val)
-                                                      .map((e) =>
-                                                          e.columnMasterid)
-                                                      .first
-                                                      .toString();
-                                                });
+                                                    yarntypeid = yarntypedetails
+                                                        .where((element) =>
+                                                            element
+                                                                .columnname ==
+                                                            val)
+                                                        .map((e) =>
+                                                            e.columnMasterid)
+                                                        .first
+                                                        .toString();
+                                                  });
                                               },
-                                              popupItemDisabled: (String s) =>
-                                                  s.startsWith('I'),
-                                              selectedItem: selectedyarntype,
+                                              selectedItem:
+                                                  _custyarntypeController.text,
                                             ),
                                           ),
                                           SizedBox(width: 10),
-                                          // if (colordata != null &&
-                                          //     colordata.isNotEmpty)
+
                                           Container(
                                             constraints: BoxConstraints(
                                               minWidth: 100,
@@ -1910,11 +3468,11 @@ class HomePageState extends State<HomePage> {
                                                   : null,
                                               hint: "Select a Color",
                                               mode: Mode.MENU,
-                                              enabled: (_id != null &&
-                                                      _id != '' &&
-                                                      _id != '0')
-                                                  ? false
-                                                  : true,
+                                              // enabled: (_id != null &&
+                                              //         _id != '' &&
+                                              //         _id != '0')
+                                              //     ? false
+                                              //     : true,
                                               showSelectedItem: true,
                                               showSearchBox: true,
                                               items: colordata,
@@ -1922,7 +3480,7 @@ class HomePageState extends State<HomePage> {
                                               showClearButton: false,
                                               onChanged: (val) {
                                                 setState(() {
-                                                  selectedcolor = val;
+                                                  Selectedcolor = val;
 
                                                   colorid = colordetails
                                                       .where((element) =>
@@ -1936,22 +3494,31 @@ class HomePageState extends State<HomePage> {
                                               },
                                               popupItemDisabled: (String s) =>
                                                   s.startsWith('I'),
-                                              selectedItem: selectedcolor,
+                                              selectedItem: Selectedcolor,
                                             ),
                                           ),
                                           SizedBox(width: 10),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                //minHeight: 20,
-                                                minWidth: 100,
-                                                maxWidth: 100,
-                                              ),
-                                              width: maxwidth * .7,
+
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 100,
+                                              maxWidth: 100,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: RawKeyboardListener(
+                                              focusNode: focusnoofbox,
+                                              onKey: _handleKeyEvent,
                                               child: TextField(
+                                                keyboardType: TextInputType
+                                                    .numberWithOptions(
+                                                        decimal: true),
+
+                                                inputFormatters: [
+                                                  DecimalTextInputFormatter(
+                                                      decimalRange: 2)
+                                                ],
+                                                textAlign: TextAlign.right,
                                                 decoration:
                                                     const InputDecoration(
                                                         focusedBorder:
@@ -1963,183 +3530,167 @@ class HomePageState extends State<HomePage> {
                                                         border:
                                                             InputBorder.none,
                                                         //disabledBorder: InputDecoration.collapsed(hintText: null),
+
                                                         labelText: "No of Box",
                                                         labelStyle: TextStyle(
                                                             fontSize: 20.0)),
-                                                keyboardType:
-                                                    TextInputType.text,
+
                                                 style: textStyle,
                                                 controller:
                                                     _custnoofboxController,
                                                 // focusNode: custidFocusNode,
 
-                                                readOnly: enable,
+                                                //   readOnly: enable,
                                                 //enableInteractiveSelection: enable,
                                               ),
                                             ),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            SizedBox(width: 10),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                //minHeight: 20,
-                                                minWidth: 100,
-                                                maxWidth: 100,
-                                              ),
-                                              width: maxwidth * .7,
-                                              child: TextField(
-                                                decoration:
-                                                    const InputDecoration(
-                                                        focusedBorder:
-                                                            UnderlineInputBorder(
-                                                          borderSide: BorderSide(
-                                                              color:
-                                                                  widgetcolor),
-                                                        ),
-                                                        border:
-                                                            InputBorder.none,
-                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                        labelText: "Kgs/Box",
-                                                        labelStyle: TextStyle(
-                                                            fontSize: 20.0)),
-                                                keyboardType:
-                                                    TextInputType.text,
-                                                style: textStyle,
-                                                controller:
-                                                    _custkgsperboxController,
-                                                //     focusNode: custidFocusNode,
+                                          ),
 
-                                                readOnly: enable,
-                                                //enableInteractiveSelection: enable,
-                                              ),
+                                          SizedBox(width: 10),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              //minHeight: 20,
+                                              minWidth: 100,
+                                              maxWidth: 100,
                                             ),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            SizedBox(width: 10),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 100,
-                                              ),
-                                              width: maxwidth * .7,
-                                              child: TextField(
-                                                decoration:
-                                                    const InputDecoration(
-                                                        focusedBorder:
-                                                            UnderlineInputBorder(
-                                                          borderSide: BorderSide(
-                                                              color:
-                                                                  widgetcolor),
-                                                        ),
-                                                        border:
-                                                            InputBorder.none,
-                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                        labelText: "Weight",
-                                                        labelStyle: TextStyle(
-                                                            fontSize: 20.0)),
-                                                keyboardType:
-                                                    TextInputType.text,
-                                                style: textStyle,
-                                                controller:
-                                                    _custweightController,
-                                                //   focusNode: custidFocusNode,
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                  labelText: "Kgs/Box",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType
+                                                  .numberWithOptions(
+                                                      decimal: true),
 
-                                                readOnly: enable,
-                                                //enableInteractiveSelection: enable,
-                                              ),
-                                            ),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            SizedBox(width: 10),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 100,
-                                              ),
-                                              width: maxwidth * .7,
-                                              child: TextField(
-                                                decoration:
-                                                    const InputDecoration(
-                                                        focusedBorder:
-                                                            UnderlineInputBorder(
-                                                          borderSide: BorderSide(
-                                                              color:
-                                                                  widgetcolor),
-                                                        ),
-                                                        border:
-                                                            InputBorder.none,
-                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                        labelText: "Rate",
-                                                        labelStyle: TextStyle(
-                                                            fontSize: 20.0)),
-                                                keyboardType:
-                                                    TextInputType.text,
-                                                style: textStyle,
-                                                controller: _custrateController,
-                                                //focusNode: custidFocusNode,
+                                              inputFormatters: [
+                                                DecimalTextInputFormatter(
+                                                    decimalRange: 2)
+                                              ],
+                                              textAlign: TextAlign.right,
+                                              style: textStyle,
+                                              controller:
+                                                  _custkgsperboxController,
+                                              //     focusNode: custidFocusNode,
 
-                                                readOnly: enable,
-                                                //enableInteractiveSelection: enable,
-                                              ),
+                                              //  readOnly: enable,
+                                              //enableInteractiveSelection: enable,
                                             ),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            SizedBox(width: 20),
-                                          if (selectedprodtype
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              'yarn')
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 100,
-                                              ),
-                                              width: maxwidth * .7,
-                                              child: TextField(
-                                                decoration:
-                                                    const InputDecoration(
-                                                        focusedBorder:
-                                                            UnderlineInputBorder(
-                                                          borderSide: BorderSide(
-                                                              color:
-                                                                  widgetcolor),
-                                                        ),
-                                                        border:
-                                                            InputBorder.none,
-                                                        //disabledBorder: InputDecoration.collapsed(hintText: null),
-                                                        labelText: "Amount",
-                                                        labelStyle: TextStyle(
-                                                            fontSize: 20.0)),
-                                                keyboardType:
-                                                    TextInputType.text,
-                                                style: textStyle,
-                                                controller:
-                                                    _custamountController,
-                                                // focusNode: custidFocusNode,
-                                                readOnly: enable,
-                                                //enableInteractiveSelection: enable,
-                                              ),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 100,
                                             ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                  labelText: "Weight",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType
+                                                  .numberWithOptions(
+                                                      decimal: true),
+
+                                              inputFormatters: [
+                                                DecimalTextInputFormatter(
+                                                    decimalRange: 3)
+                                              ],
+                                              textAlign: TextAlign.right,
+                                              style: textStyle,
+                                              controller: _custweightController,
+                                              //   focusNode: custidFocusNode,
+
+                                              // readOnly: enable,
+                                              //enableInteractiveSelection: enable,
+                                            ),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 100,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                  labelText: "Rate",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType
+                                                  .numberWithOptions(
+                                                      decimal: true),
+
+                                              inputFormatters: [
+                                                DecimalTextInputFormatter(
+                                                    decimalRange: 2)
+                                              ],
+                                              textAlign: TextAlign.right,
+                                              style: textStyle,
+                                              controller: _custrateController,
+                                              //focusNode: custidFocusNode,
+
+                                              // readOnly: enable,
+                                              //enableInteractiveSelection: enable,
+                                            ),
+                                          ),
+                                          SizedBox(width: 20),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 100,
+                                            ),
+                                            width: maxwidth * .7,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: widgetcolor),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  //disabledBorder: InputDecoration.collapsed(hintText: null),
+                                                  labelText: "Amount",
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 20.0)),
+                                              keyboardType: TextInputType
+                                                  .numberWithOptions(
+                                                      decimal: true),
+
+                                              inputFormatters: [
+                                                DecimalTextInputFormatter(
+                                                    decimalRange: 2)
+                                              ],
+                                              textAlign: TextAlign.right,
+                                              style: textStyle,
+                                              controller: _custamountController,
+                                              // focusNode: custidFocusNode,
+                                              //readOnly: enable,
+                                              //enableInteractiveSelection: enable,
+                                            ),
+                                          ),
                                         ]),
                                     ]),
                               ),
@@ -2179,7 +3730,7 @@ class HomePageState extends State<HomePage> {
                                           controller: _custgsmController,
                                           //   focusNode: custidFocusNode,
 
-                                          readOnly: enable,
+                                          //  readOnly: enable,
                                           //enableInteractiveSelection: enable,
                                         ),
                                       ),
@@ -2200,6 +3751,15 @@ class HomePageState extends State<HomePage> {
                                         ),
                                         width: maxwidth * .7,
                                         child: TextField(
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
+
+                                          inputFormatters: [
+                                            DecimalTextInputFormatter(
+                                                decimalRange: 2)
+                                          ],
+                                          textAlign: TextAlign.right,
                                           decoration: const InputDecoration(
                                               focusedBorder:
                                                   UnderlineInputBorder(
@@ -2211,12 +3771,12 @@ class HomePageState extends State<HomePage> {
                                               labelText: "No of Box",
                                               labelStyle:
                                                   TextStyle(fontSize: 20.0)),
-                                          keyboardType: TextInputType.text,
+
                                           style: textStyle,
                                           controller: _custnoofboxController,
                                           // focusNode: custidFocusNode,
 
-                                          readOnly: enable,
+                                          //readOnly: enable,
                                           //enableInteractiveSelection: enable,
                                         ),
                                       ),
@@ -2237,6 +3797,15 @@ class HomePageState extends State<HomePage> {
                                         ),
                                         width: maxwidth * .7,
                                         child: TextField(
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
+
+                                          inputFormatters: [
+                                            DecimalTextInputFormatter(
+                                                decimalRange: 3)
+                                          ],
+                                          textAlign: TextAlign.right,
                                           decoration: const InputDecoration(
                                               focusedBorder:
                                                   UnderlineInputBorder(
@@ -2248,12 +3817,12 @@ class HomePageState extends State<HomePage> {
                                               labelText: "Kgs/Box",
                                               labelStyle:
                                                   TextStyle(fontSize: 20.0)),
-                                          keyboardType: TextInputType.text,
+
                                           style: textStyle,
                                           controller: _custkgsperboxController,
                                           //     focusNode: custidFocusNode,
 
-                                          readOnly: enable,
+                                          //readOnly: enable,
                                           //enableInteractiveSelection: enable,
                                         ),
                                       ),
@@ -2284,12 +3853,20 @@ class HomePageState extends State<HomePage> {
                                               labelText: "Weight",
                                               labelStyle:
                                                   TextStyle(fontSize: 20.0)),
-                                          keyboardType: TextInputType.text,
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
+
+                                          inputFormatters: [
+                                            DecimalTextInputFormatter(
+                                                decimalRange: 3)
+                                          ],
+                                          textAlign: TextAlign.right,
                                           style: textStyle,
                                           controller: _custweightController,
                                           //   focusNode: custidFocusNode,
 
-                                          readOnly: enable,
+                                          //  readOnly: enable,
                                           //enableInteractiveSelection: enable,
                                         ),
                                       ),
@@ -2320,12 +3897,20 @@ class HomePageState extends State<HomePage> {
                                               labelText: "Rate",
                                               labelStyle:
                                                   TextStyle(fontSize: 20.0)),
-                                          keyboardType: TextInputType.text,
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
+
+                                          inputFormatters: [
+                                            DecimalTextInputFormatter(
+                                                decimalRange: 2)
+                                          ],
+                                          textAlign: TextAlign.right,
                                           style: textStyle,
                                           controller: _custrateController,
                                           //focusNode: custidFocusNode,
 
-                                          readOnly: enable,
+                                          //   readOnly: enable,
                                           //enableInteractiveSelection: enable,
                                         ),
                                       ),
@@ -2345,6 +3930,10 @@ class HomePageState extends State<HomePage> {
                                         ),
                                         width: maxwidth * .7,
                                         child: TextField(
+                                          onChanged: (text) {
+                                            if (text.indexOf(".0123456789") !=
+                                                -1) {}
+                                          },
                                           decoration: const InputDecoration(
                                               focusedBorder:
                                                   UnderlineInputBorder(
@@ -2356,34 +3945,26 @@ class HomePageState extends State<HomePage> {
                                               labelText: "Amount",
                                               labelStyle:
                                                   TextStyle(fontSize: 20.0)),
-                                          keyboardType: TextInputType.text,
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  decimal: true),
+
+                                          inputFormatters: [
+                                            DecimalTextInputFormatter(
+                                                decimalRange: 2)
+                                          ],
+                                          textAlign: TextAlign.right,
                                           style: textStyle,
                                           controller: _custamountController,
                                           // focusNode: custidFocusNode,
-                                          readOnly: enable,
+                                          //   readOnly: enable,
                                           //enableInteractiveSelection: enable,
                                         ),
                                       ),
                                   ])
                                 ],
-                              ))
-                              // SizedBox(height: 10),
-                              // ListView(
-                              //   scrollDirection: Axis.horizontal,
-                              //   children: [
-                              //   ],
-                              // )
-                              //]), //(children: [
-                              //   ),
-
-                              // SizedBox(
-                              //   height: 10,
-                              // ),
-                              ,
-                            ]))
-                        //  if (selectedprodtype.toLowerCase() == 'fabric')
-
-                        ,
+                              )),
+                            ])),
                         SizedBox(
                           height: 20,
                         ),
@@ -2402,31 +3983,70 @@ class HomePageState extends State<HomePage> {
 
                                   if (this.mounted)
                                     setState(() {
-                                      if (_itemdetails
-                                          .where((e) =>
-                                              e.fabricid == _data.fabricid &&
-                                              e.fabrictypeid ==
-                                                  _data.fabrictypeid &&
-                                              e.knittypeid ==
-                                                  _data.knittypeid &&
-                                              e.colorid == _data.colorid &&
-                                              e.diaid == _data.diaid &&
-                                              e.uomid == _data.uomid &&
-                                              e.compositionid ==
-                                                  _data.compositionid)
-                                          .isEmpty) {
+                                      if ((_itemdetails
+                                              .where((e) =>
+                                                  e.yarnmillid ==
+                                                      _data.yarnmillid &&
+                                                  e.yarntypeid ==
+                                                      _data.yarntypeid &&
+                                                  e.yarncountid ==
+                                                      _data.yarncountid &&
+                                                  e.colorid == _data.colorid)
+                                              .isEmpty) &&
+                                          (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'yarn')) {
                                         _itemdetails.add(_data);
 
-                                        selectedcolor = '';
-                                        selecteddia = '';
-                                        selecteduom = '';
-                                        selectedfabric = '';
-                                        selectedfabknittype = '';
-                                        selectedcomposition = '';
-                                        selectedfabtype = '';
-                                        selectedyarnmill = '';
-                                        selectedyarncolor = '';
-                                        selectedyarntype = '';
+                                        // Selectedcolor = '';
+                                        // selecteddia = '';
+                                        // selecteduom = '';
+                                        // selectedfabric = '';
+                                        // selectedfabknittype = '';
+                                        // selectedcomposition = '';
+                                        // selectedfabtype = '';
+                                        // Selectedyarnmill = '';
+                                        // selectedyarncolor = '';
+                                        // _custyarntypeController.text = '';
+                                        _custgsmController.text = '';
+                                        _custweightController.text = '';
+                                        _custnoofboxController.text = '';
+                                        _custrateController.text = '';
+                                        _custamountController.text = '';
+                                        _custkgsperboxController.text = '';
+                                      }
+
+                                      if (_itemdetails
+                                              .where((e) =>
+                                                  e.fabricid ==
+                                                      _data.fabricid &&
+                                                  e.fabrictypeid ==
+                                                      _data.fabrictypeid &&
+                                                  e.knittypeid ==
+                                                      _data.knittypeid &&
+                                                  e.colorid == _data.colorid &&
+                                                  e.diaid == _data.diaid &&
+                                                  e.uomid == _data.uomid &&
+                                                  e.compositionid ==
+                                                      _data.compositionid)
+                                              .isEmpty &&
+                                          (selectedprodtype
+                                                  .toString()
+                                                  .toLowerCase() ==
+                                              'fabric')) {
+                                        _itemdetails.add(_data);
+
+                                        // Selectedcolor = '';
+                                        // selecteddia = '';
+                                        // selecteduom = '';
+                                        // selectedfabric = '';
+                                        // selectedfabknittype = '';
+                                        // selectedcomposition = '';
+                                        // selectedfabtype = '';
+                                        // Selectedyarnmill = '';
+                                        // selectedyarncolor = '';
+                                        // _custyarntypeController.text = '';
                                         _custgsmController.text = '';
                                         _custweightController.text = '';
                                         _custnoofboxController.text = '';
@@ -2454,16 +4074,16 @@ class HomePageState extends State<HomePage> {
                                   setState(() {
                                     if (_previousitem != null)
                                       _itemdetails.add(_previousitem);
-                                    selectedcolor = '';
-                                    selecteddia = '';
-                                    selecteduom = '';
-                                    selectedfabric = '';
-                                    selectedfabknittype = '';
-                                    selectedcomposition = '';
-                                    selectedfabtype = '';
-                                    selectedyarnmill = '';
-                                    selectedyarncolor = '';
-                                    selectedyarntype = '';
+                                    // Selectedcolor = '';
+                                    // selecteddia = '';
+                                    // selecteduom = '';
+                                    // selectedfabric = '';
+                                    // selectedfabknittype = '';
+                                    // selectedcomposition = '';
+                                    // selectedfabtype = '';
+                                    // Selectedyarnmill = '';
+                                    // selectedyarncolor = '';
+                                    // _custyarntypeController.text = '';
                                     _custgsmController.text = '';
                                     _custweightController.text = '';
                                     _custnoofboxController.text = '';
@@ -2478,10 +4098,392 @@ class HomePageState extends State<HomePage> {
                                     color: Colors.black),
                               )),
                         ]),
-
+                        SizedBox(
+                          height: 10,
+                        ),
                         Container(
                             decoration: getBoxDecoration(),
-                            child: listtableView(maxwidth, maxheight)),
+                            child: SizedBox(
+                                height: 200,
+                                child: (_itemdetails.length > 0)
+                                    ? SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Container(
+                                                height: 200,
+                                                child: DataTable(
+                                                  columnSpacing: 10.0,
+                                                  columns: [
+                                                    if (selectedprodtype
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'fabric')
+                                                      DataColumn(
+                                                        label: Container(
+                                                            width:
+                                                                maxwidth * 0.10,
+                                                            child:
+                                                                Text("Fabric")),
+                                                        numeric: false,
+                                                      ),
+                                                    if (selectedprodtype
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'fabric')
+                                                      DataColumn(
+                                                        label: Container(
+                                                            width:
+                                                                maxwidth * 0.10,
+                                                            child: Text(
+                                                                "Fabric Type")),
+                                                        numeric: false,
+                                                      ),
+                                                    if (selectedprodtype
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'fabric')
+                                                      DataColumn(
+                                                        label: Container(
+                                                          width:
+                                                              maxwidth * 0.10,
+                                                          child:
+                                                              Text("knit Type"),
+                                                        ),
+                                                        numeric: false,
+                                                      ),
+                                                    if (selectedprodtype
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'yarn')
+                                                      DataColumn(
+                                                        label: Container(
+                                                            width:
+                                                                maxwidth * .10,
+                                                            child: Text(
+                                                                "Yarn Mill")),
+                                                        numeric: false,
+                                                      ),
+                                                    if (selectedprodtype
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'yarn')
+                                                      DataColumn(
+                                                        label: Container(
+                                                            width:
+                                                                maxwidth * 0.10,
+                                                            child: Text(
+                                                                "Yarn Count")),
+                                                        numeric: false,
+                                                      ),
+                                                    if (selectedprodtype
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'yarn')
+                                                      DataColumn(
+                                                        label: Container(
+                                                          width:
+                                                              maxwidth * 0.10,
+                                                          child:
+                                                              Text("Yarn Type"),
+                                                        ),
+                                                        numeric: false,
+                                                      ),
+                                                    DataColumn(
+                                                      label: Container(
+                                                        width: maxwidth * 0.12,
+                                                        child: Text("Color"),
+                                                      ),
+                                                      numeric: true,
+                                                    ),
+                                                    if (selectedprodtype
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'fabric')
+                                                      DataColumn(
+                                                        label: Container(
+                                                          width:
+                                                              maxwidth * 0.10,
+                                                          child: Text("Dia"),
+                                                        ),
+                                                        numeric: true,
+                                                      ),
+                                                    if (selectedprodtype
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                        'fabric')
+                                                      DataColumn(
+                                                        label: Container(
+                                                          width:
+                                                              maxwidth * 0.10,
+                                                          child: Text("Uom"),
+                                                        ),
+                                                        numeric: true,
+                                                      ),
+                                                    DataColumn(
+                                                      label: Container(
+                                                        width: maxwidth * 0.10,
+                                                        child: Text("Kgs/Box"),
+                                                      ),
+                                                      numeric: true,
+                                                    ),
+                                                    DataColumn(
+                                                      label: Container(
+                                                        width: maxwidth * 0.10,
+                                                        child: Text("Weight"),
+                                                      ),
+                                                      numeric: true,
+                                                    ),
+                                                    DataColumn(
+                                                      label: Container(
+                                                        width: maxwidth * 0.10,
+                                                        child: Text("Rate"),
+                                                      ),
+                                                      numeric: true,
+                                                    ),
+                                                    DataColumn(
+                                                      label: Container(
+                                                        width: maxwidth * 0.10,
+                                                        child: Text("Amount"),
+                                                      ),
+                                                      numeric: true,
+                                                    ),
+                                                    DataColumn(
+                                                      label: Container(
+                                                        width: maxwidth * 0.25,
+                                                        child: Text("Action"),
+                                                      ),
+                                                    )
+                                                  ],
+                                                  rows: _itemdetails
+                                                          ?.map(
+                                                            (item) => DataRow(
+                                                                cells: [
+                                                                  if (selectedprodtype
+                                                                          .toString()
+                                                                          .toLowerCase() ==
+                                                                      'fabric')
+                                                                    DataCell(
+                                                                        Container(
+                                                                      width: maxwidth *
+                                                                          0.10,
+                                                                      child: Text((fabricdetails.where((element) => element.columnMasterid == item.fabricid).map((e) => e.columnname).isNotEmpty
+                                                                          ? fabricdetails
+                                                                              .where((element) => element.columnMasterid == item.fabricid)
+                                                                              .map((e) => e.columnname)
+                                                                              .first
+                                                                              .toString()
+                                                                          : "")),
+                                                                    )),
+                                                                  if (selectedprodtype
+                                                                          .toString()
+                                                                          .toLowerCase() ==
+                                                                      'fabric')
+                                                                    DataCell(
+                                                                        Container(
+                                                                      width: maxwidth *
+                                                                          0.10,
+                                                                      child: Text(item
+                                                                          .fabrictype
+                                                                          .toString()
+                                                                          .toUpperCase()),
+                                                                    )),
+                                                                  if (selectedprodtype
+                                                                          .toString()
+                                                                          .toLowerCase() ==
+                                                                      'fabric')
+                                                                    DataCell(
+                                                                      Container(
+                                                                        width: maxwidth *
+                                                                            0.10,
+                                                                        child: Text(item
+                                                                            .knittype
+                                                                            .toString()),
+                                                                      ),
+                                                                    ),
+                                                                  if (selectedprodtype
+                                                                          .toString()
+                                                                          .toLowerCase() ==
+                                                                      'yarn')
+                                                                    DataCell(
+                                                                      Container(
+                                                                        width: maxwidth *
+                                                                            0.10,
+                                                                        child: Text(item
+                                                                            .yarnmill
+                                                                            .toString()),
+                                                                      ),
+                                                                    ),
+                                                                  if (selectedprodtype
+                                                                          .toString()
+                                                                          .toLowerCase() ==
+                                                                      'yarn')
+                                                                    DataCell(
+                                                                      Container(
+                                                                        width: maxwidth *
+                                                                            0.10,
+                                                                        child: Text(item
+                                                                            .yarncount
+                                                                            .toString()),
+                                                                      ),
+                                                                    ),
+                                                                  if (selectedprodtype
+                                                                          .toString()
+                                                                          .toLowerCase() ==
+                                                                      'yarn')
+                                                                    DataCell(
+                                                                      Container(
+                                                                        width: maxwidth *
+                                                                            0.10,
+                                                                        child: Text(item
+                                                                            .yarntype
+                                                                            .toString()),
+                                                                      ),
+                                                                    ),
+                                                                  DataCell(
+                                                                    Container(
+                                                                      width: maxwidth *
+                                                                          0.12,
+                                                                      child: Text(item
+                                                                          .color
+                                                                          .toString()),
+                                                                    ),
+                                                                  ),
+                                                                  if (selectedprodtype
+                                                                          .toString()
+                                                                          .toLowerCase() ==
+                                                                      'fabric')
+                                                                    DataCell(
+                                                                        Container(
+                                                                      width: maxwidth *
+                                                                          0.10,
+                                                                      child: Text(item
+                                                                          .dia
+                                                                          .toString()
+                                                                          .toUpperCase()),
+                                                                    )),
+                                                                  if (selectedprodtype
+                                                                          .toString()
+                                                                          .toLowerCase() ==
+                                                                      'fabric')
+                                                                    DataCell(
+                                                                        Container(
+                                                                      width: maxwidth *
+                                                                          0.10,
+                                                                      child: Text(item
+                                                                          .uom
+                                                                          .toString()
+                                                                          .toUpperCase()),
+                                                                    )),
+                                                                  DataCell(
+                                                                    Container(
+                                                                      width: maxwidth *
+                                                                          0.10,
+                                                                      child: Text(item
+                                                                          .kgsperbox
+                                                                          .toString()),
+                                                                    ),
+                                                                  ),
+                                                                  DataCell(
+                                                                    Container(
+                                                                      width: maxwidth *
+                                                                          0.10,
+                                                                      child: Text(item
+                                                                          .weight
+                                                                          .toString()),
+                                                                    ),
+                                                                  ),
+                                                                  DataCell(
+                                                                    Container(
+                                                                      width: maxwidth *
+                                                                          0.10,
+                                                                      child: Text(item
+                                                                          .rate
+                                                                          .toString()),
+                                                                    ),
+                                                                  ),
+                                                                  DataCell(
+                                                                    Container(
+                                                                      width: maxwidth *
+                                                                          0.10,
+                                                                      child: Text(item
+                                                                          .amount
+                                                                          .toString()),
+                                                                    ),
+                                                                  ),
+                                                                  DataCell(Row(
+                                                                    children: [
+                                                                      Container(
+                                                                          width: maxwidth *
+                                                                              0.25,
+                                                                          child:
+                                                                              Row(children: [
+                                                                            IconButton(
+                                                                                icon: Image.asset('Images/edit.png', color: widgetcolor),
+                                                                                highlightColor: Colors.pink,
+                                                                                onPressed: () {
+                                                                                  setState(() {
+                                                                                    // Selectedcolor = '';
+                                                                                    // Selectedyarncount = '';
+                                                                                    // _custyarntypeController.text = '';
+                                                                                    // Selectedyarnmill = '';
+
+                                                                                    Selectedcolor = item.color;
+                                                                                    if (selectedprodtype.toString().toLowerCase() == 'fabric') {
+                                                                                      //   this.setState(() {
+                                                                                      selecteddia = item.dia;
+                                                                                      selecteduom = item.uom;
+                                                                                      selectedfabknittype = item.knittype;
+                                                                                      selectedcomposition = item.composition;
+                                                                                      selectedfabtype = item.fabrictype;
+
+                                                                                      _custgsmController.text = item.gsm;
+                                                                                      selectedfabric = item.fabric;
+                                                                                      // });
+                                                                                    } else {
+                                                                                      this.setState(() {
+                                                                                        _custyarntypeController.text = item.yarntype.toString();
+                                                                                        yarntypeid = item.yarntypeid;
+                                                                                        Selectedyarncount = item.yarncount.toString();
+                                                                                        yarncountid = item.yarncountid;
+                                                                                        Selectedyarnmill = item.yarnmill.toString();
+                                                                                        yarnmillid = item.yarnmillid;
+
+                                                                                        Selectedcolor = item.color.toString();
+                                                                                        colorid = item.colorid;
+                                                                                        //selectedyarncolor = item.color;});
+                                                                                      });
+                                                                                    }
+                                                                                    _custweightController.text = item.weight;
+                                                                                    _custnoofboxController.text = item.noofbox;
+                                                                                    _custrateController.text = item.rate;
+                                                                                    _custamountController.text = item.amount;
+                                                                                    _custkgsperboxController.text = item.kgsperbox;
+
+                                                                                    _previousitem = item;
+                                                                                    removeItem(item);
+                                                                                  });
+                                                                                }),
+                                                                            SizedBox(width: 2),
+                                                                            IconButton(
+                                                                                icon: Image.asset('Images/delete.png', color: widgetcolor),
+                                                                                highlightColor: Colors.pink,
+                                                                                onPressed: () {
+                                                                                  removeItem(item);
+                                                                                })
+                                                                          ]))
+                                                                    ],
+                                                                  )),
+                                                                ]),
+                                                          )
+                                                          ?.toList() ??
+                                                      [],
+                                                ))))
+                                    : Text("Add details using the form below",
+                                        textAlign: TextAlign.center)
+                                //}
+
+                                )),
                         Container(
                           height: maxheight * .30,
                           width: maxwidth,
@@ -2743,8 +4745,8 @@ class HomePageState extends State<HomePage> {
                                                           .toString();
                                                 });
                                               },
-                                              popupItemDisabled: (String s) =>
-                                                  s.startsWith('I'),
+                                              // popupItemDisabled: (String s) =>
+                                              //     s.startsWith('I'),
                                               selectedItem:
                                                   selectedshipmentmode,
                                             ),
@@ -2865,7 +4867,7 @@ class HomePageState extends State<HomePage> {
                           ),
                         ),
 
-                        SizedBox(height: 5),
+                        SizedBox(height: 2),
                         Container(
                           constraints: BoxConstraints(
                             //minHeight: 20,
@@ -2879,8 +4881,8 @@ class HomePageState extends State<HomePage> {
                             decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: widgetcolor,
-                                      style: BorderStyle.solid),
+                                    color: widgetcolor,
+                                  ),
                                 ),
                                 //border: InputBorder.none,
                                 //disabledBorder: InputDecoration.collapsed(hintText: null),
@@ -2895,7 +4897,7 @@ class HomePageState extends State<HomePage> {
                             //enableInteractiveSelection: enable,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 2),
                         Container(
                           constraints: BoxConstraints(
                             //minHeight: 20,
@@ -2909,8 +4911,8 @@ class HomePageState extends State<HomePage> {
                             decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: widgetcolor,
-                                      style: BorderStyle.solid),
+                                    color: widgetcolor,
+                                  ),
                                 ),
                                 //disabledBorder: InputDecoration.collapsed(hintText: null),
                                 //labelText: "Terms & Conditions",
@@ -2924,7 +4926,7 @@ class HomePageState extends State<HomePage> {
                             //enableInteractiveSelection: enable,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 2),
                         Container(
                           constraints: BoxConstraints(
                             //minHeight: 20,
@@ -2938,8 +4940,8 @@ class HomePageState extends State<HomePage> {
                             decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: widgetcolor,
-                                      style: BorderStyle.solid),
+                                    color: widgetcolor,
+                                  ),
                                 ),
                                 //disabledBorder: InputDecoration.collapsed(hintText: null),
                                 //labelText: "Terms & Conditions",
@@ -2953,7 +4955,7 @@ class HomePageState extends State<HomePage> {
                             //enableInteractiveSelection: enable,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 2),
                         Container(
                           constraints: BoxConstraints(
                             //minHeight: 20,
@@ -2967,8 +4969,8 @@ class HomePageState extends State<HomePage> {
                             decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: widgetcolor,
-                                      style: BorderStyle.solid),
+                                    color: widgetcolor,
+                                  ),
                                 ),
                                 //disabledBorder: InputDecoration.collapsed(hintText: null),
                                 //labelText: "Terms & Conditions",
@@ -2982,7 +4984,7 @@ class HomePageState extends State<HomePage> {
                             //enableInteractiveSelection: enable,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 2),
                         Container(
                           constraints: BoxConstraints(
                             //minHeight: 20,
@@ -2996,8 +4998,8 @@ class HomePageState extends State<HomePage> {
                             decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: widgetcolor,
-                                      style: BorderStyle.solid),
+                                    color: widgetcolor,
+                                  ),
                                 ), //disabledBorder: InputDecoration.collapsed(hintText: null),
                                 //labelText: "Terms & Conditions",
                                 labelStyle: TextStyle(fontSize: 20.0)),
@@ -3010,7 +5012,7 @@ class HomePageState extends State<HomePage> {
                             //enableInteractiveSelection: enable,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 2),
                         Container(
                           constraints: BoxConstraints(
                             //minHeight: 20,
@@ -3024,8 +5026,8 @@ class HomePageState extends State<HomePage> {
                             decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: widgetcolor,
-                                      style: BorderStyle.solid),
+                                    color: widgetcolor,
+                                  ),
                                 ),
                                 //disabledBorder: InputDecoration.collapsed(hintText: null),
                                 //labelText: "Terms & Conditions",
@@ -3039,7 +5041,7 @@ class HomePageState extends State<HomePage> {
                             //enableInteractiveSelection: enable,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 2),
                         Container(
                           constraints: BoxConstraints(
                             //minHeight: 20,
@@ -3053,8 +5055,8 @@ class HomePageState extends State<HomePage> {
                             decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: widgetcolor,
-                                      style: BorderStyle.solid),
+                                    color: widgetcolor,
+                                  ),
                                 ),
                                 //disabledBorder: InputDecoration.collapsed(hintText: null),
                                 // labelText: "Terms & Conditions",
@@ -3192,1536 +5194,263 @@ class HomePageState extends State<HomePage> {
             ])));
   }
 
-  void saveItems() async {
-    List<purchaseorderdetl.PurchaseOrderDetails> yarndetail =
-        List<purchaseorderdetl.PurchaseOrderDetails>.generate(
-            _itemdetails.length, (int index) {
-      return purchaseorderdetl.PurchaseOrderDetails(
-          headerid: "0",
-          yarnmillid: _itemdetails[index].yarnmillid,
-          yarntypeid: _itemdetails[index].yarntypeid,
-          yarncountid: _itemdetails[index].yarncountid,
-          colorid: _itemdetails[index].colorid,
-          noofbox: _itemdetails[index].noofbox,
-          weight: _itemdetails[index].weight,
-          rate: _itemdetails[index].rate,
-          amount: _itemdetails[index].amount);
-    });
-
-    List<purchaseorderdetl.PurchaseOrderFabricDetails> fabricdetail =
-        List<purchaseorderdetl.PurchaseOrderFabricDetails>.generate(
-            _itemdetails.length, (int index) {
-      return purchaseorderdetl.PurchaseOrderFabricDetails(
-          headerid: "0",
-          fabrictypeid: _itemdetails[index].fabrictypeid,
-          fabricid: _itemdetails[index].fabricid,
-          compositionid: _itemdetails[index].compositionid,
-          gsm: _itemdetails[index].gsm,
-          diaid: _itemdetails[index].diaid,
-          knittypeid: _itemdetails[index].knittypeid,
-          uomid: _itemdetails[index].uomid,
-          colorid: _itemdetails[index].colorid,
-          noofbox: _itemdetails[index].noofbox,
-          weight: _itemdetails[index].weight,
-          rate: _itemdetails[index].rate,
-          amount: _itemdetails[index].amount);
-    });
-
-    final purchaseorderdetl.PurchaseOrderHeader purchaseorderList =
-        (selectedprodtype.toString().toLowerCase() == 'yarn')
-            ? purchaseorderdetl.PurchaseOrderHeader(
-                purchaseorderdetail: yarndetail,
-                headerid: "0",
-                pono: _custPONoController.text,
-                podate: seldate,
-                producttype: selectedprodtype,
-                consigneeid: consigneeid,
-                supplierid: supplierid,
-                currencyid: currencyid,
-                noofcontainers: _custnoofcontainerController.text,
-                paymentterms: _custpaymenttermsController.text,
-                shipmentmodeid: shipmentmodeid,
-                portofloadingid: portofloadid,
-                shipmentdate: selshipmentdate,
-                packinglistid: _custpackingdetailController.text,
-                remarks: _custRemarksController.text,
-                termsandconditions: _custtermsandconditionsController.text)
-            : purchaseorderdetl.PurchaseOrderHeader(
-                purchaseorderfabricdetail: fabricdetail,
-                headerid: "0",
-                pono: _custPONoController.text,
-                podate: seldate,
-                producttype: selectedprodtype,
-                consigneeid: consigneeid,
-                supplierid: supplierid,
-                currencyid: currencyid,
-                noofcontainers: _custnoofcontainerController.text,
-                paymentterms: _custpaymenttermsController.text,
-                shipmentmodeid: shipmentmodeid,
-                portofloadingid: portofloadid,
-                shipmentdate: selshipmentdate,
-                packinglistid: _custpackingdetailController.text,
-                remarks: _custRemarksController.text,
-                termsandconditions: _custtermsandconditionsController.text);
-    final String requestBody = json.encoder.convert(purchaseorderList);
-    final http.Response response =
-        await http.post('http://tap.suninfotechnologies.in/api/Touchpo',
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
-            body: requestBody);
-
-    if (response.statusCode == 200) {
-      setState(() {
-        clearData(context);
-        enable = false;
-      });
-      Alert(
-          context: context,
-          title: "Done!",
-          desc: "Data saved successfully",
-          type: AlertType.success,
-          style: AlertStyle(isCloseButton: false),
-          buttons: [
-            DialogButton(
-              child: Text(
-                "Close",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop();
-//pr.hide();
-              },
-              width: 120,
-            )
-          ]).show();
-    } else {
-      throw Exception('Failed to create album.');
-    }
-  }
-
-  void clearData(context) {
-    _custIdController.text = '0';
-    _custPONoController.text = '';
-    _custDateController.text = '';
-    //_cust
-    shipmentdateCtl.text = '';
-    dateCtl.text = '';
-    _custNotifypartyController.text = '';
-    _custAdd3Controller.text = '';
-    _custAdd4Controller.text = '';
-    _custEmailController.text = '';
-    _custGstinController.text = '';
-    _custMobileController.text = '';
-    _custRemarksController.text = '';
-    _custgsmController.text = '';
-    _custnoofboxController.text = '';
-    _custkgsperboxController.text = '';
-    _custweightController.text = '';
-    _custrateController.text = '';
-    _custamountController.text = '';
-    _custtermsandconditionsController.text = '';
-    _custtermsandconditionsController2.text = '';
-    _custtermsandconditionsController3.text = '';
-    _custtermsandconditionsController4.text = '';
-    _custtermsandconditionsController5.text = '';
-    _custtermsandconditionsController6.text = '';
-    _custtermsandconditionsController7.text = '';
-    _custtermsandconditionsController8.text = '';
-    _custnoofcontainerController.text = '';
-    _custpackingdetailController.text = '';
-    _custpaymenttermsController.text = '';
-    _custremarksController.text = '';
-    colorid = '0';
-    yarncountid = '0';
-    yarnmillid = '0';
-    yarntypeid = '0';
-
-    _id = '0';
-  }
-
-  purchaseorderdetl.PurchaseOrderDetails getitemdetails() {
-    purchaseorderdetl.PurchaseOrderDetails _data;
-
-    selamount = _custamountController.text;
-    if (selamount != '' &&
-        selamount != null &&
-        (selectedprodtype.toString().toLowerCase() == 'fabric' ||
-            selectedprodtype.toString().toLowerCase() == 'yarn')) {
-      var convertDataToJson = json.decode('[{"fabric": ' +
-          '"' +
-          selectedfabric.toString() +
-          '" , ' +
-          '"fabricid": ' +
-          '"' +
-          fabricid.toString() +
-          '"' +
-          ' , "Amount": ' +
-          '"' +
-          _custamountController.text.toString() +
-          '"' +
-          ' , "YarnColor": ' +
-          '"' +
-          selectedcolor.toString() +
-          '"' +
-          ' , "YarnColorID": ' +
-          '"' +
-          colorid.toString() +
-          '"' +
-          ', "composition": ' +
-          '"' +
-          selectedcomposition.toString() +
-          '"' +
-          ', "compositionid": ' +
-          '"' +
-          compositionid.toString() +
-          '"' +
-          ', "dia": ' +
-          '"' +
-          selecteddia.toString() +
-          '"' +
-          ', "diaid": ' +
-          '"' +
-          diaid.toString() +
-          '"' +
-          ', "fabrictype": ' +
-          '"' +
-          selectedfabtype.toString() +
-          '"' +
-          ', "fabrictypeid": ' +
-          '"' +
-          fabtypeid.toString() +
-          '"' +
-          ', "gsm": ' +
-          '"' +
-          _custgsmController.text.toString() +
-          '"' +
-          ', "Kgsperbox": ' +
-          '"' +
-          _custkgsperboxController.text.toString() +
-          '"' +
-          ', "knittype": ' +
-          '"' +
-          selectedfabknittype.toString() +
-          '"' +
-          ', "knittypeid": ' +
-          '"' +
-          fabknittypeid.toString() +
-          '"' +
-          ', "NoofBox": ' +
-          '"' +
-          _custnoofboxController.text.toString() +
-          '"' +
-          ', "Rate": ' +
-          '"' +
-          _custrateController.text.toString() +
-          '"' +
-          ', "uom": ' +
-          '"' +
-          selecteduom.toString() +
-          '"' +
-          ', "uomid": ' +
-          '"' +
-          uomid.toString() +
-          '"' +
-          ', "Weight": ' +
-          '"' +
-          _custweightController.text.toString() +
-          '"' +
-          ', "YarnMill": ' +
-          '"' +
-          selectedyarnmill.toString() +
-          '"' +
-          ', "YarnMillID": ' +
-          '"' +
-          yarnmillid.toString() +
-          '"' +
-          ', "yarntype": ' +
-          '"' +
-          selectedyarntype.toString() +
-          '"' +
-          ', "yanrtypeid": ' +
-          '"' +
-          yarntypeid.toString() +
-          '"' +
-          ', "YarnCount": ' +
-          '"' +
-          selectedyarncount.toString() +
-          '"' +
-          ', "YarnCountID": ' +
-          '"' +
-          yarncountid.toString() +
-          '"' +
-          '}]');
-      final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-      _data = parsed
-          .map<purchaseorderdetl.PurchaseOrderDetails>(
-              (json) => purchaseorderdetl.PurchaseOrderDetails.fromJSON(json))
-          .first;
-    }
-    return _data;
-  }
-
-  List<purchaseorderdetl.PurchaseOrderHeader> data =
-      new List<purchaseorderdetl.PurchaseOrderHeader>();
-
-  Future<List<type.Customer>> getcompanyMaster(String filter) async {
-    setState(() {
-      companydetails = [];
-      companydata = [];
-    });
-
-    final String customerurl =
-        "http://posmmapi.suninfotechnologies.in/api/partytype?&intflag=4";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      companydetails = parsed
-          .map<type.Customer>((json) => type.Customer.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        companydetails = companydetails
-            .where((element) => element.ptyname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      companydata = companydetails.map((e) => e.ptyname).toList();
-      if (compid == '' || compid == null || compid == '0')
-        selectedcompany = companydata.first;
-
-      compid = compid = companydetails
-          .where((element) => element.ptyname == selectedcompany)
-          .map((e) => e.partyid)
-          .first
-          .toString();
-    });
-
-    return companydetails;
-  }
-
-  Future<List<purchaseorderdetl.PurchaseOrderDetails>>
-      getpurchaseitemdetails() async {
-    setState(() {
-      _itemdetails = [];
-    });
-    final String customerurl =
-        'http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=20&Mode=PO&spname=GetAndSubmitPODetails&intflag=4&intHeaderID=' +
-            _id;
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      _itemdetails = (selectedprodtype.toString().toLowerCase() == 'fabric')
-          ? parsed
-              .map<purchaseorderdetl.PurchaseOrderDetails>((json) =>
-                  purchaseorderdetl.PurchaseOrderDetails.fromJSON(json))
-              .toList()
-          : parsed
-              .map<purchaseorderdetl.PurchaseOrderDetails>((json) =>
-                  purchaseorderdetl.PurchaseOrderDetails.fromyarnJSON(json))
-              .toList();
-    });
-    return _itemdetails;
-  }
-
-  Future<List<customer.Customer>> getsupplierdetails(String filter) async {
-    setState(() {
-      supplierdetails = [];
-      supplierdata = [];
-    });
-
-    final String customerurl =
-        'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&intPartytypeID=2&pagesize=50';
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      supplierdetails = parsed
-          .map<customer.Customer>((json) => customer.Customer.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        supplierdetails = supplierdetails
-            .where((element) => element.customerName
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      supplierdata = supplierdetails.map((e) => e.customerName).toList();
-      if (supplierid == '' || supplierid == null || supplierid == '0')
-        selectedsupplier = supplierdata.first;
-
-      supplierid = supplierdetails
-          .where((element) => element.customerName == selectedsupplier)
-          .map((e) => e.custId)
-          .first
-          .toString();
-    });
-
-    return supplierdetails;
-  }
-
-  Future<List<customer.Customer>> getnotifypartydetails(String filter) async {
-    setState(() {
-      notifypartydetails = [];
-      notifypartydata = [];
-    });
-
-    final String customerurl =
-        'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&intPartytypeID=4&pagesize=10';
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      notifypartydetails = parsed
-          .map<customer.Customer>((json) => customer.Customer.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        notifypartydetails = notifypartydetails
-            .where((element) => element.customerName
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      notifypartydata = notifypartydetails.map((e) => e.customerName).toList();
-      if (notifypartyid == '' || notifypartyid == null || notifypartyid == '0')
-        selectednotifyparty = notifypartydata.first;
-
-      notifypartyid = notifypartydetails
-          .where((element) => element.customerName == selectednotifyparty)
-          .map((e) => e.custId)
-          .first
-          .toString();
-    });
-
-    return notifypartydetails;
-  }
-
-  Future<List<master.Master>> getcurrencydetails(String filter) async {
-    setState(() {
-      currencydetails = [];
-      currencydata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=currencymaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      currencydetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        currencydetails = currencydetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      currencydata = currencydetails.map((e) => e.columnname).toList();
-      if (currencyid == '' || currencyid == null || currencyid == '0')
-        selectedcurrency = currencydata.first;
-
-      currencyid = currencydetails
-          .where((element) => element.columnname == selectedcurrency)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return currencydetails;
-  }
-
-  Future<List<uom.Uom>> getuomdetails(String filter) async {
-    setState(() {
-      uomdetails = [];
-      uomdata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=uom&spname=GetAndSubmituommaster&intOrgID=1&intUserID=1&intflag=4";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      uomdetails =
-          parsed.map<uom.Uom>((json) => uom.Uom.fromJSON(json)).toList();
-
-      if (filter != "")
-        uomdetails = uomdetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      uomdata = uomdetails.map((e) => e.columnname).toList();
-      if (uomid == '' || uomid == null || uomid == '0')
-        selecteduom = uomdata.first;
-
-      uomid = uomdetails
-          .where((element) => element.columnname == selecteduom)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return uomdetails;
-  }
-
-  Future<List<master.Master>> getcompositiondetails(String filter) async {
-    setState(() {
-      compositiondetails = [];
-      compositiondata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabriccompositionmaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      compositiondetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        compositiondetails = compositiondetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      compositiondata = compositiondetails.map((e) => e.columnname).toList();
-      if (compositionid == '' || compositionid == null || compositionid == '0')
-        selectedcomposition = compositiondata.first;
-
-      compositionid = compositiondetails
-          .where((element) => element.columnname == selectedcomposition)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return compositiondetails;
-  }
-
-  Future<List<master.Master>> getdiadetails(String filter) async {
-    setState(() {
-      diadetails = [];
-      diadata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabricdiamaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      diadetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        diadetails = diadetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      diadata = diadetails.map((e) => e.columnname).toList();
-      if (diaid == '' || diaid == null || diaid == '0')
-        selecteddia = diadata.first;
-
-      diaid = diadetails
-          .where((element) => element.columnname == selecteddia)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return diadetails;
-  }
-
-  Future<List<master.Master>> getportofdischargedetails(String filter) async {
-    setState(() {
-      portofdischargedetails = [];
-      portofdischargedata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=portofdischargemaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      portofdischargedetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        portofdischargedetails = portofdischargedetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      portofdischargedata =
-          portofdischargedetails.map((e) => e.columnname).toList();
-      if (portofdischargeid == '' ||
-          portofdischargeid == null ||
-          portofdischargeid == '0') selecteddia = diadata.first;
-
-      portofdischargeid = portofdischargedetails
-          .where((element) => element.columnname == selectedportofdischarge)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return portofdischargedetails;
-  }
-
-  Future<List<master.Master>> getportofloaddetails(String filter) async {
-    setState(() {
-      portofloaddetails = [];
-      portofloaddata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=portofloadingmaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      portofloaddetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        portofloaddetails = portofloaddetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      portofloaddata = portofloaddetails.map((e) => e.columnname).toList();
-      if (portofloadid == '' || portofloadid == null || portofloadid == '0')
-        selectedportofload = portofloaddata.first;
-
-      portofloadid = portofloaddetails
-          .where((element) => element.columnname == selectedportofload)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return portofloaddetails;
-  }
-
-  Future<List<master.Master>> getshipmentmodedetails(String filter) async {
-    setState(() {
-      shipmentmodedetails = [];
-      shipmentmodedata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=shipmentmodemaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      shipmentmodedetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        shipmentmodedetails = shipmentmodedetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      shipmentmodedata = shipmentmodedetails.map((e) => e.columnname).toList();
-      if (shipmentmodeid == '' ||
-          shipmentmodeid == null ||
-          shipmentmodeid == '0') selectedshipmentmode = shipmentmodedata.first;
-
-      shipmentmodeid = shipmentmodedetails
-          .where((element) => element.columnname == selectedshipmentmode)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return shipmentmodedetails;
-  }
-
-  Future<List<master.Master>> getcolordetails(String filter) async {
-    setState(() {
-      colordetails = [];
-      colordata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=master&spname=GetAndSubmitmastertable&intOrgID=1&intUserID=1&intflag=4&strTableName=colormaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      colordetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        colordetails = colordetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      colordata = colordetails.map((e) => e.columnname).toList();
-      if (colorid == '' || colorid == null || colorid == '0')
-        selectedcolor = colordata.first;
-
-      colorid = colordetails
-          .where((element) => element.columnname == selectedcolor)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return colordetails;
-  }
-
-  Future<List<master.Master>> getfabknittypedetails(String filter) async {
-    setState(() {
-      fabricknittypedetails = [];
-      fabricknitdata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabricdknittypemaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      fabricknittypedetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        fabricknittypedetails = fabricknittypedetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      fabricknitdata = fabricknittypedetails.map((e) => e.columnname).toList();
-      if (fabknittypeid == '' || fabknittypeid == null || fabknittypeid == '0')
-        selectedfabknittype = fabricknitdata.first;
-
-      fabknittypeid = fabricknittypedetails
-          .where((element) => element.columnname == selectedfabknittype)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return fabricknittypedetails;
-  }
-
-  Future<List<master.Master>> getfabrictypedetails(String filter) async {
-    setState(() {
-      fabrictypetypedetails = [];
-      fabrictypedata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabrictypemaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      fabrictypetypedetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        fabrictypetypedetails = fabrictypetypedetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      fabrictypedata = fabrictypetypedetails.map((e) => e.columnname).toList();
-      if (fabtypeid == '' || fabtypeid == null || fabtypeid == '0')
-        selectedfabtype = fabrictypedata.first;
-
-      fabtypeid = fabrictypetypedetails
-          .where((element) => element.columnname == selectedfabtype)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return fabrictypetypedetails;
-  }
-
-  Future<List<master.Master>> getyarnmilldetails(String filter) async {
-    setState(() {
-      yarnmilldetails = [];
-      yarnmilldata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=yarnmillmaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      yarnmilldetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        yarnmilldetails = yarnmilldetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      yarnmilldata = yarnmilldetails.map((e) => e.columnname).toList();
-      if (yarnmillid == '' || yarnmillid == null || yarnmillid == '0')
-        selectedyarnmill = yarnmilldata.first;
-
-      yarnmillid = yarnmilldetails
-          .where((element) => element.columnname == selectedyarnmill)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return yarnmilldetails;
-  }
-
-  Future<List<master.Master>> getyarncountdetails(String filter) async {
-    setState(() {
-      yarncountdetails = [];
-      yarncountdata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=yarncountmaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      yarncountdetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        yarncountdetails = yarncountdetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      yarncountdata = yarncountdetails.map((e) => e.columnname).toList();
-      if (yarncountid == '' || yarncountid == null || yarncountid == '0')
-        selectedyarncount = yarncountdata.first;
-
-      yarncountid = yarncountdetails
-          .where((element) => element.columnname == selectedyarncount)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return yarncountdetails;
-  }
-
-  Future<List<master.Master>> getconsigneedetails(String filter) async {
-    setState(() {
-      consigneedetails = [];
-      consigneedata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=yarncountmaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      consigneedetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        consigneedetails = consigneedetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      consigneedata = consigneedetails.map((e) => e.columnname).toList();
-      if (consigneeid == '' || consigneeid == null || consigneeid == '0')
-        selectedconsignee = consigneedata.first;
-
-      consigneeid = consigneedetails
-          .where((element) => element.columnname == selectedconsignee)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return consigneedetails;
-  }
-
-  Future<List<master.Master>> getyarntypedetails(String filter) async {
-    setState(() {
-      yarntypedetails = [];
-      yarntypedata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=yarntypemaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      yarntypedetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        yarntypedetails = yarntypedetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      yarntypedata = yarntypedetails.map((e) => e.columnname).toList();
-      if (yarntypeid == '' || yarntypeid == null || yarntypeid == '0')
-        selectedyarntype = yarntypedata.first;
-
-      yarntypeid = yarntypedetails
-          .where((element) => element.columnname == selectedyarntype)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return yarntypedetails;
-  }
-
-  Future<List<master.Master>> getfabricdetails(String filter) async {
-    setState(() {
-      fabricdetails = [];
-      fabricdata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=fabricnamemaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      fabricdetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        fabricdetails = fabricdetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      fabricdata = fabricdetails.map((e) => e.columnname).toList();
-      if (fabricid == '' || fabricid == null || fabricid == '0')
-        selectedfabric = fabricdata.first;
-
-      fabricid = fabricdetails
-          .where((element) => element.columnname == selectedfabric)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return fabricdetails;
-  }
-
-  Future<List<master.Master>> getproddetails(String filter) async {
-    setState(() {
-      prodtypedetails = [];
-      prodtypedata = [];
-    });
-
-    final String customerurl =
-        "http://tap.suninfotechnologies.in/api/touch?&pagenumber=1&pagesize=50&Mode=MASTER&spname=GetAndSubmitMasterTable&intOrgID=1&intUserID=1&intflag=4&strTableName=producttypemaster";
-
-    var response = await http.get(Uri.encodeFull(customerurl),
-        headers: {"Accept": "application/json"});
-    //List<ItemMaster> customer1 = new List<ItemMaster>();
-
-    var convertDataToJson = json.decode(response.body);
-    final parsed = convertDataToJson.cast<Map<String, dynamic>>();
-    setState(() {
-      prodtypedetails = parsed
-          .map<master.Master>((json) => master.Master.fromJSON(json))
-          .toList();
-
-      if (filter != "")
-        prodtypedetails = prodtypedetails
-            .where((element) => element.columnname
-                .toLowerCase()
-                .toString()
-                .contains(filter.toLowerCase().toString()))
-            .toList();
-
-      prodtypedata = prodtypedetails.map((e) => e.columnname).toList();
-      if (prodtypeid == '' || prodtypeid == null || prodtypeid == '0')
-        selectedprodtype = prodtypedata.first;
-
-      prodtypeid = prodtypedetails
-          .where((element) => element.columnname == selectedprodtype)
-          .map((e) => e.columnMasterid)
-          .first
-          .toString();
-    });
-
-    return prodtypedetails;
-  }
-
-  Future<purchaseorderdetl.PurchaseOrderHeader> getAddCustomerJson() async {
-    String customerurl;
-    if (_id != "" && _id != "0" && _id != null) {
-      _reportItems
-          .where((element) => element.headerid == _id)
-          .forEach((element) => setState(() {
-                dateCtl.text = element.podate;
-                shipmentdateCtl.text = element.shipmentdate;
-                selectednotifyparty = element.notifyparty;
-                notifypartyid = element.notifypartyid;
-                _custPONoController.text = element.pono;
-                selectedprodtype = element.producttype;
-                prodtypeid = element.producttype;
-                selectedconsignee = element.consignee;
-                selectedsupplier = element.supplier;
-                supplierid = element.supplierid;
-                selectedcurrency = element.currency;
-                currencyid = element.currencyid;
-                _custnoofcontainerController.text = element.noofcontainers;
-                _custpaymenttermsController.text = element.paymentterms;
-
-                selectedportofdischarge = portofdischargedetails
-                        .where((e1) =>
-                            e1.columnMasterid == element.portofdischargeid)
-                        .map((e) => e.columnname)
-                        .isNotEmpty
-                    ? portofdischargedetails
-                        .where((e1) =>
-                            e1.columnMasterid == element.portofdischargeid)
-                        .map((e) => e.columnname)
-                        .first
-                        .toString()
-                    : "";
-                selectedportofload = portofloaddetails
-                        .where((e1) =>
-                            e1.columnMasterid == element.portofloadingid)
-                        .map((e) => e.columnname)
-                        .isNotEmpty
-                    ? portofloaddetails
-                        .where((e1) =>
-                            e1.columnMasterid == element.portofloadingid)
-                        .map((e) => e.columnname)
-                        .first
-                        .toString()
-                    : "";
-                selectedshipmentmode = shipmentmodedetails
-                        .where(
-                            (e1) => e1.columnMasterid == element.shipmentmodeid)
-                        .map((e) => e.columnname)
-                        .first
-                        .isNotEmpty
-                    ? shipmentmodedetails
-                        .where(
-                            (e1) => e1.columnMasterid == element.shipmentmodeid)
-                        .map((e) => e.columnname)
-                        .first
-                        .toString()
-                    : "";
-                shipmentmodeid = element.shipmentdate;
-                portofloadid = element.portofloadingid;
-                portofdischargeid = element.portofdischargeid;
-                selshipmentdate = element.shipmentdate;
-                _custpackingdetailController.text = element.packinglistid;
-                _custremarksController.text = element.remarks;
-                _custtermsandconditionsController.text =
-                    element.termsandconditions.toString();
-                _custtermsandconditionsController2.text =
-                    element.termsandconditions2.toString();
-                _custtermsandconditionsController3.text =
-                    element.termsandconditions3.toString();
-                _custtermsandconditionsController4.text =
-                    element.termsandconditions4.toString();
-                _custtermsandconditionsController5.text =
-                    element.termsandconditions5.toString();
-                _custtermsandconditionsController6.text =
-                    element.termsandconditions6.toString();
-                _custtermsandconditionsController7.text =
-                    element.termsandconditions7.toString();
-                _custtermsandconditionsController8.text =
-                    element.termsandconditions8.toString();
-              }));
-      getpurchaseitemdetails();
-    }
-  }
-
-  @override
-  void initState() {
-    idFocusNode = FocusNode();
-    setState(() {
-      _load = true;
-    });
-    searchtext = '';
-    getCustomerJson();
-    custidFocusNode = FocusNode();
-    _custIdController.text = '0';
-    getcompanyMaster('');
-    getsupplierdetails('');
-    getcurrencydetails('');
-    getnotifypartydetails('');
-    getportofdischargedetails('');
-    getportofloaddetails('');
-    getconsigneedetails('');
-    getshipmentmodedetails('');
-    getproddetails('');
-    getfabricdetails('');
-    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
-    setState(() {
-      getAddCustomerJson();
-      if ((_id != "") && (_id != null) && (_id != "0"))
-        _custIdController.text = _id.toString();
-    });
-    super.initState();
-  }
-
-  _afterLayout(_) {
-    _getPositions();
-  }
-
-  PageController _controller = PageController(
-    initialPage: 1,
-  );
-  @override
-  void dispose() {
-    _custRemarksController.dispose();
-    _custMobileController.dispose();
-    _custPONoController.dispose();
-    _custDateController.dispose();
-    _custNotifypartyController.dispose();
-    _custAdd3Controller.dispose();
-    _custAdd4Controller.dispose();
-    _custIdController.dispose();
-    _custGstinController.dispose();
-    _custEmailController.dispose();
-    custidFocusNode.dispose();
-
-    _custGstinController.dispose();
-    _custgsmController.dispose();
-    _custnoofboxController.dispose();
-    _custkgsperboxController.dispose();
-    _custweightController.dispose();
-    _custrateController.dispose();
-    _custamountController.dispose();
-    //_custconsigneeAddressController.dispose();
-    _custtermsandconditionsController.dispose();
-    _custtermsandconditionsController2.dispose();
-    _custtermsandconditionsController3.dispose();
-    _custtermsandconditionsController4.dispose();
-    _custtermsandconditionsController5.dispose();
-    _custtermsandconditionsController6.dispose();
-    _custtermsandconditionsController7.dispose();
-    _custtermsandconditionsController8.dispose();
-    _custnoofcontainerController.dispose();
-    _custpackingdetailController.dispose();
-    _custpaymenttermsController.dispose();
-    _custremarksController.dispose();
-
-    _controller.dispose();
-    super.dispose();
-  }
-
-  bool _load = false;
-  NotchedShape shape;
-
-  Widget build(BuildContext context) {
-    MediaQueryData queryData;
-    print(widget.pageNo);
-    queryData = MediaQuery.of(context);
-
-    UnderlineInputBorder underlineInputBorder =
-        new UnderlineInputBorder(borderSide: BorderSide(color: widgetcolor));
-    pr = new ProgressDialog(context,
-        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
-
-    Widget loadingIndicator = _load
-        ? new Container(
-            color: Colors.transparent,
-            width: 70.0,
-            height: 70.0,
-            child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
-          )
-        : new Container();
-
-    Widget appbarwid() {
-      return AppBar(
-        backgroundColor: appbarcolor,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: Image.asset(
-                'images/menu.png',
-                color: widgetcolor,
-              ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-            );
-          },
-        ),
-        automaticallyImplyLeading: false,
-        title: TextField(
-            style: TextStyle(fontSize: 15),
-            //focusNode: false,
-
-            decoration: InputDecoration(
-              hintText: "Search...",
-              suffixIcon: IconButton(
-                  icon: Image.asset('Images/search.png', color: widgetcolor),
-                  onPressed: () {
-                    getCustomerJson();
-                    setState(() {
-                      pageno = 1;
-                    });
-                  }),
+  Widget appbarwid() {
+    return AppBar(
+      backgroundColor: appbarcolor,
+      leading: Builder(
+        builder: (context) {
+          return IconButton(
+            icon: Image.asset(
+              'images/menu.png',
+              color: widgetcolor,
             ),
-            keyboardType: TextInputType.text,
-            onChanged: (value) {
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+          );
+        },
+      ),
+      automaticallyImplyLeading: false,
+      title: TextField(
+          style: TextStyle(fontSize: 15),
+          //focusNode: false,
+
+          decoration: InputDecoration(
+            hintText: "Search...",
+            suffixIcon: IconButton(
+                icon: Image.asset('Images/search.png', color: widgetcolor),
+                onPressed: () {
+                  getCustomerJson();
+                  setState(() {
+                    pageno = 1;
+                  });
+                }),
+          ),
+          keyboardType: TextInputType.text,
+          onChanged: (value) {
+            setState(() {
+              searchtext = value;
+              pageno = 1;
+              getCustomerJson();
+            });
+          }),
+    );
+  }
+
+  Widget bodywid(double maxwidth, double maxheight) {
+    return new SizedBox(
+      width: maxwidth, // * .40,
+      height: maxheight,
+      child: ListView(children: <Widget>[
+        Card(
+            child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  child: Text("Type",
+                      textScaleFactor: 1.7,
+                      textAlign: TextAlign.left,
+                      style: new TextStyle(
+                        color: widgetcolor,
+                      )),
+                ),
+                Expanded(
+                  child: Text("Name",
+                      textScaleFactor: 1.7,
+                      textAlign: TextAlign.left,
+                      style: new TextStyle(
+                        color: widgetcolor,
+                      )),
+                ),
+                Expanded(
+                  child: Text("Action",
+                      textScaleFactor: 1.7,
+                      textAlign: TextAlign.left,
+                      style: new TextStyle(
+                        color: widgetcolor,
+                      )),
+                ),
+              ]),
+        )),
+        //  ),
+        Container(
+          width: maxwidth,
+          height: maxheight,
+          child: PageView(
+            controller: _controller,
+            scrollDirection: Axis.horizontal,
+            children: tableView(maxwidth, maxheight),
+            onPageChanged: (index) {
               setState(() {
-                searchtext = value;
-                pageno = 1;
+                pageno = (index == 0 ? 1 : index);
                 getCustomerJson();
               });
-            }),
-      );
-    }
-
-    Widget bodywid(double maxwidth, double maxheight) {
-      return new SizedBox(
-        width: maxwidth, // * .40,
-        height: maxheight,
-        child: ListView(children: <Widget>[
-          Card(
-              child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Expanded(
-                    child: Text("Type",
-                        textScaleFactor: 1.7,
-                        textAlign: TextAlign.left,
-                        style: new TextStyle(
-                          color: widgetcolor,
-                        )),
-                  ),
-                  Expanded(
-                    child: Text("Name",
-                        textScaleFactor: 1.7,
-                        textAlign: TextAlign.left,
-                        style: new TextStyle(
-                          color: widgetcolor,
-                        )),
-                  ),
-                  Expanded(
-                    child: Text("Action",
-                        textScaleFactor: 1.7,
-                        textAlign: TextAlign.left,
-                        style: new TextStyle(
-                          color: widgetcolor,
-                        )),
-                  ),
-                ]),
-          )),
-          //  ),
-          Container(
-            width: maxwidth,
-            height: maxheight,
-            child: PageView(
-              controller: _controller,
-              scrollDirection: Axis.horizontal,
-              children: tableView(maxwidth, maxheight),
-              onPageChanged: (index) {
-                setState(() {
-                  pageno = (index == 0 ? 1 : index);
-                  getCustomerJson();
-                });
-              },
-            ),
+            },
           ),
-        ]),
-      );
-    }
+        ),
+      ]),
+    );
+  }
 
-    @override
-    Widget bottomapp(double width, double height) {
-      return BottomAppBar(
-              color: appbarcolor,
-              shape: CircularNotchedRectangle(),
-              notchMargin: 6,
-              child: Row(children: <Widget>[
+  @override
+  Widget bottomapp(double width, double height) {
+    return BottomAppBar(
+            color: appbarcolor,
+            shape: CircularNotchedRectangle(),
+            notchMargin: 6,
+            child: Row(children: <Widget>[
+              SizedBox(
+                  width: width / 10,
+                  child: IconButton(
+                    icon: Image.asset('Images/search.png', color: widgetcolor),
+                    onPressed: () => showModalBottomSheet(
+                        context: context,
+                        builder: (context) => Container(
+                              height: height * .20,
+                              child: TextField(
+                                  focusNode: idFocusNode,
+                                  style: TextStyle(fontSize: 15),
+                                  decoration:
+                                      InputDecoration(hintText: "GO TO"),
+                                  keyboardType: TextInputType.text,
+                                  onChanged: (value) {
+                                    if (int.parse(value) <=
+                                        int.parse(totalPages)) {
+                                      setState(() {
+                                        pageno = int.parse(value);
+                                        getCustomerJson();
+                                        _controller.animateToPage(
+                                          pageno,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.linear,
+                                        );
+                                      });
+                                    }
+                                  }),
+                            )),
+                  )),
+              Text('Rows/Page',
+                  style: TextStyle(
+                    fontSize: 11,
+                  )),
+              SizedBox(width: width / 40),
+              if (selectedtype != null)
                 SizedBox(
-                    width: width / 10,
-                    child: IconButton(
-                      icon:
-                          Image.asset('Images/search.png', color: widgetcolor),
-                      onPressed: () => showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) => Container(
-                                height: height * .20,
-                                child: TextField(
-                                    focusNode: idFocusNode,
-                                    style: TextStyle(fontSize: 15),
-                                    decoration:
-                                        InputDecoration(hintText: "GO TO"),
-                                    keyboardType: TextInputType.text,
-                                    onChanged: (value) {
-                                      if (int.parse(value) <=
-                                          int.parse(totalPages)) {
-                                        setState(() {
-                                          pageno = int.parse(value);
-                                          getCustomerJson();
-                                          _controller.animateToPage(
-                                            pageno,
-                                            duration:
-                                                Duration(milliseconds: 300),
-                                            curve: Curves.linear,
-                                          );
-                                        });
-                                      }
-                                    }),
-                              )),
-                    )),
-                Text('Rows/Page',
-                    style: TextStyle(
-                      fontSize: 11,
-                    )),
-                SizedBox(width: width / 40),
-                if (selectedtype != null)
-                  SizedBox(
-                    child: DropdownButton<String>(
-                        value: selectedtype,
-                        icon: Image.asset('Images/arrow_drop_down.png',
-                            color: Colors.white),
-                        hint: SizedBox(child: Text('Rows Per Page')),
-                        items: ['5', '7', '10', '20', '30', '40', '50']
-                            .map((String value) {
-                          return new DropdownMenuItem<String>(
-                            value: value,
-                            child: SizedBox(
-                              //  width: width * .60,
-                              child: new Text(
-                                value,
-                                textAlign: TextAlign.right,
-                              ),
+                  child: DropdownButton<String>(
+                      value: selectedtype,
+                      icon: Image.asset('Images/arrow_drop_down.png',
+                          color: Colors.white),
+                      hint: SizedBox(child: Text('Rows Per Page')),
+                      items: ['5', '7', '10', '20', '30', '40', '50']
+                          .map((String value) {
+                        return new DropdownMenuItem<String>(
+                          value: value,
+                          child: SizedBox(
+                            //  width: width * .60,
+                            child: new Text(
+                              value,
+                              textAlign: TextAlign.right,
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedtype = (value);
-                            //    getPagingDetails();
-                            getCustomerJson();
-                          });
-                        }),
-                  ),
-                SizedBox(width: width / 40),
-                new IconButton(
-                  icon:
-                      Image.asset('Images/Arrow-Left.png', color: widgetcolor),
-                  iconSize: 20,
-                  color: Colors.blue,
-                  splashColor: Colors.green,
-                  onPressed: () {
-                    setState(() {
-                      if ((pageno != 1) && (pageno != 0)) pageno = pageno - 1;
-                      getCustomerJson();
-                      _controller.animateToPage(
-                        pageno,
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.linear,
-                      );
-                    });
-                  },
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedtype = (value);
+                          //    getPagingDetails();
+                          getCustomerJson();
+                        });
+                      }),
                 ),
-                //    Spacer(),
-                Text(((pageno == 0) ? 1 : pageno).toString() +
-                    '  of  ' +
-                    (totalPages != 'null' ? totalPages : '1').toString()),
-                // Spacer(),
-                new IconButton(
-                  icon:
-                      Image.asset('Images/Arrow-Right.png', color: widgetcolor),
-                  iconSize: 20,
-                  color: Colors.blue,
-                  splashColor: Colors.green,
-                  onPressed: () {
-                    setState(() {
-                      if ((pageno < int.parse(totalPages))) pageno = pageno + 1;
-                      getCustomerJson();
-                      _controller.animateToPage(
-                        pageno,
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.linear,
-                      );
-                    });
-                  },
-                ),
-                //  Spacer(),
-              ]))
-          //   ]),
-          ;
-    }
+              SizedBox(width: width / 40),
+              new IconButton(
+                icon: Image.asset('Images/Arrow-Left.png', color: widgetcolor),
+                iconSize: 20,
+                color: Colors.blue,
+                splashColor: Colors.green,
+                onPressed: () {
+                  setState(() {
+                    if ((pageno != 1) && (pageno != 0)) pageno = pageno - 1;
+                    getCustomerJson();
+                    _controller.animateToPage(
+                      pageno,
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.linear,
+                    );
+                  });
+                },
+              ),
+              //    Spacer(),
+              Text(((pageno == 0) ? 1 : pageno).toString() +
+                  '  of  ' +
+                  (totalPages != 'null' ? totalPages : '1').toString()),
+              // Spacer(),
+              new IconButton(
+                icon: Image.asset('Images/Arrow-Right.png', color: widgetcolor),
+                iconSize: 20,
+                color: Colors.blue,
+                splashColor: Colors.green,
+                onPressed: () {
+                  setState(() {
+                    if ((pageno < int.parse(totalPages))) pageno = pageno + 1;
+                    getCustomerJson();
+                    _controller.animateToPage(
+                      pageno,
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.linear,
+                    );
+                  });
+                },
+              ),
+              //  Spacer(),
+            ]))
+        //   ]),
+        ;
+  }
 
-    Widget Addbutton() {
-      return FloatingActionButton(
-        backgroundColor: widgetcolor,
-        onPressed: () {},
-        tooltip: 'Add new customer entry',
-        child: IconButton(
-            icon: Image.asset('images/add.png', color: Colors.black),
-            onPressed: () {
-              setState(() {
-                ShowAddWidget = true;
-                _id = '0';
-                custpageno = pageno;
-                custselectedtype = selectedtype;
-                getAddCustomerJson();
-                enable = false;
-                getcompanyMaster('');
-                clearData(context);
-                //setState(() {
-                //   getCustomerJson();
-                if ((_id != "") && (_id != null) && (_id != "0"))
-                  _custIdController.text = _id.toString();
-              });
-            }),
-      );
-    }
+  Widget Addbutton() {
+    return FloatingActionButton(
+      backgroundColor: widgetcolor,
+      onPressed: () {},
+      tooltip: 'Add new customer entry',
+      child: IconButton(
+          icon: Image.asset('images/add.png', color: Colors.black),
+          onPressed: () {
+            setState(() {
+              ShowAddWidget = true;
+              _id = '0';
+              custpageno = pageno;
+              custselectedtype = selectedtype;
+              getAddCustomerJson();
+              enable = false;
+              getcompanyMaster('');
+              clearData(context);
 
+              //setState(() {
+              //   getCustomerJson();
+              if ((_id != "") && (_id != null) && (_id != "0")) {
+                _custIdController.text = _id.toString();
+              } else {
+                DateTime today = DateTime.now();
+                dateCtl.text =
+                    "${today.day.toString().padLeft(2, '0')}/${today.month.toString().padLeft(2, '0')}/${today.year.toString()}";
+                seldate =
+                    "${today.year.toString()}/${today.month.toString().padLeft(2, '0')}/${today.day.toString().padLeft(2, '0')}";
+
+                shipmentdateCtl.text =
+                    "${today.day.toString().padLeft(2, '0')}/${today.month.toString().padLeft(2, '0')}/${today.year.toString()}";
+                selshipmentdate =
+                    "${today.year.toString()}/${today.month.toString().padLeft(2, '0')}/${today.day.toString().padLeft(2, '0')}";
+              }
+            });
+          }),
+    );
+  }
+
+  Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Sun Party',
         theme: new ThemeData(
@@ -4734,7 +5463,7 @@ class HomePageState extends State<HomePage> {
           var minheight = constraints.minHeight;
 
           return ScreenTypeLayout.builder(
-            mobile: (BuildContext context) => ShowAddWidget == false
+            mobile: (context) => ShowAddWidget == false
                 ? Scaffold(
                     floatingActionButtonLocation:
                         FloatingActionButtonLocation.miniEndDocked,
@@ -4744,8 +5473,8 @@ class HomePageState extends State<HomePage> {
                     bottomNavigationBar: bottomapp(maxwidth, maxheight),
                     body: bodywid(maxwidth, maxheight),
                   )
-                : addcustomerwid(maxwidth, maxheight, context),
-            desktop: (BuildContext context) => ShowAddWidget == false
+                : addcustomerwid(maxwidth, maxheight),
+            desktop: (context) => ShowAddWidget == false
                 ? Container(
                     width: maxwidth, //- 210,
                     // padding: EdgeInsets.only(left: 210),
@@ -4777,12 +5506,12 @@ class HomePageState extends State<HomePage> {
                           var maxheight = constraints.maxHeight;
                           var minheight = constraints.minHeight;
 
-                          return addcustomerwid(maxwidth, maxheight, context);
+                          return addcustomerwid(maxwidth, maxheight);
                         }),
                       )
                     ]))
-                : addcustomerwid(maxwidth, maxheight, context),
-            watch: (BuildContext context) => Container(color: Colors.purple),
+                : addcustomerwid(maxwidth, maxheight),
+            watch: (context) => Container(color: Colors.purple),
           );
         })); //);
   }
@@ -4865,7 +5594,7 @@ class HomePageState extends State<HomePage> {
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
                 itemCount: _reportItems.length,
-                itemBuilder: (BuildContext ctxt, int index) {
+                itemBuilder: (context, int index) {
                   return Container(
                     width: maxwidth,
                     height: 50,
