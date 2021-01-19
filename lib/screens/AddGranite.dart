@@ -1,32 +1,19 @@
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/gestures.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:touchwoodapp/models/Granite.dart';
 import 'package:touchwoodapp/models/Paging.dart';
-import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
 import 'dart:convert';
-import 'package:touchwoodapp/models/Paging.dart';
 import 'dart:core';
-import 'dart:io';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:touchwoodapp/repository/cutomer_repository.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:touchwoodapp/repository/assigncolor.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/material.dart';
-import 'package:progress_dialog/progress_dialog.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:touchwoodapp/widgets/custom_drawer.dart' as drawer;
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:http/http.dart' as http;
 import 'package:touchwoodapp/models/customer.dart' as customer;
 import 'package:touchwoodapp/screens/Supplierdashboard.dart';
-import 'package:dio/dio.dart';
-import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:touchwoodapp/models/Master.dart' as Master;
 
@@ -39,9 +26,8 @@ void main() => runApp(new MaterialApp(
     ));
 PageController controller = PageController();
 List<Granite> _reportItems = <Granite>[];
-Paging _pagingdetails = new Paging();
+//Paging _pagingdetails = new Paging();
 List<Granite> data = <Granite>[];
-TextEditingController _GotoTextController;
 
 List<Paging> paging = new List<Paging>();
 String selectedtype = "10";
@@ -90,20 +76,21 @@ final _graniteproductcoceController = TextEditingController();
 final _graniteproductnameController = TextEditingController();
 
 ProgressDialog pr;
-FocusNode GsmFocusNode;
+FocusNode gsmFocusNode;
 double maxwidth;
 double maxheight;
 
 bool enable = false;
 
 class HomePage extends StatefulWidget {
-  String selectedType;
-  int pageNo;
+  final String selectedType;
+  final int pageNo;
   HomePage(this.selectedType, this.pageNo);
 
   String get custid {
     selectedtype = selectedType;
     pageno = pageNo;
+    return '';
   }
 
   @override
@@ -190,7 +177,7 @@ class HomePageState extends State<HomePage> {
                                               style: textStyle,
                                               controller:
                                                   _graniteproductcoceController,
-                                              focusNode: GsmFocusNode,
+                                              focusNode: gsmFocusNode,
 
                                               readOnly: enable,
                                               //enableInteractiveSelection: enable,
@@ -219,7 +206,7 @@ class HomePageState extends State<HomePage> {
                                               style: textStyle,
                                               controller:
                                                   _graniteproductnameController,
-                                              focusNode: GsmFocusNode,
+                                              focusNode: gsmFocusNode,
 
                                               readOnly: enable,
                                               //enableInteractiveSelection: enable,
@@ -540,7 +527,6 @@ class HomePageState extends State<HomePage> {
   }
 
   void saveItems() async {
-    String custGstin = _graniteproductcoceController.text;
     if (_id != '') {
       //   pr.show();
 
@@ -833,7 +819,7 @@ class HomePageState extends State<HomePage> {
     return measurementdetails;
   }
 
-  Future<customer.Customer> getAddCustomerJson() async {
+  void getAddCustomerJson() async {
     String customerurl;
 
     if (searchtext == '' || searchtext == null) {
@@ -886,13 +872,11 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     idFocusNode = FocusNode();
-    setState(() {
-      _load = true;
-    });
+
     //getPagingDetails();
     searchtext = '';
     getCustomerJson();
-    GsmFocusNode = FocusNode();
+    gsmFocusNode = FocusNode();
     //_custIdController.text = '0';
     getgroupmaster("");
     getuomdetails("");
@@ -916,35 +900,15 @@ class HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _graniteproductcoceController.dispose();
-    GsmFocusNode.dispose();
+    gsmFocusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
 
-  bool _load = false;
+  //bool _load = false;
   NotchedShape shape;
 
   Widget build(BuildContext context) {
-    MediaQueryData queryData;
-    print(widget.pageNo);
-    queryData = MediaQuery.of(context);
-
-    UnderlineInputBorder underlineInputBorder =
-        new UnderlineInputBorder(borderSide: BorderSide(color: widgetcolor));
-    pr = new ProgressDialog(context,
-        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
-
-    Widget loadingIndicator = _load
-        ? new Container(
-            color: Colors.transparent,
-            width: 70.0,
-            height: 70.0,
-            child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
-          )
-        : new Container();
-
     Widget appbarwid() {
       return AppBar(
         backgroundColor: appbarcolor,
@@ -1327,9 +1291,9 @@ class HomePageState extends State<HomePage> {
         ),
         home: LayoutBuilder(builder: (context, BoxConstraints constraints) {
           var maxwidth = constraints.maxWidth;
-          var minwidth = constraints.minWidth;
+          //  var minwidth = constraints.minWidth;
           var maxheight = constraints.maxHeight;
-          var minheight = constraints.minHeight;
+          //  var minheight = constraints.minHeight;
 
           return ScreenTypeLayout.builder(
             mobile: (BuildContext context) => Scaffold(
@@ -1360,7 +1324,7 @@ class HomePageState extends State<HomePage> {
                       });
                     }),
               ),
-              drawer: drawer.CustomDrawer(),
+              //drawer: drawer.CustomDrawer(),
               appBar: appbarwid(),
               bottomNavigationBar: bottomapp(maxwidth, maxheight),
               body: bodywid(maxwidth, maxheight),
@@ -1403,7 +1367,7 @@ class HomePageState extends State<HomePage> {
                                 });
                               }),
                         ),
-                        drawer: drawer.CustomDrawer(),
+                        //  drawer: drawer.CustomDrawer(),
                         appBar: appbarwid(),
                         bottomNavigationBar: bottomapp(maxwidth, maxheight),
                         body: bodywid(maxwidth, maxheight),
@@ -1526,12 +1490,11 @@ class HomePageState extends State<HomePage> {
         })); //);
   }
 
-  List<Granite> _customers;
   Future<String> getCustomerJson() async {
     if (this.mounted) {
       setState(() {
         _reportItems = [];
-        _pagingdetails = null;
+        //      _pagingdetails = null;
         totalPages = null;
       });
       //selectedtype = totalCount != null ? totalCount : selectedtype;

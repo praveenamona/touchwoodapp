@@ -1,5 +1,3 @@
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/gestures.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,29 +9,15 @@ import 'package:touchwoodapp/widgets/collapsing_navigation_drawer_widget.dart'
     as drawer;
 import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:touchwoodapp/repository/cutomer_repository.dart';
-
 import 'dart:convert';
-import 'package:touchwoodapp/models/Paging.dart';
 import 'dart:core';
-import 'dart:convert';
-import 'dart:io';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:touchwoodapp/repository/cutomer_repository.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:touchwoodapp/repository/assigncolor.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/material.dart';
-import 'package:progress_dialog/progress_dialog.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:touchwoodapp/models/customer.dart' as customer;
-import 'package:touchwoodapp/screens/Supplierdashboard.dart';
-import 'package:dio/dio.dart';
-import 'package:touchwoodapp/models/partytype.dart' as type;
 import 'package:dropdown_search/dropdown_search.dart';
 
 void main() => runApp(new MaterialApp(
@@ -46,10 +30,8 @@ void main() => runApp(new MaterialApp(
 PageController controller = PageController();
 List<type.Customer> partytypedetails = <type.Customer>[];
 List<Customer> _reportItems = <Customer>[];
-Paging _pagingdetails = new Paging();
 List<Customer> data = <Customer>[];
-TextEditingController _GotoTextController;
-bool ShowAddWidget = false;
+bool showAddWidget = false;
 List<Paging> paging = new List<Paging>();
 String selectedtype = "10";
 List<String> partytypedata = [];
@@ -88,9 +70,8 @@ final _custAdd2Controller = TextEditingController();
 final _custAdd3Controller = TextEditingController();
 final _custcontactpersonController = TextEditingController();
 final _custcontactnumberController = TextEditingController();
-final _custswiftcodeontroller = TextEditingController();
 final _custtaxcodeController = TextEditingController();
-final _custremarksController = TextEditingController();
+
 ProgressDialog pr;
 FocusNode custidFocusNode;
 double maxwidth;
@@ -99,13 +80,14 @@ double maxheight;
 bool enable = false;
 
 class HomePage extends StatefulWidget {
-  String selectedType;
-  int pageNo;
+  final String selectedType;
+  final int pageNo;
   HomePage(this.selectedType, this.pageNo);
 
   String get custid {
     selectedtype = selectedType;
     pageno = pageNo;
+    return '';
   }
 
   @override
@@ -644,7 +626,7 @@ class HomePageState extends State<HomePage> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      ShowAddWidget = false;
+                                      showAddWidget = false;
                                     });
                                     //clearData(context);
                                     Navigator.of(context, rootNavigator: true)
@@ -693,7 +675,7 @@ class HomePageState extends State<HomePage> {
                 child: RaisedButton(
                     onPressed: () {
                       setState(() {
-                        ShowAddWidget = false;
+                        showAddWidget = false;
                       });
                       clearData(context);
                       // saveItems();
@@ -762,7 +744,7 @@ class HomePageState extends State<HomePage> {
           if (message.contains("""[{"RESULT":1}]""") ||
               message.contains("""[{"RESULT":2}]""")) {
             setState(() {
-              ShowAddWidget = false;
+              showAddWidget = false;
             });
             Alert(
                 context: context,
@@ -799,7 +781,7 @@ class HomePageState extends State<HomePage> {
                 ]).show();
           } else {
             setState(() {
-              ShowAddWidget = false;
+              showAddWidget = false;
             });
             Alert(
                     context: context,
@@ -817,7 +799,7 @@ class HomePageState extends State<HomePage> {
       // clearData(context);
     } else {
       setState(() {
-        ShowAddWidget = false;
+        showAddWidget = false;
       });
       Alert(
               context: context,
@@ -895,7 +877,7 @@ class HomePageState extends State<HomePage> {
     return partytypedetails;
   }
 
-  Future<customer.Customer> getAddCustomerJson() async {
+  void getAddCustomerJson() async {
     String customerurl;
 
     if (searchtext == '' || searchtext == null) {
@@ -944,10 +926,6 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     idFocusNode = FocusNode();
-    setState(() {
-      _load = true;
-    });
-    //getPagingDetails();
     searchtext = '';
     getCustomerJson();
     getpartytypeMaster('');
@@ -984,31 +962,10 @@ class HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  bool _load = false;
   NotchedShape shape;
 
   Widget build(BuildContext context) {
-    MediaQueryData queryData;
-    print(widget.pageNo);
-    queryData = MediaQuery.of(context);
-
-    UnderlineInputBorder underlineInputBorder =
-        new UnderlineInputBorder(borderSide: BorderSide(color: widgetcolor));
-    pr = new ProgressDialog(context,
-        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
-
-    Widget loadingIndicator = _load
-        ? new Container(
-            color: Colors.transparent,
-            width: 70.0,
-            height: 70.0,
-            child: new Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: new Center(child: new CircularProgressIndicator())),
-          )
-        : new Container();
-
-    Widget Addbutton() {
+    Widget addbutton() {
       return FloatingActionButton(
         backgroundColor: widgetcolor,
         onPressed: () {},
@@ -1019,7 +976,7 @@ class HomePageState extends State<HomePage> {
               setState(() {
                 enable = false;
                 _id = '0';
-                ShowAddWidget = true;
+                showAddWidget = true;
                 custpageno = pageno;
                 custselectedtype = selectedtype;
                 getAddCustomerJson();
@@ -1402,16 +1359,16 @@ class HomePageState extends State<HomePage> {
         ),
         home: LayoutBuilder(builder: (context, BoxConstraints constraints) {
           var maxwidth = constraints.maxWidth;
-          var minwidth = constraints.minWidth;
+          //   var minwidth = constraints.minWidth;
           var maxheight = constraints.maxHeight;
-          var minheight = constraints.minHeight;
+          // var minheight = constraints.minHeight;
 
           return ScreenTypeLayout.builder(
-            mobile: (BuildContext context) => ShowAddWidget == false
+            mobile: (BuildContext context) => showAddWidget == false
                 ? Scaffold(
                     floatingActionButtonLocation:
                         FloatingActionButtonLocation.miniEndDocked,
-                    floatingActionButton: Addbutton(),
+                    floatingActionButton: addbutton(),
                     drawer: drawer.CollapsingNavigationDrawer(),
                     appBar: appbarwid(),
                     bottomNavigationBar: bottomapp(maxwidth, maxheight),
@@ -1428,7 +1385,7 @@ class HomePageState extends State<HomePage> {
                       child: Scaffold(
                         floatingActionButtonLocation:
                             FloatingActionButtonLocation.miniEndDocked,
-                        floatingActionButton: Addbutton(),
+                        floatingActionButton: addbutton(),
                         drawer: drawer.CollapsingNavigationDrawer(),
                         appBar: appbarwid(),
                         bottomNavigationBar: bottomapp(maxwidth, maxheight),
@@ -1552,12 +1509,10 @@ class HomePageState extends State<HomePage> {
         })); //);
   }
 
-  List<Customer> _customers;
   Future<String> getCustomerJson() async {
     if (this.mounted) {
       setState(() {
         _reportItems = [];
-        _pagingdetails = null;
         totalPages = null;
       });
       //selectedtype = totalCount != null ? totalCount : selectedtype;
@@ -1692,7 +1647,7 @@ class HomePageState extends State<HomePage> {
                                   color: widgetcolor),
                               onPressed: () {
                                 setState(() {
-                                  ShowAddWidget = true;
+                                  showAddWidget = true;
                                   String id = _reportItems[index].custId;
                                   _id = id;
                                   custselectedtype = selectedtype;

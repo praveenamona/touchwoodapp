@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:touchwoodapp/screens/main.dart';
+import 'package:touchwoodapp/main.dart';
 import 'dart:convert';
 import '../models/customer.dart';
 
@@ -107,4 +107,85 @@ Future<Stream<String>> insertCustomer(
   final streamedRest = await client.send(http.Request('get', Uri.parse(url)));
 
   return streamedRest.stream.asBroadcastStream().transform(utf8.decoder);
+}
+
+Future<Stream<Customer>> getpartydetails(
+    String filter, String partytypeid) async {
+  //List<Customer> notifypartydetails = <Customer>[];
+
+  final String url =
+      'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&intPartytypeID=' +
+          partytypeid +
+          '&pagesize=10';
+
+  final client = new http.Client();
+  final streamedRest = await client.send(http.Request('get', Uri.parse(url)));
+
+  return streamedRest.stream
+      .transform(utf8.decoder)
+      .transform(json.decoder)
+      .expand((data) => (data as List))
+      .map((data) => Customer.fromJSON(data));
+  // final String customerurl =
+  //     'http://tap.suninfotechnologies.in/api/touch?&Mode=partymaster&spname=GetAndSubmitPartymaster&intflag=4&intOrgID=1&intUserID=1&intPartytypeID=' +
+  //         partytypeid +
+  //         '&pagesize=10';
+
+  // var response = await http.get(Uri.encodeFull(customerurl),
+  //     headers: {"Accept": "application/json"});
+  // //List<ItemMaster> customer1 = new List<ItemMaster>();
+
+  // var convertDataToJson = json.decode(response.body);
+  // final parsed = convertDataToJson.cast<Map<String, dynamic>>();
+
+  // notifypartydetails =
+  //     parsed.map<Customer>((json) => Customer.fromJSON(json)).toList();
+
+  // if (filter != "")
+  //   notifypartydetails = notifypartydetails
+  //       .where((element) => element.customerName
+  //           .toLowerCase()
+  //           .toString()
+  //           .contains(filter.toLowerCase().toString()))
+  //       .toList();
+
+  // // notifypartydata = notifypartydetails.map((e) => e.customerName).toList();
+  // // if (notifypartyid == '' || notifypartyid == null || notifypartyid == '0')
+  // //   selectednotifyparty = notifypartydata.first;
+
+  // // notifypartyid = notifypartydetails
+  // //         .where((element) => element.customerName == selectednotifyparty)
+  // //         .map((e) => e.custId)
+  // //         .isEmpty
+  // //     ? "0"
+  // //     : notifypartydetails
+  // //         .where((element) => element.customerName == selectednotifyparty)
+  // //         .map((e) => e.custId)
+  // //         .first
+  // //         .toString();
+
+  // return notifypartydetails;
+}
+
+Future<List<String>> getpartydata(
+    String filter, List<Customer> customerslist, String partytypeid) async {
+  List<String> notifypartydata = [];
+
+  if (filter != "")
+    notifypartydata = customerslist.map((e) => e.customerName).toList();
+  // if (notifypartyid == '' || notifypartyid == null || notifypartyid == '0')
+  //   selectednotifyparty = notifypartydata.first;
+
+  // notifypartyid = notifypartydetails
+  //         .where((element) => element.customerName == selectednotifyparty)
+  //         .map((e) => e.custId)
+  //         .isEmpty
+  //     ? "0"
+  //     : notifypartydetails
+  //         .where((element) => element.customerName == selectednotifyparty)
+  //         .map((e) => e.custId)
+  //         .first
+  //         .toString();
+
+  return notifypartydata;
 }

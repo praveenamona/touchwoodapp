@@ -1,21 +1,11 @@
-//import '../custom_navigation_drawer.dart';
-import 'package:flutter/material.dart';
-import 'package:touchwoodapp/models/navigation_model.dart';
-//import 'package:touchwoodapp/widgets/collapsing_list_tile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:touchwoodapp/screens/Supplierdashboard.dart' as supplier;
 import 'package:touchwoodapp/screens/AddPurchaseOrder.dart' as PurchaseOrder;
 import 'package:touchwoodapp/screens/CustomerDashboard.dart' as customer;
-//import 'package:touchwoodapp/screens/relative.dart' as relative;
 import 'package:touchwoodapp/Widgets/custom_expansion_tile.dart' as custom;
-import 'package:touchwoodapp/Widgets/sidebar.dart' as sidebar;
 import 'package:touchwoodapp/screens/AddUom.dart' as Uom;
-import 'package:touchwoodapp/screens/AddYarn.dart' as Yarn;
 import 'package:touchwoodapp/screens/AddMaster.dart' as Master;
-import 'package:touchwoodapp/screens/AddFabric.dart' as Fabric;
-import 'package:touchwoodapp/screens/AddGranite.dart' as Granite;
 import 'package:touchwoodapp/repository/assigncolor.dart';
-import 'package:touchwoodapp/screens/searchable.dart' as searchable;
 
 class CollapsingNavigationDrawer extends StatefulWidget {
   @override
@@ -350,30 +340,6 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
                                           )),
                                       iconColor: appbarcolor,
                                       children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.only(bottom: 5),
-                                          child: ListTile(
-                                            onTap: () {
-                                              Master.HomePage ad =
-                                                  new Master.HomePage(
-                                                selectedType: "10",
-                                                pageNo: 1,
-                                                headername: "Product Type",
-                                                tablename: "producttypemaster",
-                                              );
-                                              ad.custid;
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          searchable.MyApp()));
-                                            },
-                                            // leading: Image.asset(
-                                            //   'images/people.png',
-                                            // ),
-                                            title: Text("searchable"),
-                                          ),
-                                        ),
                                         Divider(
                                           height: 1,
                                           color: widgetcolor,
