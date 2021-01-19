@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:touchwoodapp/screens/main.dart';
+import 'package:touchwoodapp/main.dart';
 import 'dart:convert';
 import 'package:touchwoodapp/models/Master.dart';
 
